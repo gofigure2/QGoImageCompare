@@ -1,0 +1,41 @@
+<RCC>
+    <qresource prefix="/">
+        <file>fig/splash.png</file>
+        <file>fig/splash2.png</file>
+        <file>fig/manual-editing.png</file>
+        <file>fig/cube.png</file>
+        <file>fig/2D_VIEWS_INFOS.png</file>
+        <file>fig/LeftView.png</file>
+        <file>fig/C_M_L.png</file>
+        <file>fig/PosteriorView.png</file>
+        <file>fig/DorsalView.png</file>
+        <file>fig/Myapp2.png</file>
+        <file>fig/camera-photo.png</file>
+        <file>fig/mouse-cursor.png</file>
+        <file>fig/xy.png</file>
+        <file>fig/video.png</file>
+        <file>fig/scalarbar.png</file>
+        <file>fig/4views.png</file>
+        <file>fig/UseDatabase.png</file>
+        <file>fig/document-open.png</file>
+        <file>fig/Hand.png</file>
+        <file>fig/LookupTable.png</file>
+        <file>fig/system-quit.png</file>
+        <file>fig/VolumeRendering1.png</file>
+        <file>fig/xyz.png</file>
+        <file>fig/zx.png</file>
+        <file>fig/yz.png</file>
+        <file>fig/scalarbar.png</file>
+        <file>fig/TableWidget.png</file>
+        <file>fig/zoom.png</file>
+        <file>fig/seedIcon.png</file>
+        <file>fig/navigation.png</file>
+		    <file>fig/ContourPicking.png</file>
+		    <file>fig/MeshPicking.png</file>
+		    <file>fig/Distance.png</file>
+        <file>fig/Angle.png</file>
+        <file>fig/Box3DPicking.png</file>
+        <file>fig/EyeIcon.png</file>
+        <file>fig/BlankIcon.png</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,6 @@
+NDims = 3
+DimSize = 30 30 30
+ElementType = MET_FLOAT
+ElementSpacing = 1.0000 1.0000 1.0000
+ElementByteOrderMSB = False
+ElementDataFile = Circle3D.raw

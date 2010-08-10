@@ -1,0 +1,25 @@
+/**
+ *
+ * \mainpage  GoFigure2
+ *
+ * \section intro Introduction
+ *
+ * GoFigure2 is an open-source, cross-platform application for visualizing,
+ * processing and analyzing of multidimensional microscopy data.
+ *
+ * Users can visualize, segment and track cells through time, detect 
+ * cell-division and ultimately generate lineages.
+ *
+ * \section homepage Home Page
+ *
+ * The Home Page of GoFigure2 can be found at :
+ *
+ * http://gofigure2.sourceforge.net
+ *
+ * \section howto How to use this documentation
+ *
+ * This documentation describes the API of the Toolkit. The Modules
+ * link presents a hierarchy of classes organized according to their
+ * functionality.
+ */
+
