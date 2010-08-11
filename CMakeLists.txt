@@ -13,7 +13,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 # GOFIGURE2_WC_REVISION and the date of the release
 SET( GOFIGURE2_MAJOR_VERSION "0" )
 SET( GOFIGURE2_MINOR_VERSION "6" )
-#SET( GOFIGURE2_WC_REVISION "0" )
+SET( GOFIGURE2_WC_REVISION "0" )
 
 SET( GOFIGURE2_VERSION
   "${GOFIGURE2_MAJOR_VERSION}.${GOFIGURE2_MINOR_VERSION}.${GOFIGURE2_WC_REVISION}" )
@@ -128,18 +128,6 @@ IF( VTK_FOUND )
 
   INCLUDE( ${VTK_USE_FILE} )
 
-  IF( ${VTK_USE_MYSQL} MATCHES "ON" )
-    FIND_PACKAGE( MySQL REQUIRED )
-    SET( MYSQL_LIBRARIES ${MYSQL_LIBRARIES} CACHE FILEPATH "" )
-#    SET( MYSQL_EXTRA_LIBRARIES ${MYSQL_EXTRA_LIBRARIES} CACHE FILEPATH "" )
-  ELSE( ${VTK_USE_MYSQL} MATCHES "ON" )
-    MESSAGE( SEND_ERROR "VTK must be compiled with MySQL support" )
-    # TODO (arnaudgelas)
-    # Here add a definition to be able to compile and use GoFigure
-    # without any database support
-    # ADD_DEFINITION( -DNODBSUPPORT )
-  ENDIF( ${VTK_USE_MYSQL} MATCHES "ON" )
-
   #----------------------------------------------------------
   # Determine if GoFigure has to be built in shared or static
   # based on the configuration of VTK
@@ -170,19 +158,10 @@ IF( VTK_FOUND )
         ( ( ${ITK_VERSION_MAJOR} EQUAL 3 ) AND
           ( ${ITK_VERSION_MINOR} LESS 18 ) ) ) 
 
-  ENDIF( ${ITK_VERSION_MAJOR} EQUAL 3 ) 
-
   ENDIF( ITK_FOUND )
   #----------------------------------------------------------
 
   #----------------------------------------------------------
-  # Then find Boost. Note that we only need headers
-  #### BOOST ####
-  FIND_PACKAGE( Boost REQUIRED )
-  IF( Boost_FOUND )
-    INCLUDE_DIRECTORIES( BEFORE ${Boost_INCLUDE_DIRS} )
-  ENDIF( Boost_FOUND )
-
   # Try to find Qt.
   # Note that some command line tools will get compiled even without Qt
   #### Qt ####
