@@ -41,6 +41,15 @@
 
 class vtkViewImage3D;
 
+/*
+ * \defgroup visualization ‘‘Visualization’’
+ */
+
+/*
+ * \class vtkViewImage3DCommand
+ * \ingroup visualization
+ * \brief Manage events occuring in 3D view
+ */
 class VTK_RENDERINGADDON2_EXPORT vtkViewImage3DCommand :
   public vtkCommand
   {
@@ -75,6 +84,11 @@ public:
   // was invoked (e.g., progress value in the vtkCommand::ProgressEvent).
   virtual void Execute(vtkObject *caller, unsigned long, void *);
 
+  /**
+   * \ingroup visualization
+   * \brief Set the 3d image related to this 3d event manager
+   * \param[in] vtkViewImage3D Target 3D image
+   */
   void SetVtkImageView3D(vtkViewImage3D* vtkViewImage3D);
 
 protected:

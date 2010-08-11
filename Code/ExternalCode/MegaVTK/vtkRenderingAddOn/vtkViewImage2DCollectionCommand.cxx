@@ -246,8 +246,4 @@ void vtkViewImage2DCollectionCommand::Execute(vtkObject *caller,
         }
       }
     }
-
-  if (event == vtkViewImage2DCommand::SeedEvent)
-    {
-    }
 }

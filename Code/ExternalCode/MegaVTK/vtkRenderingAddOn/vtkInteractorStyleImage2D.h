@@ -83,27 +83,12 @@ public:
   //BTX
   enum InteractionTypeIds
     {
-    InteractionTypeNull = 0,
-    InteractionTypeSlice,
-    InteractionTypeWindowLevel,
+    InteractionTypeWindowLevel = 0,
     InteractionTypeZoom,
     InteractionTypePan,
-    InteractionTypeSeed,
     InteractionTypeContourPicking,
+    InteractionTypeDefault
     };
-  //ETX
-
-  void SetLeftButtonInteraction(InteractionTypeIds);
-  vtkGetMacro (LeftButtonInteraction, unsigned int);
-
-  void SetRightButtonInteraction(InteractionTypeIds);
-  vtkGetMacro (RightButtonInteraction, unsigned int);
-
-  void SetMiddleButtonInteraction(InteractionTypeIds);
-  vtkGetMacro (MiddleButtonInteraction, unsigned int);
-
-  void SetWheelButtonInteraction(InteractionTypeIds);
-  vtkGetMacro (WheelButtonInteraction, unsigned int);
 
   virtual void OnMouseMove();
   virtual void OnLeftButtonDown();
@@ -127,21 +112,15 @@ public:
 
   virtual void DefaultMoveAction();
 
+  void SetDefaultMode();
+  void SetZoomMode();
+  void SetPanMode();
+  void SetPickMode();
+
   /**
    * \brief Highlights the actor which is pointed by the mouse
    */
   void HighlightCurrentActor();
-
-  /**
-   * \brief Reimplemented to remove bounding boxes when we leave picking mode
-   * and to set a boolean to false
-   */
-  virtual void EndPick();
-
-  /**
-   * \brief Reimplemented to set a boolean to true
-   */
-  virtual void StartPick();
 
   vtkGetMacro(SliceStep, int);
   int* GetRequestedPosition(void)
@@ -161,11 +140,7 @@ private:
   vtkInteractorStyleImage2D(const vtkInteractorStyleImage2D &);  // Not implemented.
   void operator =(const vtkInteractorStyleImage2D&);  // Not implemented.
 
-  unsigned int LeftButtonInteraction;
-  unsigned int RightButtonInteraction;
-  unsigned int MiddleButtonInteraction;
-  unsigned int WheelButtonInteraction;
-  bool         m_PickingModeEnabled;
+  unsigned int m_Mode;
   };
 
 #endif

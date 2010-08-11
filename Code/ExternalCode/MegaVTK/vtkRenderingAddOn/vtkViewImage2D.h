@@ -89,10 +89,16 @@ class vtkCellPicker;
 class vtkActor;
 // class vtkQuadricLODActor;
 
-/**
-  \class vtkViewImage2D
-  \brief
-*/
+/*
+ * \defgroup visualization ‘‘Visualization’’
+ */
+
+/*
+ * \class vtkViewImage2D
+ * \ingroup visualization
+ * \brief Basic class to handle 32d/3D items such as images and polydatas
+ * visualization in 2D
+ */
 class VTK_RENDERINGADDON2_EXPORT vtkViewImage2D : public vtkViewImage
   {
 
@@ -153,8 +159,9 @@ public:
   //ETX
 
   /**
-     \brief The SliceImplicitPlane instance (GetImplicitSlicePlane()) is the
-     implicit function that cuts every dataset that is added with AddDataSet().
+   * \ingroup visualization
+   * \brief The SliceImplicitPlane instance (GetImplicitSlicePlane()) is the
+   * implicit function that cuts every dataset that is added with AddDataSet().
   */
   vtkGetObjectMacro(SliceImplicitPlane, vtkPlane);
   /**
@@ -165,90 +172,90 @@ public:
   */
   vtkGetObjectMacro(SlicePlane, vtkPolyData);
   /**
-    \brief Get the orientation annotation. This annotation describes the
-     orientation of the slice plane, according to the rule
-     Right(R)-Left(L) Anterior(A)-Posterior(P) Inferior(I)-Superior(S)
+   * \ingroup visualization
+   * \brief Get the orientation annotation. This annotation describes the
+   * orientation of the slice plane, according to the rule
+   * Right(R)-Left(L) Anterior(A)-Posterior(P) Inferior(I)-Superior(S)
  */
   vtkGetObjectMacro(OrientationAnnotation, vtkOrientationAnnotation);
 
   /**
-     \brief The world is not always what we think it is ...
-
-     Use this method to move the viewer slice such that the position
-     (in world coordinates) given by the arguments is contained by
-     the slice plane. If the given position is outside the bounds
-     of the image, then the slice will be as close as possible.
-  */
+   * \ingroup visualization
+   * \brief The world is not always what we think it is ...
+   * Use this method to move the viewer slice such that the position
+   * (in world coordinates) given by the arguments is contained by
+   * the slice plane. If the given position is outside the bounds
+   * of the image, then the slice will be as close as possible.
+   */
   virtual void SetWorldCoordinates(double pos[3]);
 
   /**
-     \brief Set/Get the current slice to display (depending on the orientation
-     this can be in X, Y or Z).
-  */
+   * \ingroup visualization
+   * \brief Set/Get the current slice to display (depending on the orientation
+   * this can be in X, Y or Z).
+   */
   virtual void SetSlice(int s);
 
   /**
-     \brief Instead of setting the slice orientation to an axis (YZ - XZ - XY),
-     you can force the view to be axial (foot-head), coronal (front-back),
-     or sagittal (left-right). It will just use the OrientationMatrix
-     (GetOrientationMatrix()) to check which slice orientation to pick.
+   * \ingroup visualization
+   * \brief Instead of setting the slice orientation to an axis (YZ - XZ - XY),
+   * you can force the view to be axial (foot-head), coronal (front-back),
+   * or sagittal (left-right). It will just use the OrientationMatrix
+   * (GetOrientationMatrix()) to check which slice orientation to pick.
   */
   vtkGetMacro(ViewOrientation, int);
   virtual void SetViewOrientation(int orientation);
   virtual void SetOrientationMatrix(vtkMatrix4x4* matrix);
 
   /**
-     \brief The ViewConvention instance explains where to place the camera around
-     the patient. Default behaviour is Radiological convention, meaning
-     we respectively look at the patient from his feet, his face and his left
-     ear.
-
-     For Neurological convention, we respectively look from the top of his head,
-     the the back of his head, and his left ear.
-
-     \todo Why not adding cardiologic conventions where we look at the patient in
-    oblique angles ?
-  */
+   * \ingroup visualization
+   * \brief The ViewConvention instance explains where to place the camera around
+   * the patient. Default behaviour is Radiological convention, meaning
+   * we respectively look at the patient from his feet, his face and his left
+   * ear.
+   * For Neurological convention, we respectively look from the top of his head,
+   * the the back of his head, and his left ear.
+   * \todo Why not adding cardiologic conventions where we look at the patient in
+   * oblique angles ?
+   */
   vtkGetMacro(ViewConvention, int);
   virtual void SetViewConvention(int convention);
+
   /**
-       Get/Set the interactor style behaviour. Default is Navigation,
-       The Rubberband zoom interactor is still in beta version: Prefer using Navigation mode.
-    */
-  vtkGetMacro (InteractorStyleType, int);
-  virtual void SetInteractorStyleType(int type);
-  virtual void SetInteractorStyleTypeToNavigation(void)
-  { this->SetInteractorStyleType (INTERACTOR_STYLE_NAVIGATION); }
-  virtual void SetInteractorStyleTypeToRubberZoom(void)
-  { this->SetInteractorStyleType (INTERACTOR_STYLE_RUBBER_ZOOM); }
-  /**
-     \brief Convert an indices coordinate point (image coordinates) into a world
-     coordinate point
+   * \ingroup visualization
+   * \brief Convert an indices coordinate point (image coordinates) into a world
+   * coordinate point
   */
   virtual double* GetWorldCoordinatesForSlice(int slice);
   /**
-     \brief Convert a world coordinate point into an image indices coordinate point
+   * \ingroup visualization
+   * \brief Convert a world coordinate point into an image indices coordinate point
   */
   virtual int GetSliceForWorldCoordinates(double pos[3]);
   /**
-     \brief Reset the 3D position to center
+   * \ingroup visualization
+   * \brief Reset the 3D position to center
   */
   virtual void ResetPosition(void);
   /**
-     \brief Reset position - zoom - window/level to default
+   * \ingroup visualization
+   * \brief Reset position - zoom - window/level to default
   */
   virtual void Reset(void);
   /**
-     Reset the camera in a nice way for the 2D view
+   * \ingroup visualization
+   * \brief Reset the camera in a nice way for the 2D view
    */
   virtual void ResetCamera(void);
   /**
-     Get/Set the zoom factor of the view
+   * \ingroup visualization
+   * \brief Get/Set the zoom factor of the view
    */
   vtkSetMacro(Zoom, double);
   vtkGetMacro(Zoom, double);
   /**
-     Useful method that transform a display position into a world corrdinate point
+   * \ingroup visualization
+   * \brief Useful method that transform a display position into a world corrdinate point
   */
   virtual double* GetWorldCoordinatesFromDisplayPosition(int xy[2]);
   virtual double* GetWorldCoordinatesFromDisplayPosition(const int& x,
@@ -264,7 +271,7 @@ public:
   //ETX
 
   /**
-     Get/Set weither or not the interpolation between pixels should be activated.
+     Get/Set whether or not the interpolation between pixels should be activated.
      It is On by default
   */
   virtual void SetInterpolate(const int& val);
@@ -272,13 +279,18 @@ public:
   vtkBooleanMacro (Interpolate, int);
 
   /**
-    \brief Add a dataset to the view (has to be subclass of vtkPointSet).
-    The dataset will be cut through the implicit slice plane
-    (GetImplicitSlicePlane()).
-
-    This results in a loss of dimensionality, i.e. tetrahedron will be displayed
-    as triangles, triangles as lines, lines as points.
-    A vtkProperty of the dataset can be specified.
+   * \ingroup visualization
+   * \brief Add a dataset to the view (has to be subclass of vtkPointSet).
+   * The dataset will be cut through the implicit slice plane
+   * (GetImplicitSlicePlane()).
+   * This results in a loss of dimensionality, i.e. tetrahedron will be displayed
+   * as triangles, triangles as lines, lines as points.
+   * A vtkProperty of the dataset can be specified.
+   *
+   * \param[in] dataset Data to be displayed (shape, position, etc.)
+   * \param[in] property Property of the data to be displayed (color, opacity, etc.)
+   * \param[in] intersection Display projection or intersection of the dataset with the current slice
+   * \param[in] iDataVisibility Visibility of the current actor
   */
 //   virtual vtkQuadricLODActor*
   virtual vtkActor* AddDataSet(vtkDataSet* dataset,
@@ -296,15 +308,18 @@ public:
   vtkGetVector3Macro(CameraMotionVector, double);
 
   /**
-     \brief Show/Hide the annotations.
+   * \ingroup visualization
+   * \brief Show/Hide the annotations.
   */
   vtkGetMacro(ShowAnnotations, int);
   /**
-     \brief Show/Hide the annotations.
+   * \ingroup visualization
+   * \brief Show/Hide the annotations.
   */
   vtkBooleanMacro(ShowAnnotations, int);
   /**
-     \brief Show/Hide the annotations.
+   * \ingroup visualization
+   * \brief Show/Hide the annotations.
   */
   virtual void SetShowAnnotations(const int&);
 
@@ -321,99 +336,63 @@ public:
   virtual void Update(void)
   { this->UpdateOrientation(); }
 
+  /**
+   * \ingroup visualization
+   * \brief Set interaction style to Default mode:
+   * Left button: Window level
+   * Right button: Zoom
+   * Middle button: Pan
+   * Wheel: Throught volume
+  */
   void SetDefaultInteractionStyle(void)
   {
     vtkInteractorStyleImage2D* t = vtkInteractorStyleImage2D::SafeDownCast (this->InteractorStyle);
     if (t)
       {
-      t->SetLeftButtonInteraction(vtkInteractorStyleImage2D::InteractionTypeWindowLevel);
-      t->SetRightButtonInteraction(vtkInteractorStyleImage2D::InteractionTypeZoom);
-      t->SetMiddleButtonInteraction(vtkInteractorStyleImage2D::InteractionTypePan);
-      t->SetWheelButtonInteraction(vtkInteractorStyleImage2D::InteractionTypeSlice);
+      t->SetDefaultMode();
       }
   }
 
   /**
-     Change the interaction triggered by the mouse buttons.
-     Choices are listed in vtkInteractorStyleImage2D class:
-     InteractionTypeSlice : changes the slice number.
-     InteractionTypeWindowLevel : changes the window-level values.
-     InteractionTypeZoom : changes the zoom level.
-     InteractionTypePan : translate the view in-plane.
+   * \ingroup visualization
+   * \brief Set interaction style to Zoom mode:
+   * All buttons: Zoom
   */
-  void SetLeftButtonInteractionStyle(vtkInteractorStyleImage2D::InteractionTypeIds arg)
+  void SetZoomInteractionStyle(void)
   {
     vtkInteractorStyleImage2D* t = vtkInteractorStyleImage2D::SafeDownCast (this->InteractorStyle);
-    if (t) t->SetLeftButtonInteraction (arg);
+    if (t)
+      {
+      t->SetZoomMode();
+      }
   }
+
   /**
-     Change the interaction triggered by the mouse buttons.
-     Choices are listed in vtkInteractorStyleImage2D class:
-     InteractionTypeSlice : changes the slice number.
-     InteractionTypeWindowLevel : changes the window-level values.
-     InteractionTypeZoom : changes the zoom level.
-     InteractionTypePan : translate the view in-plane.
-   */
-  void SetRightButtonInteractionStyle(vtkInteractorStyleImage2D::InteractionTypeIds arg)
-  {
-    vtkInteractorStyleImage2D* t = vtkInteractorStyleImage2D::SafeDownCast (this->InteractorStyle);
-    if (t) t->SetRightButtonInteraction (arg);
-  }
-  /**
-       Change the interaction triggered by the mouse buttons.
-       Choices are listed in vtkInteractorStyleImage2D class:
-       InteractionTypeSlice : changes the slice number.
-       InteractionTypeWindowLevel : changes the window-level values.
-       InteractionTypeZoom : changes the zoom level.
-       InteractionTypePan : translate the view in-plane.
-    */
-  void SetMiddleButtonInteractionStyle(vtkInteractorStyleImage2D::InteractionTypeIds arg)
-  {
-    vtkInteractorStyleImage2D* t = vtkInteractorStyleImage2D::SafeDownCast (this->InteractorStyle);
-    if (t) t->SetMiddleButtonInteraction (arg);
-  }
-  /**
-     Change the interaction triggered by the mouse buttons.
-     Choices are listed in vtkInteractorStyleImage2D class:
-     InteractionTypeSlice : changes the slice number.
-     InteractionTypeWindowLevel : changes the window-level values.
-     InteractionTypeZoom : changes the zoom level.
-     InteractionTypePan : translate the view in-plane.
+   * \ingroup visualization
+   * \brief Set interaction style to Pan mode:
+   * All buttons: Pan
   */
-  void SetWheelInteractionStyle(vtkInteractorStyleImage2D::InteractionTypeIds arg)
+  void SetPanInteractionStyle(void)
   {
     vtkInteractorStyleImage2D* t = vtkInteractorStyleImage2D::SafeDownCast (this->InteractorStyle);
-    if (t) t->SetWheelButtonInteraction (arg);
+    if (t)
+      {
+      t->SetPanMode();
+      }
   }
+
   /**
-     Change the interaction triggered by the mouse buttons.
-     Choices are listed in vtkInteractorStyleImage2D class:
-     InteractionTypeSlice : changes the slice number.
-     InteractionTypeWindowLevel : changes the window-level values.
-     InteractionTypeZoom : changes the zoom level.
-     InteractionTypePan : translate the view in-plane.
+   * \ingroup visualization
+   * \brief Set interaction style to Zoom mode:
+   * The actor the mouse is highlighted in addition to the Default Mode.
   */
-  void SetInteractionStyle(vtkInteractorStyleImage2D::InteractionTypeIds arg)
-  {
-    this->SetLeftButtonInteractionStyle (arg);
-    this->SetRightButtonInteractionStyle (arg);
-    this->SetMiddleButtonInteractionStyle (arg);
-    this->SetWheelInteractionStyle (arg);
-  }
-  /**
-     Change the interaction triggered by the mouse buttons.
-     Choices are listed in vtkInteractorStyleImage2D class:
-     InteractionTypeSlice : changes the slice number.
-     InteractionTypeWindowLevel : changes the window-level values.
-     InteractionTypeZoom : changes the zoom level.
-     InteractionTypePan : translate the view in-plane.
-  */
-  int GetInteractionStyle(void)
+  void SetPickInteractionStyle(void)
   {
     vtkInteractorStyleImage2D* t = vtkInteractorStyleImage2D::SafeDownCast (this->InteractorStyle);
-    if (t) return t->GetLeftButtonInteraction();
-    else
-      return 0;
+    if (t)
+      {
+      t->SetPickMode();
+      }
   }
 
   /**
@@ -423,6 +402,11 @@ public:
   vtkGetObjectMacro (Cursor, vtkPointHandleRepresentation2D);
   vtkGetObjectMacro (CursorGenerator, vtkCursor2D);
 
+
+  /*
+   * \ingroup visualization
+   *
+   */
   template<class TContourContainer,
            class TPropertyContainer>
   void AddContours(TContourContainer& iContours,
@@ -452,6 +436,11 @@ public:
       }
   }
 
+  /*
+   * \ingroup visualization
+   *
+   */
+
   template<class TContourContainer>
   void RemoveContours(TContourContainer& iContours)
   {
@@ -466,6 +455,10 @@ public:
       }
   }
 
+  /*
+   * \ingroup visualization
+   *
+   */
   void UpdateWindowLevelObservers();
 
 protected:
@@ -488,33 +481,34 @@ protected:
   virtual void SetAnnotationsFromOrientation(void);
 
   /**
-     After the orientation has changed, it is crucial to adapt
-     a couple of things according to new orientation.
-     Thus UpdateOrientation() is here overwritten and calls
-     PostUpdateOrientation(), where the SlicePlane, the Camera settings,
-     the CornerAnnotation, and the SliceImplicitPlane are modified.
+   * \ingroup visualization
+   * \brief After the orientation has changed, it is crucial to adapt
+   * a couple of things according to new orientation.
+   * Thus UpdateOrientation() is here overwritten and calls
+   * PostUpdateOrientation(), where the SlicePlane, the Camera settings,
+   * the CornerAnnotation, and the SliceImplicitPlane are modified.
   */
   virtual void SetImplicitPlaneFromOrientation(void);
   /**
-     Update the cursor position and the CornerAnnotation (top-left) according
-     to current mouse position.
+   * \ingroup visualization
+   * \brief Update the cursor position and the CornerAnnotation (top-left) according
+   * to current mouse position.
   */
   ///\todo This may has to be modified as with this configuration, the user has no possibility of changing the upper-left corner annotation because it is bypassed by this method at each mouse movement.
   virtual void UpdateCursor(void);
   /**
-     This method is called each time the orientation changes (SetViewOrientation())
-     and sets the appropriate color to the slice plane.
-
-     Red: R-L direction --> sagittal orientation
-
-     Green: A-P direction --> coronal orientation
-
-     Blue: I-S direction --> axial orientation
+   * \ingroup visualization
+   * \brief This method is called each time the orientation changes (SetViewOrientation())
+   * and sets the appropriate color to the slice plane.
+   * Red: R-L direction --> sagittal orientation
+   * Green: A-P direction --> coronal orientation
+   * Blue: I-S direction --> axial orientation
   */
   virtual void InitializeSlicePlane(void);
   /**
-     Overwrite of the Superclass InstallPipeline() method in order to set up the
-     home made InteractorStyle, and make it observe all events we need
+   * \ingroup visualization
+   * \brief Overwrite of the Superclass InstallPipeline() method in order to set up the
+   * home made InteractorStyle, and make it observe all events we need
   */
   virtual void InstallPipeline(void);
 
@@ -528,39 +522,45 @@ protected:
 
   vtkTransform* AdjustmentTransform;
   /**
-     This polydata instance is a square colored (see InitializeSlicePlane()) according to the
-     orientation of the view. It follows the image actor and is used by other view to display
-     intersections between views.
+   * \ingroup visualization
+   * \brief This polydata instance is a square colored (see InitializeSlicePlane()) according to the
+   * orientation of the view. It follows the image actor and is used by other view to display
+   * intersections between views.
   */
   vtkPolyData* SlicePlane;
   /**
-     Get the orientation annotation. This annotation describes the orientation
-     of the slice plane, according to the rule
-     Right(R)-Left(L) Anterior(A)-Posterior(P) Inferior(I)-Superior(S)
+   * \ingroup visualization
+   * \brief Get the orientation annotation. This annotation describes the orientation
+   * of the slice plane, according to the rule
+   * Right(R)-Left(L) Anterior(A)-Posterior(P) Inferior(I)-Superior(S)
   */
   vtkOrientationAnnotation* OrientationAnnotation;
 
   vtkInteractorStyle* InteractorStyleSwitcher;
   /**
-     InteractorStyle used in this view. It is a vtkInteractorStyleImage2D by default
-     but can be set to vtkInteractorStyleRubberBandZoom with SetInteractorStyleType().
-     Rubber band zoom is in beta. Prefer using default behaviour.
+   * \ingroup visualization
+   * \brief InteractorStyle used in this view. It is a vtkInteractorStyleImage2D by default
+   * but can be set to vtkInteractorStyleRubberBandZoom with SetInteractorStyleType().
+   * Rubber band zoom is in beta. Prefer using default behaviour.
   */
   vtkInteractorStyleRubberBandZoom* InteractorStyleRubberZoom;
   /**
-     Access to the command of the viewer.
-     This instance is in charge of observing the interactorstyle (GetInteractorStyle())
-     and update things accordingly in the view (i.e. the slice number when moving slice).
+   * \ingroup visualization
+   * \brief Access to the command of the viewer.
+   * This instance is in charge of observing the interactorstyle (GetInteractorStyle())
+   * and update things accordingly in the view (i.e. the slice number when moving slice).
   */
   vtkViewImage2DCommand* Command;
   /**
-     Access to the actor corresponding to the cursor. It follows the mouse cursor
-     everywhere it goes, and can be activated by pressing 'c'
+   * \ingroup visualization
+   * \brief Access to the actor corresponding to the cursor. It follows the mouse cursor
+   * everywhere it goes, and can be activated by pressing 'c'
   */
   vtkPointHandleRepresentation2D* Cursor;
   /**
-     Access to the actor corresponding to the cursor. It follows the mouse cursor
-     everywhere it goes, and can be activated by pressing 'c'
+   * \ingroup visualization
+   * \brief Access to the actor corresponding to the cursor. It follows the mouse cursor
+   * everywhere it goes, and can be activated by pressing 'c'
   */
   vtkCursor2D* CursorGenerator;
 

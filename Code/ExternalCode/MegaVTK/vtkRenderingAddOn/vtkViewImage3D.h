@@ -114,11 +114,17 @@ class vtkViewImage2D;
 class vtkScalarsToColors;
 class vtkColorTransferFunction;
 
-/**
-
-*/
-
 class ImageActorCallback;
+
+/*
+ * \defgroup visualization ‘‘Visualization’’
+ */
+
+/*
+ * \class vtkViewImage3D
+ * \ingroup visualization
+ * \brief 3D view
+ */
 
 class VTK_RENDERINGADDON2_EXPORT vtkViewImage3D : public vtkViewImage
   {

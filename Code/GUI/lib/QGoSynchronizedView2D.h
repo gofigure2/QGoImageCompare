@@ -76,17 +76,35 @@ public:
 
   ~QGoSynchronizedView2D();
 
+  /** \brief Set image displayed by the SynchronizedView
+   */
+  void SetImage(vtkImageData* iImage);
+
+  /** \brief Update the viewer contained in the widget
+   */
+  void Update( void );
+
+  /** \brief render the viewer contained in the widget if any
+   */
+  void Render( void );
+
+  /** \brief get the camera of the current viewer
+   */
+  vtkCamera* GetCamera( void );
+
+  /** \brief true if the widget has a viewer
+   */
+  bool HasViewer( void );
+
   /** \brief Print self informations
    */
   void PrintOs(ostream& os);
 
   /** \brief returns the type of SynchronizedView (2 for 2D, 3 for 3D)
    */
-  int GetSynchronizedViewType(void);
+  int GetSynchronizedViewType( void );
 
-  /** \brief Set image displayed by the SynchronizedView
-   */
-  void SetImage(vtkImageData* iImage);
+
 
   /** \brief Set ITK image displayed by the SynchronizedView
    */
@@ -113,7 +131,7 @@ public:
 
   /** \brief Returns the imageview managed by this SynchronizedView
    */
-  QGoImageView2D* GetImageView(void);
+  QGoImageView2D* GetImageView( void );
 
 public slots:
   /** \brief Save a screenshot of the viewer's content
@@ -122,11 +140,18 @@ public slots:
                          const QString& iBaseName = tr("Snapshot"));
 
 private:
+  /** delete the viewer contained in the widget
+   */
+  void deleteViewer( void );
+
   /** \brief create the viewer contained in the widget
    */
-  void createViewer(void);
+  void createViewer( void );
 
+
+  QGoImageView2D*               m_currentView;
   itkvtkConnectorType::Pointer m_itkvtkConnector;
+
 
   Q_DISABLE_COPY(QGoSynchronizedView2D);
   };

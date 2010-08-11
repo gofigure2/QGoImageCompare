@@ -84,14 +84,7 @@ vtkStandardNewMacro (vtkInteractorStyleImage3D);
 vtkInteractorStyleImage3D::
 vtkInteractorStyleImage3D()
   {
-  m_EnablePickMode = false;
-  m_EnableZoomMode = false;
-  m_EnablePanMode = false;
-
-  this->LeftButtonInteraction   = 0;
-  this->RightButtonInteraction  = 0;
-  this->MiddleButtonInteraction = 0;
-  this->WheelButtonInteraction  = 0;
+  this->m_Mode = InteractionTypeDefault;
   }
 
 //----------------------------------------------------------------------------
@@ -120,34 +113,26 @@ void
 vtkInteractorStyleImage3D::
 OnLeftButtonDown()
 {
-  // if object is picked, send the event
-  if (m_EnablePickMode)
+  switch (this->m_Mode)
     {
-    //if no actor selected = change state
-    if (this->PropPicked == 0) this->StopState();
-    }
-
-  if (m_EnableZoomMode)
-    {
-    this->Superclass::OnRightButtonDown();
-    return;
-    }
-
-  if (m_EnablePanMode)
-    {
-    this->Superclass::OnMiddleButtonDown();
-    return;
-    }
-
-  if (this->State == VTKIS_PICK3D)
-    {
-    this->SetCurrentProp();
-    this->InvokeEvent(vtkViewImage3DCommand::MeshPickingEvent);
-    return;
-    }
-
-  // Call parent to handle all other states and perform additional work
-  this->Superclass::OnLeftButtonDown();
+    case InteractionTypeZoom:
+      this->InvokeEvent(vtkViewImage3DCommand::ZoomEvent);
+      this->Superclass::OnRightButtonDown();
+      break;
+    case InteractionTypePan:
+      this->InvokeEvent(vtkViewImage3DCommand::PanEvent);
+      this->Superclass::OnMiddleButtonDown();
+      break;
+    case InteractionTypeMeshPicking:
+      this->SetCurrentProp();
+      this->InvokeEvent(vtkViewImage3DCommand::MeshPickingEvent);
+      this->State = VTKIS_NONE;
+      this->Superclass::OnLeftButtonDown();
+      break;
+    default:
+      this->Superclass::OnLeftButtonDown();
+      break;
+      }
 }
 
 //----------------------------------------------------------------------------
@@ -155,27 +140,22 @@ void
 vtkInteractorStyleImage3D::
 OnLeftButtonUp()
 {
-  // if object is picked, send the event
-  if (m_EnablePickMode)
+  switch (this->m_Mode)
     {
-    //if no actor selected = change state
-    this->StartState(VTKIS_PICK3D);
+    case InteractionTypeZoom:
+      this->Superclass::OnRightButtonUp();
+      break;
+    case InteractionTypePan:
+      this->Superclass::OnMiddleButtonUp();
+      break;
+    case InteractionTypeMeshPicking:
+      this->State = VTKIS_NONE;
+      this->StartPick();
+      break;
+    default:
+      this->Superclass::OnLeftButtonUp();
+      break;
     }
-
-  if (m_EnableZoomMode)
-    {
-    this->Superclass::OnRightButtonUp();
-    return;
-    }
-
-  if (m_EnablePanMode)
-    {
-    this->Superclass::OnMiddleButtonUp();
-    return;
-    }
-
-  // Call parent to handle all other states and perform additional work
-  this->Superclass::OnLeftButtonUp();
 }
 
 //----------------------------------------------------------------------------
@@ -183,20 +163,19 @@ void
 vtkInteractorStyleImage3D::
 OnRightButtonDown()
 {
-  // if object is picked, send the event
-  if (m_EnablePickMode)
+  switch (this->m_Mode)
     {
-    this->StopState();
+    case InteractionTypePan:
+      this->Superclass::OnMiddleButtonDown();
+      break;
+    case InteractionTypeMeshPicking:
+      this->State = VTKIS_NONE;
+      this->Superclass::OnRightButtonDown();
+      break;
+    default:
+      this->Superclass::OnRightButtonDown();
+      break;
     }
-
-  if (m_EnablePanMode)
-    {
-    this->Superclass::OnMiddleButtonDown();
-    return;
-    }
-
-  // Call parent to handle all other states and perform additional work
-  this->Superclass::OnRightButtonDown();
 }
 
 //----------------------------------------------------------------------------
@@ -204,21 +183,19 @@ void
 vtkInteractorStyleImage3D::
 OnRightButtonUp()
 {
-  // if object is picked, send the event
-  if (m_EnablePickMode)
+  switch (this->m_Mode)
     {
-    //if no actor selected = change state
-    this->StartState(VTKIS_PICK3D);
+    case InteractionTypePan:
+      this->Superclass::OnMiddleButtonUp();
+      break;
+    case InteractionTypeMeshPicking:
+      this->State = VTKIS_NONE;
+      this->StartPick();
+      break;
+    default:
+      this->Superclass::OnRightButtonUp();
+      break;
     }
-
-  if (m_EnablePanMode)
-    {
-    this->Superclass::OnMiddleButtonUp();
-    return;
-    }
-
-  // Call parent to handle all other states and perform additional work
-  this->Superclass::OnRightButtonUp();
 }
 
 //----------------------------------------------------------------------------
@@ -226,20 +203,19 @@ void
 vtkInteractorStyleImage3D::
 OnMiddleButtonDown()
 {
-  // if object is picked, send the event
-  if (m_EnablePickMode)
+  switch (this->m_Mode)
     {
-    this->StopState();
+    case InteractionTypeZoom:
+      this->Superclass::OnRightButtonDown();
+      break;
+    case InteractionTypeMeshPicking:
+      this->State = VTKIS_NONE;
+      this->Superclass::OnMiddleButtonDown();
+      break;
+    default:
+      this->Superclass::OnMiddleButtonDown();
+      break;
     }
-
-  if (m_EnableZoomMode)
-    {
-    this->Superclass::OnRightButtonDown();
-    return;
-    }
-
-  // Call parent to handle all other states and perform additional work
-  this->Superclass::OnMiddleButtonDown();
 }
 
 //----------------------------------------------------------------------------
@@ -247,53 +223,19 @@ void
 vtkInteractorStyleImage3D::
 OnMiddleButtonUp()
 {
-  // if object is picked, send the event
-  if (m_EnablePickMode)
+  switch (this->m_Mode)
     {
-    //if no actor selected = change state
-    this->StartState(VTKIS_PICK3D);
+    case InteractionTypeZoom:
+      this->Superclass::OnRightButtonUp();
+      break;
+    case InteractionTypeMeshPicking:
+      this->State = VTKIS_NONE;
+      this->StartPick();
+      break;
+    default:
+      this->Superclass::OnMiddleButtonUp();
+      break;
     }
-
-  if (m_EnableZoomMode)
-    {
-    this->Superclass::OnRightButtonUp();
-    return;
-    }
-
-  // Call parent to handle all other states and perform additional work
-  this->Superclass::OnMiddleButtonUp();
-}
-
-//----------------------------------------------------------------------------
-void
-vtkInteractorStyleImage3D::
-SetLeftButtonInteraction(InteractionTypeIds interactionType)
-{
-  LeftButtonInteraction = interactionType;
-}
-
-//----------------------------------------------------------------------------
-void
-vtkInteractorStyleImage3D::
-SetRightButtonInteraction(InteractionTypeIds interactionType)
-{
-  RightButtonInteraction = interactionType;
-}
-
-//----------------------------------------------------------------------------
-void
-vtkInteractorStyleImage3D::
-SetMiddleButtonInteraction(InteractionTypeIds interactionType)
-{
-  MiddleButtonInteraction = interactionType;
-}
-
-//----------------------------------------------------------------------------
-void
-vtkInteractorStyleImage3D::
-SetWheelButtonInteraction(InteractionTypeIds interactionType)
-{
-  WheelButtonInteraction = interactionType;
 }
 
 //----------------------------------------------------------------------------
@@ -325,17 +267,6 @@ StartPick()
   this->InvokeEvent(vtkCommand::StartPickEvent, this);
 }
 
-//----------------------------------------------------------------------------
-void
-vtkInteractorStyleImage3D::
-EndPick()
-{
-  // Remove boxes in view
-  this->HighlightProp(NULL);
-  this->PropPicked = 0;
-  this->InvokeEvent(vtkCommand::EndPickEvent, this);
-  this->StopState();
-}
 //----------------------------------------------------------------------------
 void
 vtkInteractorStyleImage3D::
@@ -379,29 +310,24 @@ HighlightCurrentActor()
     rwi->EndPickCallback();
     }
 }
-/// TODO improve it
+
 //----------------------------------------------------------------------------
 void
 vtkInteractorStyleImage3D::
 EnablePickMode()
 {
-  m_EnablePickMode = true;
+  this->State = VTKIS_NONE;
+  this->m_Mode = InteractionTypeMeshPicking;
+  this->StartPick();
 }
 
 //----------------------------------------------------------------------------
 void
 vtkInteractorStyleImage3D::
-DisablePickMode()
-{
-  m_EnablePickMode = false;
-}
-//----------------------------------------------------------------------------
-void
-vtkInteractorStyleImage3D::
 EnableZoomMode()
 {
-  m_EnableZoomMode = true;
-  m_EnablePanMode = false;
+  this->State = VTKIS_NONE;
+  this->m_Mode = InteractionTypeZoom;
 }
 
 //----------------------------------------------------------------------------
@@ -409,8 +335,8 @@ void
 vtkInteractorStyleImage3D::
 EnablePanMode()
 {
-  m_EnablePanMode = true;
-  m_EnableZoomMode = false;
+  this->State = VTKIS_NONE;
+  this->m_Mode = InteractionTypePan;
 }
 
 //----------------------------------------------------------------------------
@@ -418,7 +344,6 @@ void
 vtkInteractorStyleImage3D::
 EnableDefaultMode()
 {
-  m_EnablePanMode = false;
-  m_EnableZoomMode = false;
-  m_EnablePickMode = false;
+  this->State = VTKIS_NONE;
+  this->m_Mode = InteractionTypeDefault;
 }

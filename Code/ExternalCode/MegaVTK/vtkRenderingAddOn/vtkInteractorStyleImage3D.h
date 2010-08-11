@@ -69,15 +69,25 @@
 #define _vtk_InteractorStyleImage3D_h_
 
 #include <vtkInteractorStyleTrackballCamera.h>
+//#include "vtkInteractorStyleInterface.h"
 #include "MegaVTK2Configure.h"
 
 class vtkProp;
 
+/*
+ * \defgroup visualization ‘‘Visualization’’
+ */
+
+/*
+ * \class vtkInteractorStyleImage3D
+ * \ingroup visualization
+ * \brief Define the interactor behavior withing a vtk3DImage.
+ */
 //MOTION FLAG
 #define VTKIS_PICK3D         1050
 
 class VTK_RENDERINGADDON2_EXPORT vtkInteractorStyleImage3D :
-  public vtkInteractorStyleTrackballCamera
+  public vtkInteractorStyleTrackballCamera//, public vtkInteractorStyleInterface
   {
 public:
   static vtkInteractorStyleImage3D *New();
@@ -86,22 +96,12 @@ public:
   //BTX
   enum InteractionTypeIds
     {
-    InteractionTypeNull = 0,
+    InteractionTypeWindowLevel = 0,
+    InteractionTypeZoom,
+    InteractionTypePan,
     InteractionTypeMeshPicking,
     InteractionTypeDefault
     };
-
-  void SetLeftButtonInteraction(InteractionTypeIds);
-  vtkGetMacro (LeftButtonInteraction, unsigned int);
-
-  void SetRightButtonInteraction(InteractionTypeIds);
-  vtkGetMacro (RightButtonInteraction, unsigned int);
-
-  void SetMiddleButtonInteraction(InteractionTypeIds);
-  vtkGetMacro (MiddleButtonInteraction, unsigned int);
-
-  void SetWheelButtonInteraction(InteractionTypeIds);
-  vtkGetMacro (WheelButtonInteraction, unsigned int);
 
   virtual void OnMouseMove();
   virtual void OnLeftButtonDown();
@@ -114,16 +114,32 @@ public:
   void     SetCurrentProp();
   vtkProp* GetCurrentProp();
 
+  /**
+   *
+   */
   void StartPick();
-  void EndPick();
 
+  /**
+   *
+   */
   void HighlightCurrentActor();
 
+  /**
+   *
+   */
   void EnablePickMode();
-  void DisablePickMode();
 
+  /**
+   *
+   */
   void EnableDefaultMode();
+  /**
+   *
+   */
   void EnableZoomMode();
+  /**
+   *
+   */
   void EnablePanMode();
 
 protected:
@@ -135,16 +151,8 @@ private:
   vtkInteractorStyleImage3D(const vtkInteractorStyleImage3D &);  // Not implemented.
   void operator =(const vtkInteractorStyleImage3D&);  // Not implemented.
 
-  unsigned int LeftButtonInteraction;
-  unsigned int RightButtonInteraction;
-  unsigned int MiddleButtonInteraction;
-  unsigned int WheelButtonInteraction;
-
   vtkProp* m_CurrentProp;
-
-  bool m_EnablePickMode;
-  bool m_EnableZoomMode;
-  bool m_EnablePanMode;
+  unsigned int m_Mode;
   };
 
 #endif

@@ -587,14 +587,12 @@ void vtkViewImage::Render()
     this->RenderWindow->Render();
     }
 }
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 vtkRenderWindowInteractor* vtkViewImage::GetInteractor()
 {
   return this->Interactor;
 }
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 vtkRenderWindowInteractor* vtkViewImage::GetRenderWindowInteractor()
@@ -608,7 +606,6 @@ vtkRenderWindowInteractor* vtkViewImage::GetRenderWindowInteractor()
     return static_cast<vtkRenderWindowInteractor*>(0x0);
     }
 }
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void vtkViewImage::SetCameraPosition(double* arg)
@@ -636,7 +633,6 @@ double* vtkViewImage::GetCameraPosition(void)
 
   return static_cast<double*>(0x0);
 }
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void vtkViewImage::SetCameraFocalPoint(double* arg)
@@ -650,7 +646,6 @@ void vtkViewImage::SetCameraFocalPoint(double* arg)
       }
     }
 }
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 double* vtkViewImage::GetCameraFocalPoint(void)
@@ -665,7 +660,6 @@ double* vtkViewImage::GetCameraFocalPoint(void)
     }
   return static_cast<double*>(0x0);
 }
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void vtkViewImage::SetCameraViewUp(double* arg)
@@ -679,7 +673,6 @@ void vtkViewImage::SetCameraViewUp(double* arg)
       }
     }
 }
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 double* vtkViewImage::GetCameraViewUp(void)
@@ -695,7 +688,6 @@ double* vtkViewImage::GetCameraViewUp(void)
     }
   return static_cast<double*>(0x0);
 }
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void vtkViewImage::SetCameraParallelScale(double arg)
@@ -710,7 +702,6 @@ void vtkViewImage::SetCameraParallelScale(double arg)
       }
     }
 }
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 double vtkViewImage::GetCameraParallelScale(void)
@@ -727,7 +718,6 @@ double vtkViewImage::GetCameraParallelScale(void)
 
   return 0.;
 }
-//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void vtkViewImage::SetShowAnnotations(const int& val)

@@ -155,7 +155,7 @@ public:
   /**
    * \brief Use the contour picking mode
    */
-  void EnableContourPickingMode(bool iEnable);
+  void EnableContourPickingMode();
 
   /**
    * \brief Reset collection Window level
@@ -210,27 +210,22 @@ public:
   virtual void ChangeCursorShape(QCursor iCursorShape) = 0;
 
   /**
-  * \brief Initializae the seed widget
-  */
-  void InitializeSeedWidget();
-
-  /**
   * \brief Initializae the distance widget
   */
   void InitializeDistanceWidget();
-  void DistanceWidgetMode(bool iEnable);
+  void EnableDistanceWidget(bool iEnable);
 
   /**
   * \brief Initializae the angle widget
   */
   void InitializeAngleWidget();
-  void AngleWidgetMode(bool iActive);
+  void EnableAngleWidget(bool iActive);
 
   /**
   * \brief Initializae the angle widget
   */
   void InitializeContourWidget();
-  void ContourWidgetMode(bool iActivate);
+  void EnableContourWidget(bool iActivate);
   void InitializeContourWidgetNodes( int iDir, vtkPolyData* iNodes );
   void ReinitializeContourWidget();
   void UpdateContourRepresentationProperties(float  linewidth, QColor linecolor,
@@ -239,9 +234,10 @@ public:
   vtkPolyData* GetContourRepresentationNodePolydata(int iDir);
 
   /**
-  * \brief Enable the One Click mode (usefull since it is in a vtk widget)
+  * \brief Initializae the seed widget
   */
-  void EnableOneClickMode(bool iEnable);
+  void InitializeSeedWidget();
+  void EnableSeedWidget(bool iEnable);
   /**
    * \brief Get all the seeds positions.
    * The seeds have been defined using the one click mode.
@@ -251,8 +247,6 @@ public:
    * \brief Clear all the seeds positions after using it.
    */
   void       ClearAllSeeds();
-
-  virtual void EnableMeshPickingMode(bool iEnable){(void)iEnable;};
 
 public slots:
   /** \brief Set background color for all views.

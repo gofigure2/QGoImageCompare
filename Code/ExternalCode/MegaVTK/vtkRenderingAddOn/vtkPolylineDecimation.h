@@ -41,6 +41,16 @@
 
 #include "MegaVTK2Configure.h"
 
+/*
+ * \defgroup visualization ‘‘Visualization’’
+ */
+
+/*
+ * \class vtkPolylineDecimation
+ * \ingroup visualization
+ * \brief Decimate a vtkPolydata
+ */
+
 class VTK_RENDERINGADDON2_EXPORT vtkPolylineDecimation : public vtkPolyDataAlgorithm
   {
 public:
@@ -49,8 +59,10 @@ public:
   vtkTypeRevisionMacro(vtkPolylineDecimation, vtkPolyDataAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Description:
-  // Instantiate this object with a target reduction of 0.90.
+  /*
+   * \ingroup visualization
+   * \brief Instantiate this object with a target reduction of 0.90.
+   */
   static vtkPolylineDecimation *New();
 
   // Description:

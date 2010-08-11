@@ -149,15 +149,21 @@ int main(int argc, char** argv)
 
   viewer->ResetWindowLevel();
 
+  // Modes
   viewer->DefaultMode();
   viewer->ZoomMode();
   viewer->PanMode();
-  viewer->DistanceWidgetMode(true);
-  viewer->DistanceWidgetMode(false);
-  viewer->AngleWidgetMode(true);
-  viewer->AngleWidgetMode(false);
-  viewer->ContourWidgetMode(true);
-  viewer->ContourWidgetMode(false);
+  viewer->EnableContourPickingMode();
+
+  // Widgets
+  viewer->EnableDistanceWidget(true);
+  viewer->EnableDistanceWidget(false);
+  viewer->EnableAngleWidget(true);
+  viewer->EnableAngleWidget(false);
+  viewer->EnableContourWidget(true);
+  viewer->EnableContourWidget(false);
+  viewer->EnableSeedWidget(true);
+  viewer->EnableSeedWidget(false);
 
 
   app.processEvents();

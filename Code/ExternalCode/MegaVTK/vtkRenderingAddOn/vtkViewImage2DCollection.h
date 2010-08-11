@@ -126,9 +126,15 @@ class vtkDataSetCollection;
 class vtkMatrixToLinearTransform;
 class vtkViewImage2DCollectionCommand;
 
-/**
+/*
+ * \defgroup visualization ‘‘Visualization’’
+ */
 
-*/
+/*
+ * \class vtkViewImage2DCollection
+ * \ingroup visualization
+ * \brief Manage a collection of 2D views
+ */
 
 class VTK_RENDERINGADDON2_EXPORT vtkViewImage2DCollection : public vtkCollection
   {
@@ -137,53 +143,68 @@ public:
   static vtkViewImage2DCollection* New();
   vtkTypeRevisionMacro(vtkViewImage2DCollection, vtkCollection);
 
-  // Description:
-  // Get the next vtkViewImage2D in the list. Return NULL when at the end of the
-  // list.
+  /*
+   * \bief Get the next vtkViewImage2D in the list. Return NULL when at the end of
+   * the list
+   */
   vtkViewImage2D *GetNextItem()
   {
     return static_cast<vtkViewImage2D *>(this->GetNextItemAsObject());
   }
-  // Description:
-  // Get the next vtkViewImage2D2D in the list. Return NULL when at the end of
-  // the list.
+  /*
+   * \bief Get the next vtkViewImage2D2D in the list. Return NULL when at the end of
+   * the list
+   */
   vtkViewImage2D *GetItem(int i)
   {
     return static_cast<vtkViewImage2D *>(this->GetItemAsObject(i));
   }
-  // Description:
-  // Add an object to the list. Does not prevent duplicate entries.
+  /*
+   * \bief Add an object to the list. Does not prevent duplicate entries.
+   */
   void AddItem(vtkViewImage2D*);
-
-  // Description:
-  // Replace the i'th item in the collection with a
+  /*
+   * \bief Replace the i'th item in the collection with another 2D image
+   */
   void ReplaceItem(int i, vtkViewImage2D *);
 
-  // Description:
-  // Remove the i'th item in the list.
-  // Be careful if using this function during traversal of the list using
-  // GetNextItemAsObject (or GetNextItem in derived class).  The list WILL
-  // be shortened if a valid index is given!  If this->Current is equal to the
-  // element being removed, have it point to then next element in the list.
+  /*
+   * \brief Remove the i'th item in the list.
+   * Be careful if using this function during traversal of the list using
+   * GetNextItemAsObject (or GetNextItem in derived class).  The list WILL
+   * be shortened if a valid index is given!  If this->Current is equal to the
+   * element being removed, have it point to then next element in the list.
+   */
   void RemoveItem(int i);
 
-  // Description:
-  // Remove an object from the list. Removes the first object found, not
-  // all occurrences. If no object found, list is unaffected.  See warning
-  // in description of RemoveItem(int).
+  /*
+   * \brief Remove an object from the list. Removes the first object found, not
+   * all occurrences. If no object found, list is unaffected.  See warning
+   * in description of RemoveItem(int).
+   */
   void RemoveItem(vtkViewImage2D *);
 
-  // Description:
-  // Remove all objects from the list.
+  /*
+   * \brief Remove all objects from the collection.
+   */
   void RemoveAllItems();
 
-  // Description:
-  // Initialize the viewers togethers.
+  /*
+   * \brief Initialize the planes actors in all the views
+   */
   void Initialize();
+  /*
+   * \brief Initialize the the observers.
+   */
   void InitializeAllObservers();
 
   vtkGetObjectMacro (Command, vtkViewImage2DCollectionCommand);
   vtkGetObjectMacro (ExtraRenderWindow, vtkRenderWindow);
+
+  /*
+   * \brief Add an extra window of a different type to the collection
+   * \param[in] wim Render Window associated to the extra window
+   */
   void SetExtraRenderWindow(vtkRenderWindow* win)
   { this->ExtraRenderWindow = win; }
 
@@ -313,10 +334,16 @@ public:
   void SyncPan();
   void SyncSetZoomAndParallelScale(double Zoom, double ParallelScale);
 
-  void SetSplinePlaneActorsVisibility(bool);
+  /**
+   * \brief Set the visibility of the plane actor.
+   * \param[in] iVisibility
+   */
+  void SetSplinePlaneActorsVisibility(bool iVisibility);
   vtkstd::vector<vtkActor*> SlicePlaneActors;
-//   vtkstd::vector<vtkQuadricLODActor*>        SlicePlaneActors;
-
+  /**
+   * \brief Update the Window Level Observers according to the color of the number
+   *  of channels of the current image.
+   */
   void UpdateWindowLevelObservers();
 
   /**
@@ -337,7 +364,7 @@ public:
   /**
    * \brief Change Interaction mode of the collection to ContourPickingMode()
    */
-  void EnableContourPickingMode(bool iEnable);
+  void EnableContourPickingMode();
 
 protected:
 

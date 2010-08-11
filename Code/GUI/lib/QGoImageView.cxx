@@ -298,11 +298,7 @@ void
 QGoImageView::
 DefaultMode()
 {
-  EnableOneClickMode(false);
-  EnableContourPickingMode(false);
-  // Reimplemented in 3D
-  EnableMeshPickingMode(false);
-
+  std::cout << "Default Mode" <<std::endl;
   //Change cursor
   ChangeCursorShape(Qt::ArrowCursor);
 
@@ -315,8 +311,7 @@ void
 QGoImageView::
 ZoomMode()
 {
-  DefaultMode();
-
+  std::cout << "Zoom Mode" <<std::endl;
   //Change cursors
   QCursor zoomCursor(QPixmap(QString::fromUtf8(":/fig/zoom.png")), -1, -1);
   ChangeCursorShape(zoomCursor);
@@ -330,8 +325,7 @@ void
 QGoImageView::
 PanMode()
 {
-  DefaultMode();
-
+  std::cout << "Pan Mode" <<std::endl;
   //Change cursor
   ChangeCursorShape(Qt::OpenHandCursor);
 
@@ -428,15 +422,13 @@ ShowSplinePlane()
 //-------------------------------------------------------------------------
 void
 QGoImageView::
-EnableContourPickingMode(bool iEnable)
+EnableContourPickingMode()
 {
-  if(iEnable)
-    {
-    DefaultMode();
-    }
-
+  std::cout << "Contour Picking Mode" <<std::endl;
+  //Change cursor
+  ChangeCursorShape(Qt::ArrowCursor);
   // Change mode in the collection
-  m_Pool->EnableContourPickingMode(iEnable);
+  m_Pool->EnableContourPickingMode();
 }
 
 //-------------------------------------------------------------------------
@@ -500,16 +492,21 @@ InitializeSeedWidget()
 //-------------------------------------------------------------------------
 void
 QGoImageView::
-EnableOneClickMode(bool iEnable)
+EnableSeedWidget(bool iEnable)
 {
+  std::cout << "Seed ---Widget---" <<std::endl;
+
   if(iEnable)
     {
     DefaultMode();
     }
 
-  for (int i = 0; i < this->m_Pool->GetNumberOfItems(); i++)
+  std::vector<vtkSeedWidget*>::iterator
+  it = m_SeedWidget.begin();
+  while (it != m_SeedWidget.end())
     {
-    m_SeedWidget[i]->SetEnabled(iEnable);
+    (*it)->SetEnabled(iEnable);
+    ++it;
     }
 }
 
@@ -581,8 +578,14 @@ InitializeDistanceWidget()
 //-------------------------------------------------------------------------
 void
 QGoImageView::
-DistanceWidgetMode(bool iActive)
+EnableDistanceWidget(bool iActive)
 {
+  std::cout << "Distance ---Widget---" <<std::endl;
+  if(iActive)
+    {
+    DefaultMode();
+    }
+
   int N = this->m_Pool->GetNumberOfItems();
   for (int i = 0; i < N; i++)
   {
@@ -610,8 +613,15 @@ InitializeAngleWidget()
 //-------------------------------------------------------------------------
 void
 QGoImageView::
-AngleWidgetMode(bool iActive)
+EnableAngleWidget(bool iActive)
 {
+  std::cout << "Angle ---Widget---" <<std::endl;
+
+  if(iActive)
+    {
+    DefaultMode();
+    }
+
   int N = this->m_Pool->GetNumberOfItems();
   for (int i = 0; i < N; i++)
   {
@@ -657,8 +667,15 @@ InitializeContourWidget()
 //-------------------------------------------------------------------------
 void
 QGoImageView::
-ContourWidgetMode(bool iActivate)
+EnableContourWidget(bool iActivate)
 {
+  std::cout << "Contour ---Widget---" <<std::endl;
+
+  if(iActivate)
+    {
+    DefaultMode();
+    }
+
   std::vector<vtkSmartPointer<vtkContourWidget> >::iterator
   it = m_ContourWidget.begin();
   while (it != m_ContourWidget.end())

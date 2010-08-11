@@ -128,6 +128,8 @@ public:
   void ShowSplinePlane();
   void ShowCube3D();
 
+  // MODES
+
   /**
    * \brief Use the default interactor style
    */
@@ -141,28 +143,33 @@ public:
    */
   void PanMode();
   /**
-   * \brief Use the one click interactor style
-   */
-  void OneClickMode();
-
-  /**
    * \brief switch to contour picking mode
    */
   void ContourPickingMode();
-
   /**
    * \brief Use the mesh picking interactor style
    */
-
   void MeshPickingMode();
+
+  // WIDGETS
+  /**
+   * \brief Use the one click interactor style
+   */
+  void EnableSeedWidget( bool iActivate );
 
   /**
    * \brief Creates a box in 3d view to allow multiple meshes selection
    */
-  void SetBox3DPicking(bool);
+  void EnableBoxWidget(bool);
 
+  /**
+   * \brief Creates a box in 3d view to allow multiple meshes selection
+   */
   vtkProp* GetPickedActor();
 
+  /**
+   * \brief Creates a box in 3d view to allow multiple meshes selection
+   */
   void EnableVolumeRendering(bool iValue);
 
 signals:
@@ -251,16 +258,6 @@ protected:
   void FullScreenViewXZ();
   void FullScreenViewYZ();
   void FullScreenViewXYZ();
-
-  /**
-   * \brief Enable/Disable the contour picking interactor style
-   */
-  void EnableContourPickingMode(bool iEnable);
-
-  /**
-   * \brief Use the mesh picking interactor style
-   */
-  virtual void EnableMeshPickingMode(bool iEnable);
 
   void InitializeBoxWidget();
 

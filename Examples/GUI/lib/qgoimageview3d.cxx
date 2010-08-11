@@ -89,26 +89,33 @@ int main(int argc, char** argv)
   //viewer->SetCamera(1);
   //viewer->SetCamera(2);
   //viewer->SetCamera(3);
+
+  // Modes
   viewer->DefaultMode();
-  /// TODO Fix it
-  //viewer->ZoomMode();
+  viewer->ZoomMode();
   viewer->PanMode();
-  viewer->AngleWidgetMode(true);
-  viewer->AngleWidgetMode(false);
-  viewer->DistanceWidgetMode(true);
-  viewer->DistanceWidgetMode(false);
-  viewer->OneClickMode();
-  viewer->ContourPickingMode();
+  viewer->EnableContourPickingMode();
+  // Protected should be public
+  //viewer->EnableMeshPickingMode();
+
+  // Widgets
+  viewer->EnableDistanceWidget(true);
+  viewer->EnableDistanceWidget(false);
+  viewer->EnableAngleWidget(true);
+  viewer->EnableAngleWidget(false);
+  viewer->EnableContourWidget(true);
+  viewer->EnableContourWidget(false);
+  viewer->EnableSeedWidget(true);
+  viewer->EnableSeedWidget(false);
+  viewer->EnableBoxWidget(true);
+  viewer->EnableBoxWidget(false);
+
   vtkPoints* points = viewer->GetAllSeeds();
   points->Delete();
   viewer->ClearAllSeeds();
   viewer->GetListOfPickedContours();
   viewer->GetListOfUnPickedContours();
-  viewer->MeshPickingMode();
   viewer->GetListOfModifiedActors3D();
-
-  viewer->SetBox3DPicking(true);
-  viewer->SetBox3DPicking(false);
 
   if (atoi(argv[2]) == 1)
     {

@@ -55,7 +55,7 @@ class QGoImageView3D;
 /**
  * \class QGoSynchronizedView3D
  * \brief class used to display a QWidget containing a two dimensional
- * a vtkimagedata* or an itkimage*.
+ * vtkimagedata* or itkimage*.
  * QGoSynchronizedView3D provide the interface to synchronize cameras among
  * several GoSynchronizedView3D.
  * \example GUI/lib/qgosynchronizedview3dtest.cxx
@@ -74,11 +74,6 @@ public:
   explicit QGoSynchronizedView3D(QString iViewName, QWidget *iParent = 0);
 
   ~QGoSynchronizedView3D();
-
-  /** print the SynchronizedView information :
-   *  it consists in the image information if any.
-   */
-  void PrintOs(ostream& os);
 
   /** Set image displayed by the SynchronizedView
    */
@@ -107,20 +102,42 @@ public:
     Update();
   }
 
-  /** \brief returns the type of SynchronizedView (2 for 2D, 3 for 3D)
+  /** \brief Update the viewer contained in the widget
    */
-  int GetSynchronizedViewType(void);
+  void Update( void );
+
+  /** \brief render the all visualizations of the
+   *  viewer contained in the widget if any.
+   */
+  void Render( void );
 
   /** render the iId'th imageview:
    *  3D visualization usually contains 4 imageviewers :
    *  three 2D projection and a 3D view : iId=[0-3]
    */
-  void Render(const int& iId);
+  void Render( const int& iId );
+
+  /** \brief get the camera of the current fullscreen view
+  */
+  vtkCamera* GetCamera( void );
 
   /** get the camera of the current viewer;
    *  iId=[0-3]
    */
   vtkCamera* GetCamera(const int& iId);
+
+  /** \brief true if the widget has a viewer
+   */
+  bool HasViewer( void );
+
+  /** print the SynchronizedView information :
+   *  it consists in the image information if any.
+   */
+  void PrintOs(ostream& os);
+
+  /** \brief returns the type of SynchronizedView (2 for 2D, 3 for 3D)
+   */
+  int GetSynchronizedViewType(void);
 
   /** Returns the QGoImageView3D* displayed.
    */
@@ -178,11 +195,19 @@ public slots:
   void SetQuadView();
 
 private:
+
+  /** delete the viewer contained in the widget
+   */
+  void deleteViewer( void );
+
   /** Create the viewer in the widget
    */
   void createViewer();
 
-  itkvtkConnectorType::Pointer m_itkvtkConnector;
+
+  QGoImageView3D*               m_currentView;
+  itkvtkConnectorType::Pointer  m_itkvtkConnector;
+
 
   Q_DISABLE_COPY(QGoSynchronizedView3D);
   };

@@ -49,6 +49,16 @@
 class vtkViewImage2DCollection;
 class vtkProp3D;
 
+/*
+ * \defgroup visualization ‘‘Visualization’’
+ */
+
+/*
+ * \class vtkViewImage2DCollectionCommand
+ * \ingroup visualization
+ * \brief Manage events occuring in a 2D view and aapply it to a collec
+ */
+
 class VTK_RENDERINGADDON2_EXPORT vtkViewImage2DCollectionCommand :
   public vtkCommand
   {

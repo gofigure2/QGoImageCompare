@@ -142,9 +142,14 @@ class vtkProp;
 class vtkTransform;
 class vtkScalarsToColors;
 
+/*
+ * \defgroup visualization ‘‘Visualization’’
+ */
+
 /**
 
    \class vtkViewImage
+   \ingroup visualization
    \brief This class is a top-level convenience class for displaying a scalar - or RGB
    image in a 2D or 3D scene.
 

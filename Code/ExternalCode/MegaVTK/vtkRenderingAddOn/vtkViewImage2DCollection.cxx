@@ -151,7 +151,6 @@ InitializeAllObservers()
     style->AddObserver(vtkViewImage2DCommand::ResetViewerEvent, this->Command);
     style->AddObserver(vtkViewImage2DCommand::ContourPickingEvent, this->Command);
     style->AddObserver(vtkViewImage2DCommand::MeshPickingEvent, this->Command);
-    style->AddObserver(vtkViewImage2DCommand::SeedEvent, this->Command);
 
     a = this->GetNextItem();
     }
@@ -644,7 +643,7 @@ void vtkViewImage2DCollection::EnableZoomInteractionMode()
   vtkViewImage2D* item = this->GetNextItem();
   while (item)
     {
-    item->SetInteractionStyle(vtkInteractorStyleImage2D::InteractionTypeZoom);
+    item->SetZoomInteractionStyle();
     item = this->GetNextItem();
     }
 }
@@ -656,36 +655,19 @@ void vtkViewImage2DCollection::EnablePanInteractionMode()
   vtkViewImage2D* item = this->GetNextItem();
   while (item)
     {
-    item->SetInteractionStyle(vtkInteractorStyleImage2D::InteractionTypePan);
+    item->SetPanInteractionStyle();
     item = this->GetNextItem();
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkViewImage2DCollection::EnableContourPickingMode(bool iEnable)
+void vtkViewImage2DCollection::EnableContourPickingMode()
 {
   this->InitTraversal();
   vtkViewImage2D* item = this->GetNextItem();
   while (item)
     {
-    item->SetInteractionStyle(
-      vtkInteractorStyleImage2D::InteractionTypeContourPicking);
-    item->SetWheelInteractionStyle(
-      vtkInteractorStyleImage2D::InteractionTypeSlice);
-
-    vtkInteractorStyleImage2D* t =
-      vtkInteractorStyleImage2D::SafeDownCast(item->GetInteractorStyle());
-    if (t)
-      {
-      if (iEnable)
-        {
-        t->StartPick();
-        }
-      else
-        {
-        t->EndPick();
-        }
-      }
+    item->SetPickInteractionStyle();
     item = this->GetNextItem();
     }
 }

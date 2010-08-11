@@ -89,12 +89,16 @@
 #include <string>
 #include <sstream>
 
-vtkViewImage2DCommand::vtkViewImage2DCommand() : Viewer(0)
+//----------------------------------------------------------------------------
+vtkViewImage2DCommand::
+vtkViewImage2DCommand() : Viewer(0)
   {
   }
 
+//----------------------------------------------------------------------------
 void
-vtkViewImage2DCommand::Execute(vtkObject*    caller,
+vtkViewImage2DCommand::
+Execute(vtkObject*    caller,
                                unsigned long event,
                                void*         vtkNotUsed(callData))
 {
@@ -141,16 +145,10 @@ vtkViewImage2DCommand::Execute(vtkObject*    caller,
     //std::cout << "Mesh pick single" << std::endl;
     }
 
-  if (event == vtkViewImage2DCommand::SeedEvent)
-    {
-    //std::cout << "Seed event" << std::endl;
-    }
-
   if (event == vtkCommand::KeyPressEvent)
     {
     vtkRenderWindowInteractor *rwi =
       this->Viewer->GetRenderWindow()->GetInteractor();
-
     if (rwi->GetKeyCode() == 't')
       {
       this->Viewer->SetViewOrientation (
@@ -162,7 +160,6 @@ vtkViewImage2DCommand::Execute(vtkObject*    caller,
       this->Viewer->SetInterpolate ((this->Viewer->GetInterpolate() + 1) % 2);
       this->Viewer->Render();
       }
-
     return;
     }
 
@@ -200,7 +197,10 @@ vtkViewImage2DCommand::Execute(vtkObject*    caller,
     }
 }
 
-void vtkViewImage2DCommand::Windowing(vtkInteractorStyleImage2D* isi)
+//----------------------------------------------------------------------------
+void
+vtkViewImage2DCommand::
+Windowing(vtkInteractorStyleImage2D* isi)
 {
   int *  size = this->Viewer->GetRenderWindow()->GetSize();
   double window = this->InitialWindow;
@@ -306,7 +306,6 @@ void vtkViewImage2DCommand::Zooming()
 
   vtkRenderer* ren = this->Viewer->GetRenderer();
 
-  //int *center = ren->GetCenter();
   int* size = ren->GetSize();
   int  dy = rwi->GetEventPosition()[1] - rwi->GetLastEventPosition()[1];
 
@@ -317,7 +316,10 @@ void vtkViewImage2DCommand::Zooming()
   this->Viewer->SetZoom(z);
 }
 
-void vtkViewImage2DCommand::Panning()
+//----------------------------------------------------------------------------
+void
+vtkViewImage2DCommand::
+Panning()
 {
   vtkRenderWindowInteractor *rwi =
     this->Viewer->GetRenderWindow()->GetInteractor();
@@ -361,18 +363,6 @@ void vtkViewImage2DCommand::Panning()
   camera->SetPosition(MotionVector[0] + ViewPoint[0],
                       MotionVector[1] + ViewPoint[1],
                       MotionVector[2] + ViewPoint[2]);
-
-//   double *center = ren->GetCenter();
-
-  // Compute a translation vector, moving everything 1/10
-  // the distance to the cursor. (Arbitrary scale factor)
-
-//   MotionVector[0] = /*0.1 * */(ViewFocus[0] - NewPickPoint[0]);
-//   MotionVector[1] = /*0.1 * */(ViewFocus[1] - NewPickPoint[1]);
-//   MotionVector[2] = /*0.1 * */(ViewFocus[2] - NewPickPoint[2]);
-//   MotionVector[0] = 0.01 * (ViewFocus[0] - NewPickPoint[0]);
-//   MotionVector[1] = 0.01 * (ViewFocus[1] - NewPickPoint[1]);
-//   MotionVector[2] = 0.01 * (ViewFocus[2] - NewPickPoint[2]);
 
   this->Viewer->SetCameraMotionVector(MotionVector);
 }

@@ -857,8 +857,11 @@ void
 vtkViewImage3D::
 UpdateCurrentActor()
 {
-m_ListOfModifiedActors.clear();
-m_ListOfModifiedActors.push_back((vtkProp3D*) this->GetInteractorStyle3D()->GetCurrentProp());
-this->InvokeEvent(vtkViewImage3DCommand::ReadyEvent);
+  m_ListOfModifiedActors.clear();
+  m_ListOfModifiedActors.push_back((vtkProp3D*) this->GetInteractorStyle3D()->GetCurrentProp());
+
+  //Update actors here
+  // Update container+database with this event
+  this->InvokeEvent(vtkViewImage3DCommand::ReadyEvent);
 }
 //-------------------------------------------------------------------------

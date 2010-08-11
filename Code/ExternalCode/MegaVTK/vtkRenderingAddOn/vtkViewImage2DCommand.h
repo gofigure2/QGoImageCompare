@@ -75,6 +75,16 @@ class vtkInteractorStyleImage2D;
 class vtkInteractorStyleImage;
 class vtkViewImage2D;
 
+/*
+ * \defgroup visualization ‘‘Visualization’’
+ */
+
+/*
+ * \class vtkViewImage2DCommand
+ * \ingroup visualization
+ * \brief Manage events occuring in 2D view
+ */
+
 class VTK_RENDERINGADDON2_EXPORT vtkViewImage2DCommand : public vtkCommand
   {
 public:
@@ -96,7 +106,6 @@ public:
     MeshPickingEvent,
     CameraMoveEvent,
     DefaultMoveEvent,
-    SeedEvent,
     WindowLevelEvent,
     SyncViewsEvent
     };
@@ -110,6 +119,11 @@ public:
   virtual void Execute(vtkObject * caller, unsigned long event,
                        void *vtkNotUsed(callData));
 
+  /**
+   * \ingroup visualization
+   * \brief Set the 2d image related to this 2d event manager
+   * \param[in] vtkViewImage2D Target 2D image
+   */
   void SetViewer(vtkViewImage2D *viewer)
   { this->Viewer = viewer; }
 
@@ -117,9 +131,27 @@ protected:
   vtkViewImage2DCommand();
   ~vtkViewImage2DCommand(){};
 
+  /**
+   * \ingroup visualization
+   * \brief Method to be called if an event is caught in "Windowing Mode"
+   * \param[in] isi Related interactor
+   */
   void Windowing(vtkInteractorStyleImage2D* isi);
+  /**
+   * \ingroup visualization
+   * \brief Method to be called if an event is caught in "Zooming Mode"
+   */
   void Zooming();
+  /**
+   * \ingroup visualization
+   * \brief Method to be called if an event is caught in "Panning Mode"
+   */
   void Panning();
+  /**
+   * \ingroup visualization
+   * \brief Method to be called when an event is caught to update information in 2D view
+   * such as position, pixel intensity, etc.
+   */
   void PrintInformation();
 
 private:

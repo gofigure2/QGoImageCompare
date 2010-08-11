@@ -55,7 +55,6 @@ QGoSynchronizedView::QGoSynchronizedView(QString iViewName, QWidget *iParent)
   : QWidget                  (iParent),
   m_currentViewName       (iViewName),
   m_currentImage          (NULL),
-  m_currentView           (NULL),
   m_currentViewManager    (NULL)
   {
   setupUi(this);
@@ -74,10 +73,7 @@ QGoSynchronizedView::QGoSynchronizedView(QString iViewName, QWidget *iParent)
 //--------------------------------------------------------------------------
 QGoSynchronizedView::
 ~QGoSynchronizedView()
-  {
-  // delete the view if any
-  deleteViewer();
-  }
+  {}
 
 //--------------------------------------------------------------------------
 void QGoSynchronizedView::changeEvent(QEvent *e)
@@ -135,57 +131,6 @@ GetName()
 }
 
 //--------------------------------------------------------------------------
-/* Update the viewer contained in the widget */
-void
-QGoSynchronizedView::
-Update()
-{
-  if (m_currentView)
-    {
-    m_currentView->Update();
-    }
-}
-
-//--------------------------------------------------------------------------
-/*  render the viewer contained in the widget if any */
-void
-QGoSynchronizedView::
-Render()
-{
-  if (m_currentView)
-    {
-    m_currentView->GetImageViewer(0)->Render();
-    }
-}
-
-//--------------------------------------------------------------------------
-/*  get the camera of the current viewer */
-vtkCamera*
-QGoSynchronizedView::
-GetCamera()
-{
-  if ( m_currentView )
-    {
-    return m_currentView->GetImageViewer(0)
-           ->GetRenderer()
-           ->GetActiveCamera();
-    }
-  else
-    {
-    return NULL;
-    }
-}
-
-//--------------------------------------------------------------------------
-/*  true if the widget has a viewer */
-bool
-QGoSynchronizedView::
-HasViewer()
-{
-  return (m_currentView != NULL);
-}
-
-//--------------------------------------------------------------------------
 /* Set the address of the current orchestra */
 void
 QGoSynchronizedView::
@@ -198,18 +143,4 @@ SetCurrentViewManager(QGoSynchronizedViewManager* iCurrentViewManager)
   Private
 */
 
-//--------------------------------------------------------------------------
-/* delete the viewer contained in the widget */
-void
-QGoSynchronizedView::
-deleteViewer()
-{
-  // if there is no viewer
-  if (m_currentView)
-    {
-    // delete object
-    delete (m_currentView);
-    // set pointer to NULL
-    m_currentView = NULL;
-    }
-}
+

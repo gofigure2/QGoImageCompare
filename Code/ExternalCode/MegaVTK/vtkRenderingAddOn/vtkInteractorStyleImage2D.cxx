@@ -89,12 +89,7 @@ vtkInteractorStyleImage2D()
   this->RequestedPosition = new int[2];
   this->RequestedPosition[0] = this->RequestedPosition[1] = 0;
 
-  this->LeftButtonInteraction   = InteractionTypeWindowLevel;
-  this->RightButtonInteraction  = InteractionTypeZoom;
-  this->MiddleButtonInteraction = InteractionTypePan;
-  this->WheelButtonInteraction  = InteractionTypeSlice;
-
-  this->m_PickingModeEnabled = false;
+  this->m_Mode = InteractionTypeDefault;
   }
 //----------------------------------------------------------------------------
 
@@ -115,13 +110,10 @@ OnMouseMove()
 
   switch (this->State)
     {
-    case VTKIS_SLICE_MOVE:
-      this->SliceMove();
-      this->InvokeEvent(vtkViewImage2DCommand::SyncViewsEvent, this);
-      break;
     case VTKIS_PAN:
       this->InvokeEvent(vtkViewImage2DCommand::PanEvent);
       break;
+    // USEFUL....
     case VTKIS_SPIN:
     case VTKIS_ROTATE:
     case VTKIS_DOLLY:
@@ -166,45 +158,22 @@ OnLeftButtonDown()
     return;
     }
 
-  if (this->Interactor->GetShiftKey() || this->Interactor->GetControlKey())
+  switch (this->m_Mode)
     {
-    if (this->GetLeftButtonInteraction() == InteractionTypeWindowLevel)
-      {
-      this->StartSliceMove();
+    case InteractionTypeZoom:
+      this->InvokeEvent(vtkViewImage2DCommand::ZoomEvent);
+      this->Superclass::OnRightButtonDown();
+      break;
+    case InteractionTypePan:
+      this->InvokeEvent(vtkViewImage2DCommand::PanEvent);
+      this->Superclass::OnMiddleButtonDown();
+      break;
+    case InteractionTypeContourPicking:
+      this->InvokeEvent(vtkViewImage2DCommand::ContourPickingEvent);
+      break;
+    default:
+      break;
       }
-    }
-  else if (this->State == VTKIS_PICK)
-    {
-    this->InvokeEvent(vtkViewImage2DCommand::ContourPickingEvent);
-    this->Superclass::OnLeftButtonDown();
-    }
-  else
-    {
-    switch (this->GetLeftButtonInteraction())
-      {
-      case InteractionTypeSlice:
-        this->Superclass::OnLeftButtonDown();
-        break;
-      case InteractionTypeWindowLevel:
-        this->Superclass::OnLeftButtonDown();
-        break;
-      case InteractionTypeZoom:
-        this->InvokeEvent(vtkViewImage2DCommand::ZoomEvent);
-        this->Superclass::OnRightButtonDown();
-        break;
-      case InteractionTypePan:
-        this->InvokeEvent(vtkViewImage2DCommand::PanEvent);
-        this->Superclass::OnMiddleButtonDown();
-        break;
-      case InteractionTypeSeed:
-        this->InvokeEvent(vtkViewImage2DCommand::SeedEvent);
-        this->Superclass::OnLeftButtonDown();
-        break;
-      default:
-        this->Superclass::OnLeftButtonDown();
-        break;
-      }
-    }
 
   // Call parent to handle all other states and perform additional work
   this->Superclass::OnLeftButtonDown();
@@ -216,31 +185,15 @@ void
 vtkInteractorStyleImage2D::
 OnLeftButtonUp()
 {
-  switch (this->State)
+  switch (this->m_Mode)
     {
-    case VTKIS_SLICE_MOVE:
-      this->EndSliceMove();
-      break;
-    default:
-      break;
-    }
-
-  switch (this->LeftButtonInteraction)
-    {
-    case InteractionTypeSlice:
-      this->Superclass::OnLeftButtonUp();
-      break;
     case InteractionTypeZoom:
       this->Superclass::OnRightButtonDown();
       break;
     case InteractionTypePan:
       this->Superclass::OnMiddleButtonDown();
       break;
-    case InteractionTypeWindowLevel:
-      this->Superclass::OnLeftButtonUp();
-      break;
     default:
-      this->Superclass::OnLeftButtonUp();
       break;
     }
 
@@ -253,45 +206,25 @@ void
 vtkInteractorStyleImage2D::
 OnMiddleButtonDown()
 {
-  // bool to check
-  if (this->m_PickingModeEnabled)
-    {
-    this->State = VTKIS_PAN;
-    }
 
   int x = this->Interactor->GetEventPosition()[0];
   int y = this->Interactor->GetEventPosition()[1];
   this->FindPokedRenderer(x, y);
 
-  if (this->Interactor->GetShiftKey() || this->Interactor->GetControlKey())
+  switch (this->m_Mode)
     {
-    if (this->GetLeftButtonInteraction() == InteractionTypeWindowLevel)
-      {
-      this->StartSliceMove();
-      }
-    }
-  else
-    {
-    switch (this->GetMiddleButtonInteraction())
-      {
-      case InteractionTypeSlice:
-        this->Superclass::OnLeftButtonDown();
-        break;
-      case InteractionTypeWindowLevel:
-        this->Superclass::OnLeftButtonDown();
-        break;
-      case InteractionTypeZoom:
-        this->InvokeEvent(vtkViewImage2DCommand::ZoomEvent);
-        this->Superclass::OnRightButtonDown();
-        break;
-      case InteractionTypePan:
-        this->InvokeEvent(vtkViewImage2DCommand::PanEvent);
-        this->Superclass::OnMiddleButtonDown();
-        break;
-      default:
-        this->Superclass::OnMiddleButtonDown();
-        break;
-      }
+    case InteractionTypeWindowLevel:
+      this->Superclass::OnLeftButtonDown();
+      break;
+    case InteractionTypeZoom:
+      this->InvokeEvent(vtkViewImage2DCommand::ZoomEvent);
+      this->Superclass::OnRightButtonDown();
+      break;
+    case InteractionTypeContourPicking:
+      this->State = VTKIS_NONE;
+      break;
+    default:
+      break;
     }
 
   // Call parent to handle all other states and perform additional work
@@ -303,36 +236,16 @@ void
 vtkInteractorStyleImage2D::
 OnMiddleButtonUp()
 {
-  // bool to check
-  if (this->m_PickingModeEnabled)
+  switch (this->m_Mode)
     {
-    this->State = VTKIS_PICK;
-    }
-
-  switch (this->State)
-    {
-    case VTKIS_SLICE_MOVE:
-      this->EndSliceMove();
-      break;
-    default:
-      break;
-    }
-
-  switch (this->MiddleButtonInteraction)
-    {
-    case InteractionTypeSlice:
-      this->Superclass::OnLeftButtonDown();
-      break;
     case InteractionTypeZoom:
       this->Superclass::OnRightButtonUp();
       break;
-    case InteractionTypePan:
-      this->Superclass::OnMiddleButtonUp();
-      break;
-    case InteractionTypeWindowLevel:
-      break;
+    case InteractionTypeContourPicking:
+      this->State = VTKIS_NONE;
+      this->Superclass::StartPick();
+      return;
     default:
-      this->Superclass::OnMiddleButtonUp();
       break;
     }
 
@@ -345,34 +258,20 @@ void
 vtkInteractorStyleImage2D::
 OnRightButtonDown()
 {
-  // bool to check
-  if (this->m_PickingModeEnabled)
-    {
-    this->State = VTKIS_ZOOM;
-    }
-
   //change state to zoom
-  switch (this->GetRightButtonInteraction())
+  switch (this->m_Mode)
     {
-    case InteractionTypeSlice:
-      this->StartSliceMove();
-      this->Superclass::OnLeftButtonDown();
-      break;
-    case InteractionTypeWindowLevel:
-      this->Superclass::OnLeftButtonDown();
-      break;
-    case InteractionTypeZoom:
-      // change state
-      this->InvokeEvent(vtkViewImage2DCommand::ZoomEvent);
-      this->Superclass::OnRightButtonDown();
-      // renable state
-      break;
     case InteractionTypePan:
       this->InvokeEvent(vtkViewImage2DCommand::PanEvent);
       this->Superclass::OnMiddleButtonDown();
       break;
+    case InteractionTypeWindowLevel:
+      this->Superclass::OnLeftButtonDown();
+      break;
+    case InteractionTypeContourPicking:
+      this->State = VTKIS_NONE;
+      break;
     default:
-      this->Superclass::OnRightButtonDown();
       break;
     }
 
@@ -385,39 +284,19 @@ void
 vtkInteractorStyleImage2D::
 OnRightButtonUp()
 {
-  if (this->m_PickingModeEnabled)
+  switch (this->m_Mode)
     {
-    this->State = VTKIS_PICK;
-    }
-
-  switch (this->State)
-    {
-    case VTKIS_SLICE_MOVE:
-      this->EndSliceMove();
-      break;
-    // To avoid going into the super class we need the following return
-    case VTKIS_PICK:
-      return;
-    default:
-      break;
-    }
-
-  switch (this->RightButtonInteraction)
-    {
-    case InteractionTypeSlice:
-      this->Superclass::OnLeftButtonUp();
-      break;
     case InteractionTypePan:
       this->Superclass::OnMiddleButtonUp();
       break;
     case InteractionTypeWindowLevel:
       this->Superclass::OnLeftButtonUp();
       break;
-    case InteractionTypeZoom:
-      this->Superclass::OnRightButtonUp();
-      break;
+    case InteractionTypeContourPicking:
+      this->State = VTKIS_NONE;
+      this->Superclass::StartPick();
+      return;
     default:
-      this->Superclass::OnRightButtonUp();
       break;
     }
 
@@ -430,7 +309,6 @@ void
 vtkInteractorStyleImage2D::
 OnMouseWheelForward()
 {
-
   int x = this->Interactor->GetEventPosition()[0];
   int y = this->Interactor->GetEventPosition()[1];
 
@@ -440,22 +318,15 @@ OnMouseWheelForward()
     return;
     }
 
-  switch (this->GetWheelButtonInteraction())
+  switch (this->m_Mode)
     {
-    case InteractionTypeSlice:
+    case InteractionTypeDefault:
       this->StartSliceMove();
       this->SliceStep = static_cast<int>(this->MouseWheelMotionFactor);
       this->SliceMove();
       this->EndSliceMove();
       break;
-    case InteractionTypeWindowLevel:
-      break;
-    case InteractionTypeZoom:
-      break;
-    case InteractionTypePan:
-      break;
     default:
-      this->Superclass::OnMouseWheelForward();
       break;
     }
 }
@@ -474,22 +345,15 @@ OnMouseWheelBackward()
     return;
     }
 
-  switch (this->GetWheelButtonInteraction())
+  switch (this->m_Mode)
     {
-    case InteractionTypeSlice:
+    case InteractionTypeDefault:
       this->StartSliceMove();
       this->SliceStep = static_cast<int>(-this->MouseWheelMotionFactor);
       this->SliceMove();
       this->EndSliceMove();
       break;
-    case InteractionTypeWindowLevel:
-      break;
-    case InteractionTypeZoom:
-      break;
-    case InteractionTypePan:
-      break;
     default:
-      this->Superclass::OnMouseWheelBackward();
       break;
     }
 }
@@ -640,38 +504,6 @@ DefaultMoveAction()
 }
 
 //----------------------------------------------------------------------------
-void
-vtkInteractorStyleImage2D::
-SetLeftButtonInteraction(InteractionTypeIds interactionType)
-{
-  LeftButtonInteraction = interactionType;
-}
-
-//----------------------------------------------------------------------------
-void
-vtkInteractorStyleImage2D::
-SetRightButtonInteraction(InteractionTypeIds interactionType)
-{
-  RightButtonInteraction = interactionType;
-}
-
-//----------------------------------------------------------------------------
-void
-vtkInteractorStyleImage2D::
-SetMiddleButtonInteraction(InteractionTypeIds interactionType)
-{
-  MiddleButtonInteraction = interactionType;
-}
-
-//----------------------------------------------------------------------------
-void
-vtkInteractorStyleImage2D::
-SetWheelButtonInteraction(InteractionTypeIds interactionType)
-{
-  WheelButtonInteraction = interactionType;
-}
-
-//----------------------------------------------------------------------------
 vtkProp*
 vtkInteractorStyleImage2D::
 GetCurrentProp()
@@ -722,21 +554,39 @@ HighlightCurrentActor()
     rwi->EndPickCallback();
     }
 }
+
 //----------------------------------------------------------------------------
 void
 vtkInteractorStyleImage2D::
-StartPick()
+SetDefaultMode()
 {
-  this->m_PickingModeEnabled = true;
-  this->Superclass::StartPick();
+  this->State = VTKIS_NONE;
+  this->m_Mode =InteractionTypeDefault;
 }
 //----------------------------------------------------------------------------
 void
 vtkInteractorStyleImage2D::
-EndPick()
+SetZoomMode()
 {
-  this->HighlightProp(NULL);
-  this->PropPicked = 0;
-  this->Superclass::EndPick();
-  this->m_PickingModeEnabled = false;
+  this->State = VTKIS_NONE;
+  this->m_Mode =InteractionTypeZoom;
+}
+
+//----------------------------------------------------------------------------
+void
+vtkInteractorStyleImage2D::
+SetPanMode()
+{
+  this->State = VTKIS_NONE;
+  this->m_Mode =InteractionTypePan;
+}
+
+//----------------------------------------------------------------------------
+void
+vtkInteractorStyleImage2D::
+SetPickMode()
+{
+  this->State = VTKIS_NONE;
+  this->m_Mode =InteractionTypeContourPicking;
+  this->Superclass::StartPick();
 }
