@@ -9,28 +9,11 @@ IF( COMMAND CMAKE_POLICY )
   CMAKE_POLICY( SET CMP0003 NEW )
 ENDIF(COMMAND CMAKE_POLICY)
 
-#-------------------------------------------------------------------------
-# Subversion
-IF( EXISTS ${CMAKE_SOURCE_DIR}/.svn/ )
-  FIND_PACKAGE( Subversion )
-
-  IF( Subversion_FOUND )
-    Subversion_WC_INFO( ${GOFIGURE2_SOURCE_DIR} GOFIGURE2 )
-  ELSE( Subversion_FOUND )
-    SET( GOFIGURE2_WC_REVISION 0 )
-  ENDIF( Subversion_FOUND )
-ELSE( EXISTS ${CMAKE_SOURCE_DIR}/.svn/ )
-  SET( GOFIGURE2_WC_REVISION 0 )
-ENDIF( EXISTS ${CMAKE_SOURCE_DIR}/.svn/ )
-#-------------------------------------------------------------------------
-
 # When making one release: update GOFIGURE2_*_VERSION,
 # GOFIGURE2_WC_REVISION and the date of the release
 SET( GOFIGURE2_MAJOR_VERSION "0" )
 SET( GOFIGURE2_MINOR_VERSION "6" )
 #SET( GOFIGURE2_WC_REVISION "0" )
-
-SET( DATE "07/28/2010" )
 
 SET( GOFIGURE2_VERSION
   "${GOFIGURE2_MAJOR_VERSION}.${GOFIGURE2_MINOR_VERSION}.${GOFIGURE2_WC_REVISION}" )
@@ -186,20 +169,6 @@ IF( VTK_FOUND )
     ENDIF( ( ${ITK_VERSION_MAJOR} LESS 3 ) OR
         ( ( ${ITK_VERSION_MAJOR} EQUAL 3 ) AND
           ( ${ITK_VERSION_MINOR} LESS 18 ) ) ) 
-
-  
-  IF( ${ITK_VERSION_MAJOR} EQUAL 3 ) 
-    IF( ( ${ITK_USE_REVIEW} MATCHES "OFF" ) OR 
-        ( ${ITK_USE_REVIEW_STATISTICS} MATCHES "OFF" ) )
-      MESSAGE( SEND_ERROR
-        "GoFigure2 requires ITK to be compiled with USE_REVIEW and USE_REVIEW_STATISTICS turned ON" )
-     ENDIF( ( ${ITK_USE_REVIEW} MATCHES "OFF" ) OR 
-        ( ${ITK_USE_REVIEW_STATISTICS} MATCHES "OFF" ) )
-  ELSE( ${ITK_VERSION_MAJOR} EQUAL 3 )
-    IF( ${ITK_USE_REVIEW} MATCHES "OFF" )
-      MESSAGE( SEND_ERROR
-        "GoFigure2 requires ITK to be compiled with USE_REVIEW turned ON" )
-    ENDIF( ${ITK_USE_REVIEW} MATCHES "OFF" )
 
   ENDIF( ${ITK_VERSION_MAJOR} EQUAL 3 ) 
 
