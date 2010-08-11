@@ -246,8 +246,6 @@ IF( VTK_FOUND )
     SET( QT_UIC_EXECUTABLE ${VTK_QT_UIC_EXECUTABLE} CACHE FILEPATH "" )
     #---------------------------------------------------------------------
 
-
-
     ADD_SUBDIRECTORY( Code )
 
     #-----------------------------------------------------------------------
@@ -276,12 +274,6 @@ IF( VTK_FOUND )
       SET( BUILD_TESTING OFF )
     ENDIF( BUILD_EXAMPLES )
 
-    CONFIGURE_FILE(
-      "${CMAKE_CURRENT_SOURCE_DIR}/UseGoFigure2.cmake.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/UseGoFigure2.cmake"
-      @ONLY
-      )
-    
     #-----------------------------------------------------------------------
     # PACKAGE With CPack
     #-----------------------------------------------------------------------
