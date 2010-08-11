@@ -1,7 +1,6 @@
 SET( QGOGUILIB_EXAMPLE_SRC
   qgoimageview2d
   qgoimageview3d
-  QGoImageInfoTest
   qgolutdialog
 
   qgosynchronizedview2dtest
@@ -30,11 +29,6 @@ ADD_TEST( qgoimageview2dTest
 ADD_TEST( qgoimageview3dTest
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/qgoimageview3d
   ${TESTING_DATA_PATH}/Circle3D.mhd
-  1
-)
-
-ADD_TEST( QGoImageInfoTest
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/QGoImageInfoTest
   1
 )
 
