@@ -53,8 +53,6 @@ SET( QGoGUILIB_HDRS
 #---------------------------------------------------------------------------
 
 SET( QGoGUILIB_UI
-  Resources/QNameDescriptionInputDialog.ui
-
   Resources/QGoSynchronizedView.ui
 )
 
