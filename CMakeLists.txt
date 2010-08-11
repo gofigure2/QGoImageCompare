@@ -46,31 +46,6 @@ IF( WIN32 )
   ENDIF( NOT BORLAND )
 ENDIF( WIN32 )
 
-#-----------------------------------------------------------------------
-# Export and Install configuration
-#
-# GOFIGURE2_INSTALL_BUNDLE_DIR       - bundle dir
-# GOFIGURE2_INSTALL_BIN_DIR          - binary dir (executables)
-# GOFIGURE2_INSTALL_LIB_DIR          - library dir (libs)
-# GOFIGURE2_INSTALL_DOC_DIR          - documentation dir
-# GOFIGURE2_INSTALL_LICENSE_DIR      - licenses dir
-#-----------------------------------------------------------------------
-IF( NOT GOFIGURE2_INSTALL_BUNDLE_DIR )
-  SET( GOFIGURE2_INSTALL_BUNDLE_DIR "." )
-ENDIF( NOT GOFIGURE2_INSTALL_BUNDLE_DIR )
-
-IF( NOT GOFIGURE2_INSTALL_BIN_DIR )
-  SET( GOFIGURE2_INSTALL_BIN_DIR "bin" )
-ENDIF( NOT GOFIGURE2_INSTALL_BIN_DIR )
-   
-IF( NOT GOFIGURE2_INSTALL_LIB_DIR )
-  SET( GOFIGURE2_INSTALL_LIB_DIR "lib/gofigure2" )
-ENDIF( NOT GOFIGURE2_INSTALL_LIB_DIR )
-
-IF( NOT GOFIGURE2_INSTALL_LICENSE_DIR )
-  SET( GOFIGURE2_INSTALL_LICENSE_DIR "share/doc/gofigure2/Licenses" )
-ENDIF( NOT GOFIGURE2_INSTALL_LICENSE_DIR )
-
 #---------------------------------------------------------------------------
 # Define CMAKE_whatever_OUTPUT_DIRECTORY
 #---------------------------------------------------------------------------
@@ -245,24 +220,6 @@ IF( VTK_FOUND )
     ELSE( BUILD_EXAMPLES )
       SET( BUILD_TESTING OFF )
     ENDIF( BUILD_EXAMPLES )
-
-    #-----------------------------------------------------------------------
-    # PACKAGE With CPack
-    #-----------------------------------------------------------------------
-    # add the uninstall support
-    CONFIGURE_FILE(
-      "${CMAKE_CURRENT_SOURCE_DIR}/GOFIGURE2Uninstall.cmake.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/GOFIGURE2Uninstall.cmake"
-      @ONLY
-      )
-
-    ADD_CUSTOM_TARGET( uninstall
-      "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/GOFIGURE2Uninstall.cmake"
-      )
-      
-    IF( ( ${CMAKE_MAJOR_VERSION} EQUAL 2 )  AND ( ${CMAKE_MINOR_VERSION} GREATER 7 ) )
-      INCLUDE( GOFIGURE2CPack.cmake )
-    ENDIF( ( ${CMAKE_MAJOR_VERSION} EQUAL 2 )  AND ( ${CMAKE_MINOR_VERSION} GREATER 7 ) )
 
   ELSE( QT4_FOUND AND QT_VERSION_MINOR GREATER 4 )
     MESSAGE( SEND_ERROR "GoFigure2 requires Qt4.5 (or newer version) to be installed" )
