@@ -9,28 +9,11 @@ IF( COMMAND CMAKE_POLICY )
   CMAKE_POLICY( SET CMP0003 NEW )
 ENDIF(COMMAND CMAKE_POLICY)
 
-#-------------------------------------------------------------------------
-# Subversion
-IF( EXISTS ${CMAKE_SOURCE_DIR}/.svn/ )
-  FIND_PACKAGE( Subversion )
-
-  IF( Subversion_FOUND )
-    Subversion_WC_INFO( ${GOFIGURE2_SOURCE_DIR} GOFIGURE2 )
-  ELSE( Subversion_FOUND )
-    SET( GOFIGURE2_WC_REVISION 0 )
-  ENDIF( Subversion_FOUND )
-ELSE( EXISTS ${CMAKE_SOURCE_DIR}/.svn/ )
-  SET( GOFIGURE2_WC_REVISION 0 )
-ENDIF( EXISTS ${CMAKE_SOURCE_DIR}/.svn/ )
-#-------------------------------------------------------------------------
-
 # When making one release: update GOFIGURE2_*_VERSION,
 # GOFIGURE2_WC_REVISION and the date of the release
 SET( GOFIGURE2_MAJOR_VERSION "0" )
 SET( GOFIGURE2_MINOR_VERSION "6" )
-#SET( GOFIGURE2_WC_REVISION "0" )
-
-SET( DATE "07/28/2010" )
+SET( GOFIGURE2_WC_REVISION "0" )
 
 SET( GOFIGURE2_VERSION
   "${GOFIGURE2_MAJOR_VERSION}.${GOFIGURE2_MINOR_VERSION}.${GOFIGURE2_WC_REVISION}" )
@@ -145,18 +128,6 @@ IF( VTK_FOUND )
 
   INCLUDE( ${VTK_USE_FILE} )
 
-  IF( ${VTK_USE_MYSQL} MATCHES "ON" )
-    FIND_PACKAGE( MySQL REQUIRED )
-    SET( MYSQL_LIBRARIES ${MYSQL_LIBRARIES} CACHE FILEPATH "" )
-#    SET( MYSQL_EXTRA_LIBRARIES ${MYSQL_EXTRA_LIBRARIES} CACHE FILEPATH "" )
-  ELSE( ${VTK_USE_MYSQL} MATCHES "ON" )
-    MESSAGE( SEND_ERROR "VTK must be compiled with MySQL support" )
-    # TODO (arnaudgelas)
-    # Here add a definition to be able to compile and use GoFigure
-    # without any database support
-    # ADD_DEFINITION( -DNODBSUPPORT )
-  ENDIF( ${VTK_USE_MYSQL} MATCHES "ON" )
-
   #----------------------------------------------------------
   # Determine if GoFigure has to be built in shared or static
   # based on the configuration of VTK
@@ -187,33 +158,10 @@ IF( VTK_FOUND )
         ( ( ${ITK_VERSION_MAJOR} EQUAL 3 ) AND
           ( ${ITK_VERSION_MINOR} LESS 18 ) ) ) 
 
-  
-  IF( ${ITK_VERSION_MAJOR} EQUAL 3 ) 
-    IF( ( ${ITK_USE_REVIEW} MATCHES "OFF" ) OR 
-        ( ${ITK_USE_REVIEW_STATISTICS} MATCHES "OFF" ) )
-      MESSAGE( SEND_ERROR
-        "GoFigure2 requires ITK to be compiled with USE_REVIEW and USE_REVIEW_STATISTICS turned ON" )
-     ENDIF( ( ${ITK_USE_REVIEW} MATCHES "OFF" ) OR 
-        ( ${ITK_USE_REVIEW_STATISTICS} MATCHES "OFF" ) )
-  ELSE( ${ITK_VERSION_MAJOR} EQUAL 3 )
-    IF( ${ITK_USE_REVIEW} MATCHES "OFF" )
-      MESSAGE( SEND_ERROR
-        "GoFigure2 requires ITK to be compiled with USE_REVIEW turned ON" )
-    ENDIF( ${ITK_USE_REVIEW} MATCHES "OFF" )
-
-  ENDIF( ${ITK_VERSION_MAJOR} EQUAL 3 ) 
-
   ENDIF( ITK_FOUND )
   #----------------------------------------------------------
 
   #----------------------------------------------------------
-  # Then find Boost. Note that we only need headers
-  #### BOOST ####
-  FIND_PACKAGE( Boost REQUIRED )
-  IF( Boost_FOUND )
-    INCLUDE_DIRECTORIES( BEFORE ${Boost_INCLUDE_DIRS} )
-  ENDIF( Boost_FOUND )
-
   # Try to find Qt.
   # Note that some command line tools will get compiled even without Qt
   #### Qt ####
@@ -231,16 +179,11 @@ IF( VTK_FOUND )
     SET( QT_PLUGIN_LIBS ${QT_LIBRARIES} )
 
     ADD_DEFINITIONS( ${QT_DEFINITIONS} )
-    #
-    # ADD_DEFINITIONS( -DQT_GUI_LIBS )
-    # ADD_DEFINITIONS( -DQT_CORE_LIB )
 
     SET( GOFIGURE2_EXTERNAL_SOURCE_DIR
       ${GOFIGURE2_SOURCE_DIR}/Code/ExternalCode )
     SET( GOFIGURE2_EXTERNAL_BINARY_DIR
       ${GOFIGURE2_BINARY_DIR}/Code/ExternalCode )
-    SET( GOFIGURE2_BOOST_MULTI_INDEX_DIR
-      ${GOFIGURE2_EXTERNAL_SOURCE_DIR}/Boost/multi_index )
 
     SET( MEGAVTK2_SOURCE_DIR ${GOFIGURE2_EXTERNAL_SOURCE_DIR}/MegaVTK )
     SET( MEGAVTK2_BINARY_DIR ${GOFIGURE2_EXTERNAL_BINARY_DIR}/MegaVTK )
@@ -256,8 +199,6 @@ IF( VTK_FOUND )
       ${QT_INCLUDES}
       ${GOFIGURE2_SOURCE_DIR}/Code/
       ${GOFIGURE2_BINARY_DIR}/Code/
-      ${GOFIGURE2_SOURCE_DIR}/Code/IO/
-      ${GOFIGURE2_BINARY_DIR}/Code/IO/
       ${GOFIGURE2_SOURCE_DIR}/Code/GUI/
       ${GOFIGURE2_BINARY_DIR}/Code/GUI/
       ${GOFIGURE2_SOURCE_DIR}/Code/GUI/lib/
@@ -276,8 +217,6 @@ IF( VTK_FOUND )
     SET( QT_MOC_EXECUTABLE ${VTK_QT_MOC_EXECUTABLE} CACHE FILEPATH "" )
     SET( QT_UIC_EXECUTABLE ${VTK_QT_UIC_EXECUTABLE} CACHE FILEPATH "" )
     #---------------------------------------------------------------------
-
-
 
     ADD_SUBDIRECTORY( Code )
 
@@ -307,12 +246,6 @@ IF( VTK_FOUND )
       SET( BUILD_TESTING OFF )
     ENDIF( BUILD_EXAMPLES )
 
-    CONFIGURE_FILE(
-      "${CMAKE_CURRENT_SOURCE_DIR}/UseGoFigure2.cmake.in"
-      "${CMAKE_CURRENT_BINARY_DIR}/UseGoFigure2.cmake"
-      @ONLY
-      )
-    
     #-----------------------------------------------------------------------
     # PACKAGE With CPack
     #-----------------------------------------------------------------------

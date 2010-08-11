@@ -16,11 +16,9 @@ SET( QGoGUILIB_SRC
   QGoImageView.cxx
   QGoImageView2D.cxx
   QGoImageView3D.cxx
-  QGoImageInfo.cxx
   QGoLUTDialog.cxx
   QSplitterChild.cxx
   SnapshotHelper.cxx
-  qtcolorcombobox.cxx
   QGoSynchronizedView.cxx
   QGoSynchronizedView2D.cxx
   QGoSynchronizedView3D.cxx
@@ -38,10 +36,8 @@ SET( QGoGUILIB_HDRS
   QGoImageView.h
   QGoImageView2D.h
   QGoImageView3D.h
-  QGoImageInfo.h
   QGoLUTDialog.h
   QSplitterChild.h
-  qtcolorcombobox.h
 
   QGoSynchronizedView.h
   QGoSynchronizedView2D.h
@@ -57,8 +53,6 @@ SET( QGoGUILIB_HDRS
 #---------------------------------------------------------------------------
 
 SET( QGoGUILIB_UI
-  Resources/QNameDescriptionInputDialog.ui
-
   Resources/QGoSynchronizedView.ui
 )
 
