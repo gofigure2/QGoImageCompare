@@ -79,6 +79,15 @@ int main(int argc, char** argv)
   vtkSmartPointer< vtkImageReader2Factory > imageFactory =
     vtkSmartPointer< vtkImageReader2Factory >::New();
 
+
+
+  /* we simply create a new manager that will take care of
+   ∗ creation/deletion of visualization and callbacks for us.
+   */
+  QGoSynchronizedViewManager* ViewManager	=	new	QGoSynchronizedViewManager ();
+
+  QString ViewName;
+
   for (int i = 0; i<argc;++i)
     {
     std::cout << argv[i] << std::endl;
@@ -90,6 +99,14 @@ int main(int argc, char** argv)
       {
       imageReader->SetFileName( argv[i] );
       imageReader->Update();
+
+
+      ViewName.clear();
+      ViewName.append(argv[i]);
+
+      ViewManager->newSynchronizedView(ViewName, imageReader->GetOutput() );
+      ViewManager->Update();
+      ViewManager->show();
       }
     else
       {
@@ -98,6 +115,19 @@ int main(int argc, char** argv)
                 << std::endl;
       }
     }
+
+/* the synchronization manager can synchronize the opened images
+∗ with a simple function call */
+ViewManager->synchronizeOpenSynchronizedViews();
+
+
+
+app.processEvents();
+int output = app.exec();
+
+delete ViewManager;
+
+return output;
 }
 
 /*

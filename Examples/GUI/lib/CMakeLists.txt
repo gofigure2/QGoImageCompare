@@ -7,7 +7,7 @@ SET( QGOGUILIB_EXAMPLE_SRC
   qgosynchronizedview3dtest
   qgosynchronizedviewmanagertest
   qgosynchronizedviewguitest
-  qgocompareexample
+  compareexample
 )
 
 
