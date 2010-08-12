@@ -182,12 +182,20 @@ synchronizeCameras0(vtkObject* caller,
   // for every opened SynchronizedView :
   std::vector<QGoSynchronizedView3D*>::iterator SynchronizedViewIt
          = p_m_QGoSynchronizedView3Ds.begin();
+
   while ( SynchronizedViewIt != p_m_QGoSynchronizedView3Ds.end() )
     {
+    /*
+     * To inspect : if we don't move even the non visible views,
+     * the positionning is not correct when going back to quadview
+     * solution => a reset camera taking reference at the last fullscreenview ?
+     */
+    /*
     // if the SynchronizedView is visible and the modified camera is rendrered
     if      ((*SynchronizedViewIt)->isVisible()
              &&  (((*SynchronizedViewIt)->GetFullScreenView() == 0)
                   ||  ((*SynchronizedViewIt)->GetFullScreenView() == 1)))
+    */
       {
       // we copy the position of the moved camera
       // into each SynchronizedView's camera
@@ -232,10 +240,17 @@ synchronizeCameras1(vtkObject* caller,
        SynchronizedViewIt != p_m_QGoSynchronizedView3Ds.end();
        ++SynchronizedViewIt)
     {
+    /*
+     * To inspect : if we don't move even the non visible views,
+     * the positionning is not correct when going back to quadview
+     * solution => a reset camera taking reference at the last fullscreenview ?
+     */
+    /*
     // if the SynchronizedView is visible and the modified camera is rendrered
     if      ((*SynchronizedViewIt)->isVisible()
              &&  (((*SynchronizedViewIt)->GetFullScreenView() == 0)
                   ||  ((*SynchronizedViewIt)->GetFullScreenView() == 2)))
+    */
       {
       // we copy the position of the moved camera into each
       // SynchronizedView's camera
@@ -278,10 +293,17 @@ synchronizeCameras2(vtkObject* caller,
        SynchronizedViewIt != p_m_QGoSynchronizedView3Ds.end();
        ++SynchronizedViewIt)
     {
+    /*
+     * To inspect : if we don't move even the non visible views,
+     * the positionning is not correct when going back to quadview
+     * solution => a reset camera taking reference at the last fullscreenview ?
+     */
+    /*
     // if the SynchronizedView is visible and the modified camera is rendrered
     if      ((*SynchronizedViewIt)->isVisible()
              &&  (((*SynchronizedViewIt)->GetFullScreenView() == 0)
                   ||  ((*SynchronizedViewIt)->GetFullScreenView() == 3)))
+    */
       {
       // we copy the position of the moved camera into each
       // SynchronizedView's camera
@@ -325,10 +347,18 @@ synchronizeCameras3(vtkObject* caller,
        SynchronizedViewIt != p_m_QGoSynchronizedView3Ds.end();
        ++SynchronizedViewIt)
     {
+    /*
+     * To inspect : if we don't move even the non visible views,
+     * the positionning is not correct when going back to quadview
+     * solution => a reset camera taking reference at the last fullscreenview ?
+     */
+    /*
     // if the SynchronizedView is visible and the modified camera is rendrered
+
     if      ((*SynchronizedViewIt)->isVisible()
              &&  (((*SynchronizedViewIt)->GetFullScreenView() == 0)
                   ||  ((*SynchronizedViewIt)->GetFullScreenView() == 4)))
+    */
       {
       // we copy the position of the moved camera
       // into each SynchronizedView's camera
