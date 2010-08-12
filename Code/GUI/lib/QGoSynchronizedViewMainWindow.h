@@ -179,7 +179,7 @@ private:
   QToolBar *View3DToolBar;
   QAction * syncAct;
   QAction * openfileAct;
-  QAction * openmemAct;
+//  QAction * openmemAct;
   QAction * snapshotAsAct;
   QAction * exitAct;
   QAction * closeAct;

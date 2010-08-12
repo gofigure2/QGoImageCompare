@@ -355,10 +355,16 @@ synchronize()
   if (m_SynchronizedViewManager->isSynchronizing())
     {
     m_SynchronizedViewManager->unSynchronizeOpenSynchronizedViews();
+    syncAct->setText(tr("&Synchronize images"));
+    syncAct->setStatusTip(
+      tr("Synchronize open images for point-to-point comparison"));
     }
   else
     {
     m_SynchronizedViewManager->synchronizeOpenSynchronizedViews();
+    syncAct->setText(tr("De&Synchronize images"));
+    syncAct->setStatusTip(
+      tr("Synchronize open images for point-to-point comparison"));
     }
 }
 
@@ -498,8 +504,8 @@ createActions()
           SIGNAL(triggered()),
           this,
           SLOT(openfile()));
-
-  openmemAct = new QAction( /*QIcon( ":/images/open.png" ), */
+/*
+  openmemAct = new QAction(
     tr("Open from &memory"), this);
   //    openmemAct->setShortcuts(QKeySequence::Open);
   openmemAct->setStatusTip(tr("Open an image from memory"));
@@ -507,7 +513,7 @@ createActions()
           SIGNAL(triggered()),
           this,
           SLOT(openfile()));
-
+*/
   syncAct = new QAction(tr("&Synchronize images"), this);
   //    syncAct->setShortcuts(QKeySequence::SaveAs);
   syncAct->setStatusTip(
@@ -626,7 +632,7 @@ void QGoSynchronizedViewMainWindow::createMenus()
 {
   fileMenu = menuBar()->addMenu(tr("&File"));
   fileMenu->addAction(openfileAct);
-  fileMenu->addAction(openmemAct);
+//  fileMenu->addAction(openmemAct);
   fileMenu->addAction(snapshotAsAct);
   fileMenu->addSeparator();
 
@@ -645,7 +651,7 @@ void QGoSynchronizedViewMainWindow::createMenus()
 void QGoSynchronizedViewMainWindow::createToolBars()
 {
   ToolBar = addToolBar(tr("ImageActions"));
-  ToolBar->addAction(openmemAct);
+//  ToolBar->addAction(openmemAct);
   ToolBar->addAction(openfileAct);
   ToolBar->addAction(snapshotAsAct);
   ToolBar->addAction(syncAct);
