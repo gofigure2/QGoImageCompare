@@ -1,0 +1,62 @@
+% For code snippets style definition
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\lstloadlanguages{[ISO]C++,C}
+% set up listing environment with C syntax hightlight
+\definecolor{stringcolor}{rgb}{0.20,0.50,0.20}
+\definecolor{commentcolor}{rgb}{0.40,0.40,0.40}
+\definecolor{keywordcolor}{rgb}{0.50,0.10,0.10}
+\definecolor{idcolor}{rgb}{0.10,0.10,0.50}
+\definecolor{bg}{rgb}{0.95,0.95,0.95}
+% with \lstset one can predefine parameters for listings
+%\lstset{language=[ISO]C++,basicstyle=\small,keywordstyle=\color{keywordcolor},
+ %       commentstyle={\color{commentcolor}\itshape},
+%        stringstyle={\color{stringcolor}},
+%        identifierstyle=\color{idcolor},numbers=left,
+       % xleftmargin=2em,framerule=0.8pt,
+%        stepnumber=1,frame=single,showstringspaces=false,
+%        firstnumber=1,numberstyle=\ttfamily,backgroundcolor=\color{bg}}
+ 
+\lstset{ %
+  language=[ISO]C++,                % choose the language of the code
+  basicstyle={\small\ttfamily},       % the size of the fonts that are used for the code
+  keywordstyle=\color{keywordcolor},
+  stringstyle={\color{stringcolor}},
+  identifierstyle=\color{idcolor},
+  numbers=left,                   % where to put the line-numbers
+  numberstyle=\footnotesize,      % the size of the fonts that are used for the line-numbers
+  stepnumber=1,                   % the step between two line-numbers. If it's 1 each line 
+                                % will be numbered
+  numbersep=5pt,                  % how far the line-numbers are from the code
+  backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  frame=single,	                % adds a frame around the code
+  tabsize=2,	                % sets default tabsize to 2 spaces
+  captionpos=t,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+  title=\lstname,                 % show the filename of files included with \lstinputlisting;
+                                % also try caption instead of title
+  escapeinside={\%*}{*)},         % if you want to add a comment within your code
+  }
+ 
+% rotate images 
+\usepackage{rotating}
+        
+% Definition of \C++ to be eye candy :
+\usepackage{relsize}
+\usepackage{lipsum}
+%c from texinfo.tex
+\def\ifmonospace{\ifdim\fontdimen3\font=0pt }
+\def\C++{%
+\ifmonospace%
+    C++%
+\else%
+    C\kern-.1667em\raise.30ex\hbox{\smaller{++}}%
+\fi%
+\spacefactor1000 }
