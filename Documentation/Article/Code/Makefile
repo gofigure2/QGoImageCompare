@@ -1,6 +1,6 @@
 
 
-NAME = ArticleExample
+NAME = Article
 
 BIBTEXDATABSENAME = InsightJournal
 
