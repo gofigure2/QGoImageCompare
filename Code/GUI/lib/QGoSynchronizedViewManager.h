@@ -55,12 +55,10 @@ class vtkImageData;
  * \brief High level class for
  * QGoSynchronizedView2D, QGoSynchronizedView2DCallbacks
  * QGoSynchronizedView3D, QGoSynchronizedView3DCallbacks.
- *
- * This class is dealing with QGoSynchronizedViews for correct
- * synchronization and handling provides a simple interface
- * to create/delete/synchronize QGoSynchronizedView s.
- * This class should be used with any class using QGoSynchronizedView
- * and QGoSynchronize.
+ * This class deals with QGoSynchronizedViews for correct synchronization
+ * and provides a simple interface to create/delete/synchronize
+ * QGoSynchronizedViews. This class should be used with any class using
+ * QGoSynchronizedView using QGoSynchronizedView widgets.
  * \example GUI/lib/qgosynchronizedviewmanagertest.cxx
  */
 class QGoSynchronizedViewManager : public QObject

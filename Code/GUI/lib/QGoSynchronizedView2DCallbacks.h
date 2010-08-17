@@ -48,11 +48,11 @@ class vtkCallbackCommand;
 
 /**
  * \class QGoSynchronizedView2DCallbacks
- * \brief This object takes a list of QGoSynchronizedView and
- * synchronize their cameras by setting up callbacks.
- * It is recommended to let the
- * QGoSynchronizedViewManager deal
- * with SynchronizedView synchronization.
+ * \brief This object takes a list of QGoSynchronizedView objects and
+ * synchronizes their cameras by setting up appropriate callbacks.
+ * It is recommended to let the QGoSynchronizedViewManager deal with
+ * synchronization of objects since it simplifies the burden on the
+ * user significantly.
  */
 class QGoSynchronizedView2DCallbacks
   {
