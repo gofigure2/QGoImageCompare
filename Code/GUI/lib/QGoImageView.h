@@ -198,6 +198,11 @@ public:
   void ShowSplinePlane();
 
   /**
+   * \brief Interpolate the data for visualization
+   */
+  void SetInterpolate(const int& val);
+
+  /**
    * \brief Get list of the 2D picked actors
    */
   std::list<vtkProp3D*> GetListOfPickedContours();

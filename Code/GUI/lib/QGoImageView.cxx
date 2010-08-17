@@ -419,6 +419,14 @@ ShowSplinePlane()
   m_Pool->SetSplinePlaneActorsVisibility(m_ShowSplinePlane);
 }
 
+//--------------------------------------------------------------------------
+void
+QGoImageView::
+SetInterpolate(const int& val)
+{
+  m_Pool->SyncSetInterpolate(val);
+}
+
 //-------------------------------------------------------------------------
 void
 QGoImageView::

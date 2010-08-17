@@ -110,6 +110,8 @@ Update()
   if (m_currentView)
     {
     this->m_currentView->Update();
+    // in addition to standard parameters, we don't want to interpolate data
+    this->m_currentView->SetInterpolate(0);
     }
 }
 
