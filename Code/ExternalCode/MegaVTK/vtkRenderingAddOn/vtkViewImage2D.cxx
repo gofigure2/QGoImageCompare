@@ -991,6 +991,7 @@ AddDataSet(vtkPolyData* dataset, vtkProperty* property, const bool& intersection
       ((bounds[2] == bounds[3]) && (normal[2] == 0) && (normal[0] == 0)) ||
       ((bounds[4] == bounds[5]) && (normal[0] == 0) && (normal[1] == 0)))
     {
+    //std::cout << "extract 2d" << std::endl;
     extracter->SetInput(dataset);
     extracter->SetImplicitFunction(this->SliceImplicitPlane);
     extracter->Update();
@@ -999,6 +1000,7 @@ AddDataSet(vtkPolyData* dataset, vtkProperty* property, const bool& intersection
   // i.e. if volume
   else if (intersection)
     {
+    //std::cout << "intersection" << std::endl;
     cutter->SetInput(dataset);
     cutter->SetCutFunction(this->SliceImplicitPlane);
     cutter->Update();
@@ -1006,6 +1008,7 @@ AddDataSet(vtkPolyData* dataset, vtkProperty* property, const bool& intersection
     }
   else
     {
+    //std::cout << "else" << std::endl;
     mapper->SetInput(dataset);
     }
 
@@ -1032,8 +1035,54 @@ vtkViewImage2D::
 AddDataSet(vtkDataSet* dataset, vtkProperty* property, const bool& intersection,
     const bool& iDataVisibility)
 {
-  return this->AddDataSet( vtkPolyData::SafeDownCast( dataset ),
-    property, intersection, iDataVisibility );
+ /* return this->AddDataSet( vtkPolyData::SafeDownCast( dataset ),
+    property, intersection, iDataVisibility );*/
+  vtkCamera *cam = NULL;
+
+      if (this->Renderer)
+        {
+        cam = this->Renderer->GetActiveCamera();
+        }
+      else
+        {
+        return NULL;
+        }
+
+      vtkSmartPointer<vtkPolyDataMapper> mapper =
+        vtkSmartPointer<vtkPolyDataMapper>::New();
+      mapper->SetScalarVisibility(iDataVisibility);
+
+      //vtkQuadricLODActor* actor = vtkQuadricLODActor::New();
+      vtkActor* actor = vtkActor::New();
+
+      vtkSmartPointer<vtkCutter> cutter = vtkSmartPointer<vtkCutter>::New();
+
+      if (intersection)
+        {
+        //std::cout << "inter dataset" << std::endl;
+        cutter->SetInput(dataset);
+        cutter->SetCutFunction(this->SliceImplicitPlane);
+        mapper->SetInput(cutter->GetOutput());
+        }
+      else
+        {
+        //std::cout << "else dataset" << std::endl;
+        mapper->SetInput(vtkPolyData::SafeDownCast(dataset));
+        }
+      mapper->Update();
+
+      actor->SetMapper(mapper);
+      if (property)
+        {
+        actor->SetProperty(property);
+        }
+      actor->GetProperty()->BackfaceCullingOn();
+
+      this->Renderer->AddViewProp(actor);
+      this->DataSetCollection->AddItem((vtkDataSet*) dataset);
+      this->Prop3DCollection->AddItem(actor);
+
+      return actor;
 }
 
 //----------------------------------------------------------------------------

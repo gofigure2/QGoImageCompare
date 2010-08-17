@@ -33,9 +33,9 @@
 
 /*=========================================================================
  Modifications were made by the GoFigure Dev. Team.
- while at Megason Lab, Systems biology, Harvard Medical school, 2009
+ while at Megason Lab, Systems biology, Harvard Medical school, 2009-10
 
- Copyright (c) 2009, President and Fellows of Harvard College.
+ Copyright (c) 2009-10, President and Fellows of Harvard College.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -142,42 +142,47 @@ class vtkProp;
 class vtkTransform;
 class vtkScalarsToColors;
 
-/*
- * \defgroup visualization ‘‘Visualization’’
+/**
+ * \defgroup MegaVTK MegaVTK
  */
 
 /**
+  \class vtkViewImage
+  \ingroup MegaVTK
+  \brief This class is a top-level convenience class for displaying a
+  scalar - or RGB image in a 2D or 3D scene.
 
-   \class vtkViewImage
-   \ingroup visualization
-   \brief This class is a top-level convenience class for displaying a scalar - or RGB
-   image in a 2D or 3D scene.
+  It inherits from the vtkImageViewer2 class, which is initially designed 
+  for 2D scene visualization. However, vtkViewImage overrides some of its
+  parents' methods (SetSlice()) in order to generalize its purpose to 2D 
+  AND 3D scene visualization.
 
-   It inherits from the vtkImageViewer2 class, which is initially designed for 2D scene
-   visualization. However, vtkViewImage overrides some of its parents' methods (SetSlice())
-   in order to generalize its purpose to 2D AND 3D scene visualization.
-
-   As a high-level class, it provides the user with convinient functionalities
-   such as a colormap (SetLookupTable()), a scalar bar (ScalarBarActor), some corner annotations
-   (CornerAnnotation), access to the background color (SetBackground()), the
-   annotation text properties (SetTextProperty()), or a call for reseting to default values
-   (Reset() or ResetCamera()).
+  As a high-level class, it provides the user with convinient
+  functionalities such as a colormap (SetLookupTable()), a scalar bar 
+  (ScalarBarActor), some corner annotations (CornerAnnotation), access to 
+  the background color (SetBackground()), the annotation text properties 
+  (SetTextProperty()), or a call for reseting to default values (Reset() or
+  ResetCamera()).
 
 
-   The principle add-on of this class is to tacke the common issue of placing
-   different objects in a same consistent reference frame. In a world coordinates system, an
-   volume image can be localized by its origin and its spacing, and an orientation vector defining
-   how to rotate the volume to be consistent with reality.
+  The principle add-on of this class is to tacke the common issue of placing
+  different objects in a same consistent reference frame. In a world 
+  coordinates system, an volume image can be localized by its origin and 
+  its spacing, and an orientation vector defining how to rotate the volume 
+  to be consistent with reality.
 
-   The vtkImageData class has among its attributes the origin and the spacing information.
-   However, the orientation information is missing.
+  The vtkImageData class has among its attributes the origin and the 
+  spacing information. However, the orientation information is missing.
 
-   The vtkViewImage class tackle this lack by providing the user the possibility to set an
-   orientation matrix with SetOrientationMatrix(). This matrix will directly be applied to the
-   actor describing the image in the 2D - or 3D - scene. The rotation 3x3 component of this matrix
-   has to be orthogonal (no scaling). The offset component may contain the origin information.
-   In this case the user will have to make sure that this information is absent from the vtkImageData
-   instance given in SetInput(). For that you can call : view->GetInput()->SetOrigin(0,0,0).
+  The vtkViewImage class tackle this lack by providing the user the 
+  possibility to set an orientation matrix with SetOrientationMatrix(). 
+  This matrix will directly be applied to the actor describing the image 
+  in the 2D - or 3D - scene. The rotation 3x3 component of this matrix has 
+  to be orthogonal (no scaling). The offset component may contain the 
+  origin information.
+  In this case the user will have to make sure that this information is
+  absent from the vtkImageData instance given in SetInput(). For that you
+  can call : view->GetInput()->SetOrigin(0,0,0).
 */
 class VTK_RENDERINGADDON2_EXPORT vtkViewImage : public vtkImageViewer2
   {
@@ -199,39 +204,38 @@ public:
   virtual vtkRenderWindowInteractor* GetRenderWindowInteractor();
 
   /**
-     \brief Get the corner annotation.
-     \todo make the corner annotation such that it follows the slice number, the
-    image scalar value at cursor, the spacing, etc
+   \brief Get the corner annotation.
+   \todo make the corner annotation such that it follows the slice number,
+   the image scalar value at cursor, the spacing, etc
   */
   vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
   /**
-     \brief Get the scalar bar actor. This instance follows the color window/level
-     of the viewer.
-     \todo make this scalar bar actually follow the WindowLevel filter. It does
-    not seems to work yet
+   \brief Get the scalar bar actor. This instance follows the color 
+   window/level of the viewer.
+   \todo make this scalar bar actually follow the WindowLevel filter. 
+   It does not seems to work yet
   */
   vtkGetObjectMacro(ScalarBarActor, vtkScalarBarActor);
   /**
-     \brief
-      The OrientationMatrix instance (GetOrientationMatrix()) is a very important
-     added feature of this viewer. It describes the rotation and translation to
-     apply to the image bouding box (axis aligned) to the world coordinate
-     system.
+   \brief The OrientationMatrix instance (GetOrientationMatrix()) is a 
+    very important added feature of this viewer. It describes the rotation 
+    and translation to apply to the image bouding box (axis aligned) to the
+    world coordinate system.
 
-     Rotation part is usually given by the GetDirection() method on an itk::Image
-     for instance. Translation usually correspond to the origin of the image
-     given by GetOrigin() on an itk::Image.
+    Rotation part is usually given by the GetDirection() method on an 
+    itk::Image for instance. Translation usually correspond to the origin 
+    of the image given by GetOrigin() on an itk::Image.
 
-     CAUTION: if you provide non-zero origin to the viewer vtkImageData input
+    CAUTION: if you provide non-zero origin to the viewer vtkImageData input
      (SetInput()), then don't provide translation to the OrientationMatrix
      instance, otherwise the information is redundant.
 
-     The best behaviour is to force the origin of the vtkImageData input to zero
-     and provide this origin information in the OrientationMatrix.
-
+     The best behaviour is to force the origin of the vtkImageData input 
+     to zero and provide this origin information in the OrientationMatrix.
   */
   vtkGetObjectMacro(OrientationMatrix, vtkMatrix4x4);
   virtual void SetOrientationMatrix(vtkMatrix4x4* matrix);
+
   /**
      The LookupTable instance (GetLookupTable()) can be used to set a
      user-defined color-table to the viewer. Default is a linear black to
@@ -240,8 +244,10 @@ public:
   vtkGetObjectMacro(LookupTable, vtkLookupTable);
   virtual void SetLookupTable(vtkLookupTable* lookuptable);
 
-  /** \brief  The TextProperty instance (GetTextProperty()) describes the font
-    and other settings of the CornerAnnotation instance (GetCornerAnnotation())
+  /** 
+   \brief  The TextProperty instance (GetTextProperty()) describes the font
+    and other settings of the CornerAnnotation instance 
+    (GetCornerAnnotation())
   */
   vtkGetObjectMacro(TextProperty, vtkTextProperty);
   virtual void SetTextProperty(vtkTextProperty* textproperty);
@@ -249,22 +255,22 @@ public:
      This viewer is able to display not only images but also
      any vtkPolyData or vtkUnstructuredGrid instance.
      Use AddDataSet() and RemoveDataSet() for that.
-     All displayed datasets (other than Input (SetInput()) are gathered in a vtkDataSetCollection
-     for easier access.
+     All displayed datasets (other than Input (SetInput()) are gathered in 
+     a vtkDataSetCollection for easier access.
   */
   vtkGetObjectMacro (DataSetCollection, vtkDataSetCollection);
   /**
-     All displayed dataset generates an actor which is added to the renderer. (See AddDataSet()).
-     These actors are gathered in this vtkProp3DCollection for easier access.
+   All displayed dataset generates an actor which is added to the renderer.    \sa AddDataSet.
+   These actors are gathered in this vtkProp3DCollection for easier access.
   */
   vtkGetObjectMacro (Prop3DCollection, vtkProp3DCollection);
 
   /**
-     \brief The world is not always what we think it is ...
-     Use this method to move the viewer slice such that the position
-     (in world coordinates) given by the arguments is contained by
-     the slice plane. If the given position is outside the bounds
-     of the image, then the slice will be as close as possible.
+   \brief The world is not always what we think it is ...
+   Use this method to move the viewer slice such that the position
+   (in world coordinates) given by the arguments is contained by
+   the slice plane. If the given position is outside the bounds
+   of the image, then the slice will be as close as possible.
   */
   void SetWorldCoordinates(const double& x,
                            const double& y, const double& z);

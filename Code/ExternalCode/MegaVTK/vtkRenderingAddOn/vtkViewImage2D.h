@@ -89,13 +89,9 @@ class vtkCellPicker;
 class vtkActor;
 // class vtkQuadricLODActor;
 
-/*
- * \defgroup visualization ‘‘Visualization’’
- */
-
-/*
+/**
  * \class vtkViewImage2D
- * \ingroup visualization
+ * \ingroup MegaVTK
  * \brief Basic class to handle 32d/3D items such as images and polydatas
  * visualization in 2D
  */
@@ -159,7 +155,6 @@ public:
   //ETX
 
   /**
-   * \ingroup visualization
    * \brief The SliceImplicitPlane instance (GetImplicitSlicePlane()) is the
    * implicit function that cuts every dataset that is added with AddDataSet().
   */
@@ -172,7 +167,6 @@ public:
   */
   vtkGetObjectMacro(SlicePlane, vtkPolyData);
   /**
-   * \ingroup visualization
    * \brief Get the orientation annotation. This annotation describes the
    * orientation of the slice plane, according to the rule
    * Right(R)-Left(L) Anterior(A)-Posterior(P) Inferior(I)-Superior(S)
@@ -180,7 +174,6 @@ public:
   vtkGetObjectMacro(OrientationAnnotation, vtkOrientationAnnotation);
 
   /**
-   * \ingroup visualization
    * \brief The world is not always what we think it is ...
    * Use this method to move the viewer slice such that the position
    * (in world coordinates) given by the arguments is contained by
@@ -190,14 +183,12 @@ public:
   virtual void SetWorldCoordinates(double pos[3]);
 
   /**
-   * \ingroup visualization
    * \brief Set/Get the current slice to display (depending on the orientation
    * this can be in X, Y or Z).
    */
   virtual void SetSlice(int s);
 
   /**
-   * \ingroup visualization
    * \brief Instead of setting the slice orientation to an axis (YZ - XZ - XY),
    * you can force the view to be axial (foot-head), coronal (front-back),
    * or sagittal (left-right). It will just use the OrientationMatrix
@@ -208,7 +199,6 @@ public:
   virtual void SetOrientationMatrix(vtkMatrix4x4* matrix);
 
   /**
-   * \ingroup visualization
    * \brief The ViewConvention instance explains where to place the camera around
    * the patient. Default behaviour is Radiological convention, meaning
    * we respectively look at the patient from his feet, his face and his left
@@ -222,39 +212,32 @@ public:
   virtual void SetViewConvention(int convention);
 
   /**
-   * \ingroup visualization
    * \brief Convert an indices coordinate point (image coordinates) into a world
    * coordinate point
   */
   virtual double* GetWorldCoordinatesForSlice(int slice);
   /**
-   * \ingroup visualization
    * \brief Convert a world coordinate point into an image indices coordinate point
   */
   virtual int GetSliceForWorldCoordinates(double pos[3]);
   /**
-   * \ingroup visualization
    * \brief Reset the 3D position to center
   */
   virtual void ResetPosition(void);
   /**
-   * \ingroup visualization
    * \brief Reset position - zoom - window/level to default
   */
   virtual void Reset(void);
   /**
-   * \ingroup visualization
    * \brief Reset the camera in a nice way for the 2D view
    */
   virtual void ResetCamera(void);
   /**
-   * \ingroup visualization
    * \brief Get/Set the zoom factor of the view
    */
   vtkSetMacro(Zoom, double);
   vtkGetMacro(Zoom, double);
   /**
-   * \ingroup visualization
    * \brief Useful method that transform a display position into a world corrdinate point
   */
   virtual double* GetWorldCoordinatesFromDisplayPosition(int xy[2]);
@@ -279,7 +262,6 @@ public:
   vtkBooleanMacro (Interpolate, int);
 
   /**
-   * \ingroup visualization
    * \brief Add a dataset to the view (has to be subclass of vtkPointSet).
    * The dataset will be cut through the implicit slice plane
    * (GetImplicitSlicePlane()).
@@ -308,17 +290,14 @@ public:
   vtkGetVector3Macro(CameraMotionVector, double);
 
   /**
-   * \ingroup visualization
    * \brief Show/Hide the annotations.
   */
   vtkGetMacro(ShowAnnotations, int);
   /**
-   * \ingroup visualization
    * \brief Show/Hide the annotations.
   */
   vtkBooleanMacro(ShowAnnotations, int);
   /**
-   * \ingroup visualization
    * \brief Show/Hide the annotations.
   */
   virtual void SetShowAnnotations(const int&);
@@ -337,7 +316,6 @@ public:
   { this->UpdateOrientation(); }
 
   /**
-   * \ingroup visualization
    * \brief Set interaction style to Default mode:
    * Left button: Window level
    * Right button: Zoom
@@ -354,7 +332,6 @@ public:
   }
 
   /**
-   * \ingroup visualization
    * \brief Set interaction style to Zoom mode:
    * All buttons: Zoom
   */
@@ -368,7 +345,6 @@ public:
   }
 
   /**
-   * \ingroup visualization
    * \brief Set interaction style to Pan mode:
    * All buttons: Pan
   */
@@ -382,7 +358,6 @@ public:
   }
 
   /**
-   * \ingroup visualization
    * \brief Set interaction style to Zoom mode:
    * The actor the mouse is highlighted in addition to the Default Mode.
   */
@@ -403,8 +378,7 @@ public:
   vtkGetObjectMacro (CursorGenerator, vtkCursor2D);
 
 
-  /*
-   * \ingroup visualization
+  /**
    *
    */
   template<class TContourContainer,
@@ -436,8 +410,7 @@ public:
       }
   }
 
-  /*
-   * \ingroup visualization
+  /**
    *
    */
 
@@ -455,8 +428,7 @@ public:
       }
   }
 
-  /*
-   * \ingroup visualization
+  /**
    *
    */
   void UpdateWindowLevelObservers();
@@ -481,7 +453,6 @@ protected:
   virtual void SetAnnotationsFromOrientation(void);
 
   /**
-   * \ingroup visualization
    * \brief After the orientation has changed, it is crucial to adapt
    * a couple of things according to new orientation.
    * Thus UpdateOrientation() is here overwritten and calls
@@ -490,14 +461,12 @@ protected:
   */
   virtual void SetImplicitPlaneFromOrientation(void);
   /**
-   * \ingroup visualization
    * \brief Update the cursor position and the CornerAnnotation (top-left) according
    * to current mouse position.
   */
   ///\todo This may has to be modified as with this configuration, the user has no possibility of changing the upper-left corner annotation because it is bypassed by this method at each mouse movement.
   virtual void UpdateCursor(void);
   /**
-   * \ingroup visualization
    * \brief This method is called each time the orientation changes (SetViewOrientation())
    * and sets the appropriate color to the slice plane.
    * Red: R-L direction --> sagittal orientation
@@ -506,7 +475,6 @@ protected:
   */
   virtual void InitializeSlicePlane(void);
   /**
-   * \ingroup visualization
    * \brief Overwrite of the Superclass InstallPipeline() method in order to set up the
    * home made InteractorStyle, and make it observe all events we need
   */
@@ -522,14 +490,12 @@ protected:
 
   vtkTransform* AdjustmentTransform;
   /**
-   * \ingroup visualization
    * \brief This polydata instance is a square colored (see InitializeSlicePlane()) according to the
    * orientation of the view. It follows the image actor and is used by other view to display
    * intersections between views.
   */
   vtkPolyData* SlicePlane;
   /**
-   * \ingroup visualization
    * \brief Get the orientation annotation. This annotation describes the orientation
    * of the slice plane, according to the rule
    * Right(R)-Left(L) Anterior(A)-Posterior(P) Inferior(I)-Superior(S)
@@ -538,27 +504,23 @@ protected:
 
   vtkInteractorStyle* InteractorStyleSwitcher;
   /**
-   * \ingroup visualization
    * \brief InteractorStyle used in this view. It is a vtkInteractorStyleImage2D by default
    * but can be set to vtkInteractorStyleRubberBandZoom with SetInteractorStyleType().
    * Rubber band zoom is in beta. Prefer using default behaviour.
   */
   vtkInteractorStyleRubberBandZoom* InteractorStyleRubberZoom;
   /**
-   * \ingroup visualization
    * \brief Access to the command of the viewer.
    * This instance is in charge of observing the interactorstyle (GetInteractorStyle())
    * and update things accordingly in the view (i.e. the slice number when moving slice).
   */
   vtkViewImage2DCommand* Command;
   /**
-   * \ingroup visualization
    * \brief Access to the actor corresponding to the cursor. It follows the mouse cursor
    * everywhere it goes, and can be activated by pressing 'c'
   */
   vtkPointHandleRepresentation2D* Cursor;
   /**
-   * \ingroup visualization
    * \brief Access to the actor corresponding to the cursor. It follows the mouse cursor
    * everywhere it goes, and can be activated by pressing 'c'
   */

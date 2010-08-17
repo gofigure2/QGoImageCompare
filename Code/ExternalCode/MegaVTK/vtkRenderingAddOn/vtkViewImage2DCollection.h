@@ -126,16 +126,11 @@ class vtkDataSetCollection;
 class vtkMatrixToLinearTransform;
 class vtkViewImage2DCollectionCommand;
 
-/*
- * \defgroup visualization ‘‘Visualization’’
- */
-
-/*
+/**
  * \class vtkViewImage2DCollection
- * \ingroup visualization
+ * \ingroup MegaVTK
  * \brief Manage a collection of 2D views
  */
-
 class VTK_RENDERINGADDON2_EXPORT vtkViewImage2DCollection : public vtkCollection
   {
 public:
@@ -226,6 +221,9 @@ public:
   vtkSyncSetObjectMacro (Position, int, vtkViewImage2D);
   vtkSyncSetObjectMacro (WorldCoordinates, double, vtkViewImage2D);
 
+  /// Description: Synchronize interpolate between views
+  vtkSyncSetMacro (Interpolate, int, vtkViewImage2D);
+
   /*/// Description: Synchronize background color between views
   vtkSyncSetObjectMacro (Background, double, vtkViewImage2D);
   /// Description: Synchronize camera position between views
@@ -241,8 +239,7 @@ public:
   vtkSyncSet2DMacro (ViewOrientation, int);
   /// Description: Synchronize view convention between views
   vtkSyncSet2DMacro (ViewConvention, int);
-  /// Description: Synchronize interpolate between views
-  vtkSyncSet2DMacro (Interpolate, int);
+
   /// Description: Synchronize interactor style type between views
   vtkSyncSet2DMacro (InteractorStyleType, int);
   /// Description: Synchronize mouse interaction between views
