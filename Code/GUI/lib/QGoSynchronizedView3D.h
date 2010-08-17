@@ -54,10 +54,9 @@ class QGoImageView3D;
 
 /**
  * \class QGoSynchronizedView3D
- * \brief class used to display a QWidget containing a two dimensional
- * vtkimagedata* or itkimage*.
- * QGoSynchronizedView3D provide the interface to synchronize cameras among
- * several GoSynchronizedView3D.
+ * \brief class is used to display a QWidget containing a three dimensional
+ * vtkimagedata* or itkimage*. QGoSynchronizedView3D provides the interface
+ * to synchronize cameras among several GoSynchronizedView3D obhects.
  * \example GUI/lib/qgosynchronizedview3dtest.cxx
  */
 class QGoSynchronizedView3D : public QGoSynchronizedView
