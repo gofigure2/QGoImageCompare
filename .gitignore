@@ -2,4 +2,5 @@
 *~
 *.user
 BUILD
-
+Documentation/Article/Code/Article.*
+!Documentation/Article/Code/Article.tex
