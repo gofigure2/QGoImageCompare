@@ -1,14 +1,18 @@
 /**
  *
- * \mainpage  GoFigure2
+ * \mainpage  Compare Project - GoFigure2 Subproject
  *
  * \section intro Introduction
  *
  * GoFigure2 is an open-source, cross-platform application for visualizing,
  * processing and analyzing of multidimensional microscopy data.
  *
- * Users can visualize, segment and track cells through time, detect 
- * cell-division and ultimately generate lineages.
+ * The itkCompare project is a light tool to visualize and compare several
+ * ITK or VTK images. It displays them and synchronizes the views for
+ * pixel/voxel to pixel/voxel comparison.
+ * The project is being integrated to gdb pretty debugger, to create a
+ * visual ITK/VTK debugger !
+ *
  *
  * \section homepage Home Page
  *

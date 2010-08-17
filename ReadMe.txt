@@ -7,20 +7,45 @@ GoFigure2- Image Compare subproject
 cell membranes and in temporally tracking them amidst cell division to 
 create lineages.
 
-  Using ITK, VTK and Qt libraries, we developed an application for images visualization and comparison. 
-A set of classes is provided for simple integration in a program, an executable is also provided for a command line use. in case of a 3D dataset, the visualization is rendered with a variant of the vtkINRIA engine.
+  Using ITK, VTK and Qt libraries, we developed an application for images 
+visualization and comparison. A set of classes is provided for simple 
+integration in a program, an executable is also provided for a command line use. 
+In case of a 3D dataset, the visualization is rendered with a variant of the vtkINRIA engine.
 
 
 
 2-Documentation
   2.1 Article
-  An article introducing the features of the QGoSynchronized* classes can be found there :
-
-  2.1 Doxygen
-  The docuymentation of the presented classes can be found at this address :
+  An article introducing the features of this project is provided via its LateX sources.
   
+    2.1.1 Prerequites
+  
+  To be able to compile this article, reader should first have the following software:
+      * LateX distribution (TexLive 2009 was used with picins.sty)
 
-  This is a part of the Gofigure2 Doxygen documentation.
+
+    2.1.2 Compiling the pdf
+
+$ cd Documentation/Article/Code
+
+$ make
+
+
+  2.2 Doxygen
+
+    2.2.1 Prerequites
+  To be able to compile the documentation, User or Developper should first intall
+the following software:
+      * Doxygen (>=1.7.1)
+
+   
+    2.2.2 Compiling the documentation:
+
+  Turn on BUILD_DOCUMENTATION during cmake configuration (See 3-Installation).
+  ITK, VTK, Qt documentations can be linked 
+by turning ON the option LINK_EXTERNAL_DOC.
+
+
 
 3-Installation
   3.1 From Sources
@@ -49,6 +74,7 @@ $ mkdir BUILD
 Launch cmake 
 $ cd BUILD
 $ ccmake path/to/source/directory
+
 
 Build
 $ make -j2
