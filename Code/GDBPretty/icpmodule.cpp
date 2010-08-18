@@ -50,4 +50,3 @@ helloworld( PyObject * self, PyObject * args )
   std::cout << "hello from inside the python module" << std::endl;
   return Py_BuildValue( "" ); // None
 }
-
