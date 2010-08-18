@@ -18,18 +18,26 @@ static PyMethodDef icpMethods[] =
 
 PyMODINIT_FUNC  initicp(void)
 {
+  // The module object
   PyObject * m;
   m = Py_InitModule3( "icp", icpMethods, "Use itkCompareProject to examine images while with the gdb's pretty printers." );
-  if(m == NULL)
+  if( m == NULL )
     return;
+
+  // Create a module specific exception.  This will be used when encountering
+  // itk::Exception's, etc.
   icpError = PyErr_NewException(const_cast<char*>("icp.error"), NULL, NULL);
   Py_INCREF(icpError);
   PyModule_AddObject( m, "error", icpError );
 
+  // Create lookup_function.
   PyObject * npArrayModule = PyImport_ImportModule( "itk.v3.numpy.array" );
+  if( npArrayModule == NULL )
+    return;
   PyObject * lookupFunctionClass = PyObject_GetAttrString( npArrayModule, "RELookupFunctionTagNumpyType" );
-  //! @TODO make sure these C API function do not return NULL
   Py_DECREF( npArrayModule );
+  if( lookupFunctionClass == NULL )
+    return;
 
   PyObject * prettyPrintersDict = PyDict_New();
   PyObject * prettyPrintersDictArgs = Py_BuildValue( "(O)", prettyPrintersDict );
@@ -38,6 +46,8 @@ PyMODINIT_FUNC  initicp(void)
   Py_DECREF( prettyPrintersDict );
   Py_DECREF( prettyPrintersDictArgs );
   Py_DECREF( lookupFunctionClass );
+  if( lookupFunction == NULL )
+    return;
 
   PyModule_AddObject( m, "lookup_function", lookupFunction );
   Py_DECREF( lookupFunction );
