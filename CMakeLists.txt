@@ -107,6 +107,13 @@ IF( BUILD_DOCUMENTATION )
   ENDIF( DOXYGEN_FOUND )
 ENDIF( BUILD_DOCUMENTATION )
 
+#---------------------------------------------------------------------------
+# Determine if we want to build the gdb pretty printer python module.
+#---------------------------------------------------------------------------
+
+SET( BUILD_GDB_PRETTY OFF CACHE BOOL
+  "Build a module for debugging with gdb pretty printers" )
+
 
 #---------------------------------------------------------------------------
 # Main GoFigure Settings
@@ -244,6 +251,7 @@ IF( VTK_FOUND )
         @ONLY
         )
       INCLUDE ( CTest )
+      ADD_SUBDIRECTORY( Testing )
     ENDIF( BUILD_TESTING )
 
     IF( BUILD_EXAMPLES )

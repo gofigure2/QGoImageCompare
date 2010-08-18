@@ -1,0 +1,16 @@
+# We modify the python path so it can see our new module.
+python
+import sys
+sys.path.insert( 0, '@CMAKE_LIBRARY_OUTPUT_DIRECTORY@' )
+import icp
+icp.helloworld()
+end
+
+# Specify the inferior (executable we will be examining).
+file @CMAKE_RUNTIME_OUTPUT_DIRECTORY@/pretty-executable
+
+# Set the arguments to the executable.
+set args @TESTING_DATA_PATH@/Circle3D.mhd
+
+# Start executing our pretty-executable.
+run
