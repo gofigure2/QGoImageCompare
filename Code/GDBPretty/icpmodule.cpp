@@ -2,18 +2,45 @@
 
 #include <iostream>
 
+
+/** Create the lookup_function Python function.  This is a function associated
+ * with the module expected by my version of gdb.pretty used for by register
+ * function.
+ *
+ * The PyObject* is return, or NULL if a failure occurred.
+ */
+PyObject * lookup_function()
+{
+  PyObject * npArrayModule = PyImport_ImportModule( "itk.v3.numpy.array" );
+  if( npArrayModule == NULL )
+    return NULL;
+  PyObject * lookupFunctionClass = PyObject_GetAttrString( npArrayModule, "RELookupFunctionTagNumpyType" );
+  Py_DECREF( npArrayModule );
+  if( lookupFunctionClass == NULL )
+    return NULL;
+
+  PyObject * prettyPrintersDict = PyDict_New();
+  PyObject * prettyPrintersDictArgs = Py_BuildValue( "(O)", prettyPrintersDict );
+
+  PyObject * lookupFunction = PyEval_CallObject( lookupFunctionClass,  prettyPrintersDictArgs );
+  Py_DECREF( prettyPrintersDict );
+  Py_DECREF( prettyPrintersDictArgs );
+  Py_DECREF( lookupFunctionClass );
+  if( lookupFunction == NULL )
+    return NULL;
+
+  return lookupFunction;
+}
+
+
 extern "C"
 {
 
-static PyObject * helloworld(PyObject *self, PyObject *args);
 static PyObject * icpError;
 
 static PyMethodDef icpMethods[] =
 {
-  {"helloworld", helloworld, METH_VARARGS,
-"say hey yo"
-  },
-  {NULL, NULL, 0, NULL}
+  {NULL, NULL, 0, NULL} /* Sentinel */
 };
 
 PyMODINIT_FUNC  initicp(void)
@@ -31,32 +58,9 @@ PyMODINIT_FUNC  initicp(void)
   PyModule_AddObject( m, "error", icpError );
 
   // Create lookup_function.
-  PyObject * npArrayModule = PyImport_ImportModule( "itk.v3.numpy.array" );
-  if( npArrayModule == NULL )
-    return;
-  PyObject * lookupFunctionClass = PyObject_GetAttrString( npArrayModule, "RELookupFunctionTagNumpyType" );
-  Py_DECREF( npArrayModule );
-  if( lookupFunctionClass == NULL )
-    return;
-
-  PyObject * prettyPrintersDict = PyDict_New();
-  PyObject * prettyPrintersDictArgs = Py_BuildValue( "(O)", prettyPrintersDict );
-
-  PyObject * lookupFunction = PyEval_CallObject( lookupFunctionClass,  prettyPrintersDictArgs );
-  Py_DECREF( prettyPrintersDict );
-  Py_DECREF( prettyPrintersDictArgs );
-  Py_DECREF( lookupFunctionClass );
+  PyObject * lookupFunction = lookup_function();
   if( lookupFunction == NULL )
     return;
-
   PyModule_AddObject( m, "lookup_function", lookupFunction );
-  Py_DECREF( lookupFunction );
 }
 } // end extern "C"
-
-static PyObject *
-helloworld( PyObject * self, PyObject * args )
-{
-  std::cout << "hello from inside the python module" << std::endl;
-  return Py_BuildValue( "" ); // None
-}

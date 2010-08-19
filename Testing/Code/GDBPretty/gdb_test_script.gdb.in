@@ -3,7 +3,6 @@ python
 import sys
 sys.path.insert( 0, '@CMAKE_LIBRARY_OUTPUT_DIRECTORY@' )
 import icp
-icp.helloworld()
 end
 
 # Specify the inferior (executable we will be examining).
