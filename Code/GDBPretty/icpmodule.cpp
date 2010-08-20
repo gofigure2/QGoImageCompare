@@ -8,6 +8,7 @@
 typedef struct
 {
   PyObject_HEAD
+  PyObject * val; //  the gdb.Value to be 'printed'
 } ICPPrinter;
 
 /** This is equivalent in C++ to the constructor for ICPPrinter. */
@@ -19,21 +20,22 @@ ICPPrinter_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
   self = (ICPPrinter *)type->tp_alloc(type, 0);
   if ( self != NULL )
   {
-      //self->first = PyString_FromString("");
-      //if (self->first == NULL)
-        //{
-          //Py_DECREF(self);
-          //return NULL;
-        //}
-
-      //self->last = PyString_FromString("");
-      //if (self->last == NULL)
-        //{
-          //Py_DECREF(self);
-          //return NULL;
-        //}
-
-      //self->number = 0;
+  PyObject * gdbModule = PyImport_ImportModule( "gdb" );
+  if( gdbModule == NULL )
+    return NULL;
+  PyObject * valueClass = PyObject_GetAttrString( gdbModule, "Value" );
+  Py_DECREF( gdbModule );
+  if( valueClass == NULL )
+    return NULL;
+  PyObject * valueArgs = Py_BuildValue( "(i)", 0 );
+  self->val = PyEval_CallObject( valueClass, valueArgs );
+  Py_DECREF( valueArgs );
+  Py_DECREF( valueClass );
+  if( self->val == NULL )
+    {
+    Py_DECREF( self );
+    return NULL;
+    }
   }
 
   return (PyObject *)self;
@@ -43,6 +45,7 @@ ICPPrinter_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
 static void
 ICPPrinter_dealloc( ICPPrinter * self )
 {
+  Py_XDECREF( self->val );
   self->ob_type->tp_free((PyObject*)self);
 }
 
@@ -52,30 +55,24 @@ ICPPrinter_dealloc( ICPPrinter * self )
 static int
 ICPPrinter_init( ICPPrinter * self, PyObject * args, PyObject * kwds )
 {
-    //PyObject *first=NULL, *last=NULL, *tmp;
+  PyObject * val = NULL;
+  PyObject * tmp;
 
-    //static char *kwlist[] = {"first", "last", "number", NULL};
+  static char *kwlist[] = { NULL };
 
-    //if (! PyArg_ParseTupleAndKeywords(args, kwds, "|OOi", kwlist,
-                                      //&first, &last,
-                                      //&self->number))
-        //return -1;
+  if ( !PyArg_ParseTupleAndKeywords( args, kwds, "O", kwlist,
+      val ))
+    return -1;
 
-    //if (first) {
-        //tmp = self->first;
-        //Py_INCREF(first);
-        //self->first = first;
-        //Py_XDECREF(tmp);
-    //}
+  if (val)
+    {
+    tmp = self->val;
+    Py_INCREF(val);
+    self->val = val;
+    Py_XDECREF(tmp);
+    }
 
-    //if (last) {
-        //tmp = self->last;
-        //Py_INCREF(last);
-        //self->last = last;
-        //Py_XDECREF(tmp);
-    //}
-
-    return 0;
+  return 0;
 }
 
 /** The python class members for ICPPrinter. */
