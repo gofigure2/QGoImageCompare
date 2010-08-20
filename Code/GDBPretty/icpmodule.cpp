@@ -1,6 +1,11 @@
 #include "Python.h"
 #include "structmember.h"
 
+#include "QtCore/QProcess"
+
+//! This is used for spawning the gui process.
+static QProcess * process = new QProcess();
+
 #include <iostream>
 
 /** Our gdb pretty printer class.  An instantiation of this struct is like a C++
@@ -75,6 +80,8 @@ ICPPrinter_init( ICPPrinter * self, PyObject * args, PyObject * kwds )
 
 static PyObject * ICPPrinter_to_string( ICPPrinter * self )
 {
+  QString program = "ls";
+  process->start( program );
   return PyString_FromString( "what a lovely image you have" );
 }
 
