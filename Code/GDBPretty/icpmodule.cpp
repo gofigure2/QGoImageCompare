@@ -145,19 +145,41 @@ static PyTypeObject ICPPrinterType = {
  *
  * The PyObject* is return, or NULL if a failure occurred.
  */
-static PyObject * lookup_function()
+static PyObject * lookup_function( PyObject * icpPrinter )
 {
   PyObject * npArrayModule = PyImport_ImportModule( "itk.v3.numpy.array" );
   if( npArrayModule == NULL )
     return NULL;
   PyObject * lookupFunctionClass = PyObject_GetAttrString( npArrayModule, "RELookupFunctionTagNumpyType" );
-  Py_DECREF( npArrayModule );
   if( lookupFunctionClass == NULL )
+    {
+    Py_DECREF( npArrayModule );
     return NULL;
+    }
 
   PyObject * prettyPrintersDict = PyDict_New();
-  PyObject * prettyPrintersDictArgs = Py_BuildValue( "(O)", prettyPrintersDict );
+  PyObject * re_dict = PyObject_GetAttrString( npArrayModule, "re_dict" );
+  Py_DECREF( npArrayModule );
+  if( re_dict == NULL )
+    {
+    Py_DECREF( prettyPrintersDict );
+    Py_DECREF( re_dict );
+    return NULL;
+    }
+  PyObject * reImage = PyDict_GetItemString( re_dict, "Image" );
+  Py_DECREF( re_dict );
+  if( reImage == NULL )
+    {
+    Py_DECREF( prettyPrintersDict );
+    return NULL;
+    }
+  if( PyDict_SetItem( prettyPrintersDict, reImage, icpPrinter ) == -1 )
+    {
+    Py_DECREF( prettyPrintersDict );
+    return NULL;
+    }
 
+  PyObject * prettyPrintersDictArgs = Py_BuildValue( "(O)", prettyPrintersDict );
   PyObject * lookupFunction = PyEval_CallObject( lookupFunctionClass,  prettyPrintersDictArgs );
   Py_DECREF( prettyPrintersDict );
   Py_DECREF( prettyPrintersDictArgs );
@@ -199,7 +221,7 @@ PyMODINIT_FUNC  initicp(void)
   PyModule_AddObject( m, "ICPPrinter", (PyObject *)&ICPPrinterType );
 
   // Create lookup_function.
-  PyObject * lookupFunction = lookup_function();
+  PyObject * lookupFunction = lookup_function( (PyObject *)&ICPPrinterType );
   if( lookupFunction == NULL )
     return;
   PyModule_AddObject( m, "lookup_function", lookupFunction );
