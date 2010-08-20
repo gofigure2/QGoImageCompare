@@ -3,6 +3,6 @@ IF( BUILD_GDB_PRETTY )
     ADD_SUBDIRECTORY( GDBPretty )
   ELSE()
     MESSAGE( WARNING "To test the gdb pretty module the project must be built
-    with CMAKE_BUILD_TYPE set to 'Debug' or 'RelWithDebInfo'." )
+    with CMAKE_BUILD_TYPE set to 'Debug'." )
   ENDIF()
 ENDIF()
