@@ -140,7 +140,7 @@ static PyTypeObject ICPPrinterType = {
  *
  * The PyObject* is return, or NULL if a failure occurred.
  */
-PyObject * lookup_function()
+static PyObject * lookup_function()
 {
   PyObject * npArrayModule = PyImport_ImportModule( "itk.v3.numpy.array" );
   if( npArrayModule == NULL )
