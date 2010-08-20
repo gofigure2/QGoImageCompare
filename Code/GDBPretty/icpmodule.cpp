@@ -76,11 +76,16 @@ ICPPrinter_init( ICPPrinter * self, PyObject * args, PyObject * kwds )
   return 0;
 }
 
+static PyObject * ICPPrinter_to_string( ICPPrinter * self )
+{
+  return PyString_FromString( "what a lovely image you have" );
+}
+
 /** The python class members for ICPPrinter. */
 static PyMethodDef ICPPrinter_methods[] = {
-    //{"to_string", (PyCFunction)ICPPrinter_to_string, METH_ARGS,
-     //"Prints information about the image and sends it to the gui."
-    //},
+    {"to_string", (PyCFunction)ICPPrinter_to_string, METH_NOARGS,
+     "Prints information about the image and sends it to the gui."
+    },
     {NULL}  /* Sentinel */
 };
 
