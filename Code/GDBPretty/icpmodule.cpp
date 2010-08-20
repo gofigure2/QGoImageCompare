@@ -1,4 +1,5 @@
-#include <Python.h>
+#include "Python.h"
+#include "structmember.h"
 
 #include <iostream>
 
@@ -83,6 +84,11 @@ static PyMethodDef ICPPrinter_methods[] = {
     {NULL}  /* Sentinel */
 };
 
+static PyMemberDef ICPPrinter_members[] = {
+    {"val", T_OBJECT_EX, offsetof(ICPPrinter, val), 0,
+     "gdb.Value to print."},
+    {NULL}  /* Sentinel */
+};
 
 /** The PyTypeObject for ICPPrinter.  This defines how ICPPrinter behaves in
  * python. */
@@ -116,7 +122,7 @@ static PyTypeObject ICPPrinterType = {
     0,                         /* tp_iter */
     0,                         /* tp_iternext */
     ICPPrinter_methods,             /* tp_methods */
-    0,             /* tp_members */
+    ICPPrinter_members,             /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */
     0,                         /* tp_dict */
