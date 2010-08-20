@@ -2,7 +2,6 @@
 python
 import sys
 sys.path.insert( 0, '@CMAKE_LIBRARY_OUTPUT_DIRECTORY@' )
-import icp
 end
 
 # Specify the inferior (executable we will be examining).
@@ -11,5 +10,11 @@ file @CMAKE_RUNTIME_OUTPUT_DIRECTORY@/pretty-executable
 # Set the arguments to the executable.
 set args @TESTING_DATA_PATH@/Circle3D.mhd
 
+# Set a breakpoint
+break pretty-executable.cpp:32
+
 # Start executing our pretty-executable.
 run
+
+# print an image
+print output
