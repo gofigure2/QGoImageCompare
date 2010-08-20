@@ -59,10 +59,7 @@ ICPPrinter_init( ICPPrinter * self, PyObject * args, PyObject * kwds )
   PyObject * val = NULL;
   PyObject * tmp;
 
-  static char *kwlist[] = { NULL };
-
-  if ( !PyArg_ParseTupleAndKeywords( args, kwds, "O", kwlist,
-      val ))
+  if ( !PyArg_ParseTuple( args, "O", &val ))
     return -1;
 
   if (val)
