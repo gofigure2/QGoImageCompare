@@ -1,12 +1,25 @@
 #include "Python.h"
 #include "structmember.h"
 
-#include "QtCore/QProcess"
+#include <QtCore/QProcess>
+
+#include <iostream>
 
 //! This is used for spawning the gui process.
 static QProcess * process = new QProcess();
 
-#include <iostream>
+static PyObject * _cleanup_QProcess( PyObject * self, PyObject * args )
+{
+  if( process->state() == QProcess::Running )
+    process->kill();
+  process->waitForFinished();
+  delete process;
+  Py_INCREF( Py_None );
+  return Py_None;
+}
+
+static const char icpGuiBuildLocation[] = "@ICPGUI_BUILD_LOCATION@";
+static const char icpGuiInstallLocation[] = "@ICPGUI_INSTALL_LOCATION@";
 
 /** Our gdb pretty printer class.  An instantiation of this struct is like a C++
  * class this*, but in python it is traditionally call self*.
@@ -80,8 +93,16 @@ ICPPrinter_init( ICPPrinter * self, PyObject * args, PyObject * kwds )
 
 static PyObject * ICPPrinter_to_string( ICPPrinter * self )
 {
-  QString program = "ls";
-  process->start( program );
+  QString program = icpGuiBuildLocation;
+  if( process->state() == QProcess::NotRunning )
+    {
+    process->start( program );
+    if( !process->waitForStarted() )
+      {
+      PyErr_SetString( PyExc_OSError, "Could not start the icpGui." );
+      return NULL;
+      }
+    }
   return PyString_FromString( "what a lovely image you have" );
 }
 
@@ -201,6 +222,8 @@ static PyObject * icpError;
 
 static PyMethodDef icpMethods[] =
 {
+  {"_cleanup_QProcess", _cleanup_QProcess, METH_NOARGS,
+    "Internal method for cleanup of the module." },
   {NULL, NULL, 0, NULL} /* Sentinel */
 };
 
@@ -229,5 +252,26 @@ PyMODINIT_FUNC  initicp(void)
   if( lookupFunction == NULL )
     return;
   PyModule_AddObject( m, "lookup_function", lookupFunction );
+
+  // We use the atexit module here because, at least at this time, it appears
+  // gdb cannot call Py_Finalize without
+  // "Fatal Python error: auto-releasing thread-state, but no thread-state for
+  // this thread".
+  PyObject * atexit = PyImport_ImportModule( "atexit" );
+  if( atexit == NULL )
+    return;
+  PyObject * register_m = PyObject_GetAttrString( atexit, "register" );
+  Py_DECREF( atexit );
+  if( register_m == NULL )
+    return;
+  PyObject * _cleanup_QProcess_m = PyObject_GetAttrString( m, "_cleanup_QProcess" );
+  if( _cleanup_QProcess_m == NULL )
+    return;
+  PyObject * registerArgs = Py_BuildValue( "(O)", _cleanup_QProcess_m );
+  PyObject * registerReturn = PyEval_CallObject( register_m, registerArgs );
+  Py_DECREF( registerArgs );
+  Py_DECREF( register_m );
+  if( registerReturn == NULL )
+    return;
 }
 } // end extern "C"
