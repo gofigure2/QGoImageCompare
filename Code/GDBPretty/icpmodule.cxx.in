@@ -1,12 +1,22 @@
 #include "Python.h"
 #include "structmember.h"
 
+#include <QtCore/QByteArray>
 #include <QtCore/QProcess>
+#include <QLocalServer>
+#include <QLocalSocket>
 
+#include <cstring>
 #include <iostream>
+#include <sstream>
+
+#include "QImageReceiver.h"
 
 //! This is used for spawning the gui process.
 static QProcess * process = new QProcess();
+static QLocalServer * server = new QLocalServer( process );
+static QLocalSocket * socket;
+
 
 static PyObject * _cleanup_QProcess( PyObject * self, PyObject * args )
 {
@@ -96,14 +106,120 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
   QString program = icpGuiBuildLocation;
   if( process->state() == QProcess::NotRunning )
     {
+    // @todo These two can eventually be commented out for Windows compatibility.
+    process->setStandardOutputFile( "/dev/stdout", QIODevice::Append );
+    process->setStandardOutputFile( "/dev/stderr", QIODevice::Append );
     process->start( program );
     if( !process->waitForStarted() )
       {
       PyErr_SetString( PyExc_OSError, "Could not start the icpGui." );
       return NULL;
       }
+    if( !server->waitForNewConnection( 5000 ) )
+      {
+      PyErr_SetString( PyExc_OSError, "icpGui did not connect to local server." );
+      return NULL;
+      }
+    socket = server->nextPendingConnection();
     }
-  return PyString_FromString( "what a lovely image you have" );
+
+  PyObject * type = PyObject_GetAttrString( self->val, "type" );
+  if( type == NULL )
+    return NULL;
+  PyObject * dimension_o = PyObject_CallMethod( type, "template_argument", "i", 1 );
+  Py_DECREF( type );
+  long dimension;
+  if( dimension_o == NULL )
+    {
+    PyObject * errType;
+    PyObject * errValue;
+    PyObject * errTraceback;
+    PyErr_Fetch( &errType, &errValue, &errTraceback );
+    if( errValue != NULL &&
+      PyString_Check( errValue ) )
+      {
+      char * dimension_c = PyString_AS_STRING( errValue );
+      // Counting on the location of the dimension not changing in the error
+      // string.  Right now it is "No type named 3u."
+      std::string dimension_s( 1, dimension_c[14] );
+      std::istringstream istr( dimension_s );
+      istr >> dimension;
+      }
+    else
+      {
+      PyErr_Restore( errType, errValue, errTraceback );
+      return NULL;
+      }
+    }
+  else
+    {
+    dimension = PyInt_AsLong( dimension_o );
+    Py_DECREF( dimension_o );
+    }
+
+  // Send note that the image is on its way.
+  QByteArray ba;
+  int content;
+  int* data_p;
+  size_t contentLength;
+  content = QImageReceiver::InitializationString;
+  ba.resize( sizeof( int ) );
+  data_p = reinterpret_cast< int* >( ba.data() );
+  *data_p = content;
+  ba.append( "An image is on its way (take cover!)" );
+  socket->write( ba );
+  if( !socket->waitForBytesWritten( 3000 ) )
+    {
+    PyErr_SetString( PyExc_RuntimeError, "Failed to write to socket." );
+    return NULL;
+    }
+
+  // Common vars.
+  PyObject * key;
+  long i = 0;
+  PyObject * longComponent_o;
+  long longComponent;
+  const char * longComponent_c = reinterpret_cast< const char * >( &longComponent );
+
+  // Get the size of the buffered region.
+  key = PyString_FromString( "m_BufferedRegion" );
+  PyObject * bufferedRegion = PyObject_GetItem( self->val, key );
+  Py_DECREF( key );
+  if( bufferedRegion == NULL )
+    return NULL;
+  key = PyString_FromString( "m_Size" );
+  PyObject * size = PyObject_GetItem( bufferedRegion, key );
+  Py_DECREF( bufferedRegion );
+  PyObject * size_size = PyObject_GetItem( size, key );
+  Py_DECREF( size );
+  Py_DECREF( key );
+  if( size_size == NULL )
+    return NULL;
+  long size_a[3] = {1, 1, 1};
+  for( i = 0; i < dimension; ++i )
+    {
+    key = PyInt_FromLong( i );
+    longComponent_o = PyObject_GetItem( size_size, key );
+    size_a[i] = PyInt_AsLong( longComponent_o );
+    Py_DECREF( longComponent_o );
+    Py_DECREF( key );
+    }
+  content = QImageReceiver::ImageSize;
+  contentLength = sizeof( int ) + 3 * sizeof( long );
+  ba.resize( contentLength );
+  data_p = reinterpret_cast< int* >( ba.data() );
+  *data_p = content;
+  memcpy( ba.data() + sizeof( int ), &size_a, contentLength );
+  socket->write( ba );
+  if( !socket->waitForBytesWritten( 3000 ) )
+    {
+    PyErr_SetString( PyExc_RuntimeError, "Failed to write to socket." );
+    return NULL;
+    }
+
+  //PyObject_Print( size_size, stdout, Py_PRINT_RAW );
+
+  return PyString_FromString( "\nwhat a lovely image you have" );
 }
 
 /** The python class members for ICPPrinter. */
@@ -273,5 +389,14 @@ PyMODINIT_FUNC  initicp(void)
   Py_DECREF( register_m );
   if( registerReturn == NULL )
     return;
+
+  if( !server->isListening() )
+    {
+    if( !server->listen( "icpPythonModule" ) )
+      {
+      PyErr_SetString( PyExc_OSError, server->errorString().toUtf8().data() );
+      return;
+      }
+    }
 }
 } // end extern "C"

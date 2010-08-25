@@ -18,3 +18,5 @@ run
 
 # Print an image.
 print output
+
+shell sleep 3
