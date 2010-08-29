@@ -70,7 +70,10 @@ QImageReceiver
     /** Check to make sure the content is as expected.  The pieces of data
      * describing an image should come in order. */
     if( content != m_ExpectedContent )
-      throw( std::runtime_error( "Image datagram did not have its expected content." ));
+      {
+      std::cerr <<  "Image datagram did not have its expected content.\n";
+      return;
+      }
     if( content == FinalizationString )
       m_ExpectedContent = InitializationString;
     else

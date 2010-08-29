@@ -21,7 +21,7 @@ static QLocalSocket * socket;
 static PyObject * _cleanup_QProcess( PyObject * self, PyObject * args )
 {
   if( process->state() == QProcess::Running )
-    process->terminate();
+    process->kill();
   delete server;
   Py_INCREF( Py_None );
   return Py_None;
