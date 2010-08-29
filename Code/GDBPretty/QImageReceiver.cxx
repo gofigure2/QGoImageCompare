@@ -10,11 +10,10 @@
 QImageReceiver
 ::QImageReceiver( QObject * parent ):
   QObject( parent ),
+  m_ImageIndex( 0 ),
   m_ExpectedContent( InitializationString )
 {
   m_Socket = new QLocalSocket( this );
-
-  m_Importer = new StreamingImageImporter();
 
   connect( m_Socket, SIGNAL(readyRead()),
     this, SLOT(readPendingDatagram()));
@@ -26,7 +25,6 @@ QImageReceiver
 QImageReceiver
 ::~QImageReceiver()
 {
-  delete m_Importer;
 }
 
 
@@ -84,9 +82,43 @@ QImageReceiver
       ba = m_Socket->read( 3 * sizeof( long ));
       break;
     default:
+    // @todo throw an exception here?
       std::cerr << "Error: Unknown content " << content << std::endl;
       }
     }
 
-  m_Importer->ApplyContent( content, ba );
+  this->applyContent( content, ba );
+}
+
+
+void
+QImageReceiver
+::applyContent( int content, QByteArray & ba )
+{
+  switch ( content )
+    {
+  case InitializationString:
+    m_Images.push_back( vtkSmartPointer< vtkImageData >::New() );
+    m_Images[m_ImageIndex]->SetNumberOfScalarComponents( 1 );
+    break;
+  case ImageSize:
+      {
+      long * size_l = reinterpret_cast< long * >( ba.data() );
+
+      int dims[3];
+      for( unsigned int i = 0; i < 3; ++i )
+        {
+        dims[i] = static_cast< int >( size_l[i] );
+        }
+      m_Images[m_ImageIndex]->SetDimensions( dims );
+      break;
+      }
+  case FinalizationString:
+    ++m_ImageIndex;
+    // @todo add the image to the visualization
+    break;
+  default:
+    // @todo throw an exception here?
+    std::cerr << "Error: Unknown content " << content << std::endl;
+    }
 }

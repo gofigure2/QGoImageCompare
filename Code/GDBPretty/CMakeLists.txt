@@ -8,7 +8,6 @@ INCLUDE( ${QT_USE_FILE} )
 SET( ICPGUI_SRCS_CXX
   icpGuiMain.cxx
   QImageReceiver.cxx
-  StreamingImageImporter.cxx
   )
 SET( ICPGUI_SRCS_MOC_SRCS
   QImageReceiver.h

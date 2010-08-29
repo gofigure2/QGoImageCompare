@@ -1,10 +1,13 @@
 #ifndef _QImageReceiver_h
 #define _QImageReceiver_h
 
+#include "vtkSmartPointer.h"
+#include "vtkImageData.h"
+
 #include <QtCore/QObject>
 #include <QLocalSocket>
 
-#include "StreamingImageImporter.h"
+#include <vector>
 
 /** @brief Receives an image from the python module with a local socket and
  * shared memory. */
@@ -27,9 +30,11 @@ private slots:
   void readPendingDatagram();
 
 private:
+  void applyContent( int content, QByteArray & ba );
   QLocalSocket * m_Socket;
 
-  StreamingImageImporter * m_Importer;
+  std::vector< vtkSmartPointer< vtkImageData > > m_Images;
+  size_t m_ImageIndex;
 
   DatagramContent m_ExpectedContent;
 };
