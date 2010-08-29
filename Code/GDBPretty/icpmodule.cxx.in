@@ -14,16 +14,15 @@
 
 //! This is used for spawning the gui process.
 static QProcess * process = new QProcess();
-static QLocalServer * server = new QLocalServer( process );
+static QLocalServer * server = new QLocalServer();
 static QLocalSocket * socket;
 
 
 static PyObject * _cleanup_QProcess( PyObject * self, PyObject * args )
 {
   if( process->state() == QProcess::Running )
-    process->kill();
-  process->waitForFinished();
-  delete process;
+    process->terminate();
+  delete server;
   Py_INCREF( Py_None );
   return Py_None;
 }
@@ -110,7 +109,7 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
     process->setStandardOutputFile( "/dev/stdout", QIODevice::Append );
     process->setStandardOutputFile( "/dev/stderr", QIODevice::Append );
     process->start( program );
-    if( !process->waitForStarted() )
+    if( !process->waitForStarted( 5000 ) )
       {
       PyErr_SetString( PyExc_OSError, "Could not start the icpGui." );
       return NULL;
@@ -389,6 +388,7 @@ PyMODINIT_FUNC  initicp(void)
   Py_DECREF( register_m );
   if( registerReturn == NULL )
     return;
+  Py_DECREF( registerReturn );
 
   if( !server->isListening() )
     {

@@ -18,6 +18,7 @@ class QImageReceiver: public QObject
 public:
   enum DatagramContent {
     InitializationString,
+    ScalarType,
     ImageSize,
     FinalizationString
     };

@@ -19,4 +19,4 @@ run
 # Print an image.
 print output
 
-shell sleep 3
+shell sleep 1
