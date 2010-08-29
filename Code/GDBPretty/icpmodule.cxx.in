@@ -109,12 +109,28 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
     process->setStandardOutputFile( "/dev/stdout", QIODevice::Append );
     process->setStandardOutputFile( "/dev/stderr", QIODevice::Append );
     process->start( program );
-    if( !process->waitForStarted( 5000 ) )
+    if( !server->isListening() )
+      {
+      QString pid;
+#ifdef Q_OS_WIN
+      // @todo this needs to be tested that it returns the same as
+      // QCoreApplication::applicationPid() used int QImageReceiver.
+      pid.setNum( process->pid()->dwProcessId );
+#else
+      pid.setNum( process->pid() );
+#endif
+      if( !server->listen( QString( "icpPythonModule" ) + pid ))
+        {
+        PyErr_SetString( PyExc_OSError, server->errorString().toUtf8().data() );
+        return NULL;
+        }
+      }
+    if( !process->waitForStarted( 3000 ) )
       {
       PyErr_SetString( PyExc_OSError, "Could not start the icpGui." );
       return NULL;
       }
-    if( !server->waitForNewConnection( 5000 ) )
+    if( !server->waitForNewConnection( 3000 ) )
       {
       PyErr_SetString( PyExc_OSError, "icpGui did not connect to local server." );
       return NULL;
@@ -389,14 +405,5 @@ PyMODINIT_FUNC  initicp(void)
   if( registerReturn == NULL )
     return;
   Py_DECREF( registerReturn );
-
-  if( !server->isListening() )
-    {
-    if( !server->listen( "icpPythonModule" ) )
-      {
-      PyErr_SetString( PyExc_OSError, server->errorString().toUtf8().data() );
-      return;
-      }
-    }
 }
 } // end extern "C"

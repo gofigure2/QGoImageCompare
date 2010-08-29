@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 #include <QtCore/QFile>
+#include <QCoreApplication>
 #include <QtGui/QMessageBox>
 
 QImageReceiver
@@ -19,7 +20,11 @@ QImageReceiver
     this, SLOT(readPendingDatagram()));
   connect( m_Socket, SIGNAL(error(QLocalSocket::LocalSocketError)),
     this, SLOT(displayError(QLocalSocket::LocalSocketError)));
-  m_Socket->connectToServer( "icpPythonModule" );
+  QString pid;
+  pid.setNum( QCoreApplication::applicationPid() );
+  m_Socket->connectToServer( "icpPythonModule" + pid );
+  if( !m_Socket->waitForConnected( 3000 ) )
+    this->displayError( m_Socket->error() );
 }
 
 QImageReceiver
