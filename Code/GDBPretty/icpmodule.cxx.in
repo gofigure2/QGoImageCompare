@@ -304,9 +304,16 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
     return NULL;
     }
 
-  //PyObject_Print( size_size, stdout, Py_PRINT_RAW );
-
-  return PyString_FromString( "\nwhat a lovely image you have" );
+  QString pid;
+#ifdef Q_OS_WIN
+  // @todo this needs to be tested that it returns the same as
+  // QCoreApplication::applicationPid() used int QImageReceiver.
+  pid.setNum( process->pid()->dwProcessId );
+#else
+  pid.setNum( process->pid() );
+#endif
+  pid.prepend( "icpGui pid = " );
+  return PyString_FromString( pid.toUtf8().data() );
 }
 
 /** The python class members for ICPPrinter. */
