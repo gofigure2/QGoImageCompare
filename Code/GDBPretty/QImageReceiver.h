@@ -20,6 +20,8 @@ public:
     InitializationString,
     ScalarType,
     ImageSize,
+    ImageOrigin,
+    ImageSpacing,
     FinalizationString
     };
 

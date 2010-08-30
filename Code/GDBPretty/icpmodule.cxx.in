@@ -196,8 +196,7 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
   PyObject * key;
   long i = 0;
   PyObject * longComponent_o;
-  long longComponent;
-  const char * longComponent_c = reinterpret_cast< const char * >( &longComponent );
+  PyObject * doubleComponent_o;
 
   // Get the size of the buffered region.
   key = PyString_FromString( "m_BufferedRegion" );
@@ -227,6 +226,58 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
   sizeBa.resize( contentLength );
   memcpy( sizeBa.data(), &size_a, contentLength );
   ba.append( sizeBa );
+
+  // Get the origin.
+  key = PyString_FromString( "m_Origin" );
+  PyObject * point = PyObject_GetItem( self->val, key );
+  Py_DECREF( key );
+  if( point == NULL )
+    return NULL;
+  key = PyString_FromString( "m_InternalArray" );
+  PyObject * origin = PyObject_GetItem( point, key );
+  Py_DECREF( point );
+  if( origin == NULL )
+    return NULL;
+  double origin_a[3] = {0.0, 0.0, 0.0};
+  for( i = 0; i < dimension; ++i )
+    {
+    key = PyInt_FromLong( i );
+    doubleComponent_o = PyObject_GetItem( origin, key );
+    origin_a[i] = PyFloat_AsDouble( doubleComponent_o );
+    Py_DECREF( doubleComponent_o );
+    Py_DECREF( key );
+    }
+  QByteArray originBa;
+  contentLength = 3 * sizeof( double );
+  originBa.resize( contentLength );
+  memcpy( originBa.data(), &origin_a, contentLength );
+  ba.append( originBa );
+
+  // Get the spacing.
+  key = PyString_FromString( "m_Spacing" );
+  PyObject * spacing_o = PyObject_GetItem( self->val, key );
+  Py_DECREF( key );
+  if( spacing_o == NULL )
+    return NULL;
+  key = PyString_FromString( "m_InternalArray" );
+  PyObject * spacing = PyObject_GetItem( spacing_o, key );
+  Py_DECREF( spacing_o );
+  if( spacing == NULL )
+    return NULL;
+  double spacing_a[3] = {1.0, 1.0, 1.0};
+  for( i = 0; i < dimension; ++i )
+    {
+    key = PyInt_FromLong( i );
+    doubleComponent_o = PyObject_GetItem( spacing, key );
+    spacing_a[i] = PyFloat_AsDouble( doubleComponent_o );
+    Py_DECREF( doubleComponent_o );
+    Py_DECREF( key );
+    }
+  QByteArray spacingBa;
+  contentLength = 3 * sizeof( double );
+  spacingBa.resize( contentLength );
+  memcpy( spacingBa.data(), &spacing_a, contentLength );
+  ba.append( spacingBa );
 
   // The FinalizationString
   ba.append( "The image has arrived!\n" );

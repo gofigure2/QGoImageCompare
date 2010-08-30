@@ -74,6 +74,12 @@ QImageReceiver
   ba = m_Socket->read( 3 * sizeof( long ));
   this->applyContent( ImageSize, ba );
 
+  ba = m_Socket->read( 3 * sizeof( double ));
+  this->applyContent( ImageOrigin, ba );
+
+  ba = m_Socket->read( 3 * sizeof( double ));
+  this->applyContent( ImageSpacing, ba );
+
   ba = m_Socket->readLine();
   this->applyContent( FinalizationString, ba );
 }
@@ -89,6 +95,7 @@ QImageReceiver
     m_Images.push_back( vtkSmartPointer< vtkImageData >::New() );
     m_Images[m_ImageIndex]->SetNumberOfScalarComponents( 1 );
     break;
+
   case ScalarType:
     if( ba == "float" )
       m_Images[m_ImageIndex]->SetScalarTypeToFloat();
@@ -115,6 +122,7 @@ QImageReceiver
     else
       std::cerr << "Unknown scalar type: " << ba.data() << std::endl;
     break;
+
   case ImageSize:
       {
       long * size_l = reinterpret_cast< long * >( ba.data() );
@@ -125,13 +133,29 @@ QImageReceiver
         dims[i] = static_cast< int >( size_l[i] );
         }
       m_Images[m_ImageIndex]->SetDimensions( dims );
-      break;
       }
+    break;
+
+  case ImageOrigin:
+      {
+      double * origin = reinterpret_cast< double * >( ba.data() );
+      m_Images[m_ImageIndex]->SetOrigin( origin );
+      }
+    break;
+
+  case ImageSpacing:
+      {
+      double * spacing = reinterpret_cast< double * >( ba.data() );
+      m_Images[m_ImageIndex]->SetSpacing( spacing );
+      }
+    break;
+
   case FinalizationString:
     // @todo add the image to the visualization
     m_Images[m_ImageIndex]->Print( std::cout );
     ++m_ImageIndex;
     break;
+
   default:
     std::cerr << "Error: Unknown content " << content << std::endl;
     }
