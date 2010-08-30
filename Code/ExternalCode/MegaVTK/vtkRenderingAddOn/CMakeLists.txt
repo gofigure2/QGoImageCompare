@@ -1,6 +1,5 @@
 #Define sources
 SET( vtkRenderingAddOn_SRCS2
-  vtkFillImageWithPolyData.cxx
   vtkImage3DCroppingBoxCallback.cxx
   vtkImage3DImagePlaneCallback.cxx
   vtkImageBlendWithMask.cxx
@@ -9,7 +8,6 @@ SET( vtkRenderingAddOn_SRCS2
   vtkLookupTableManager.cxx
   vtkOrientationAnnotation.cxx
   vtkOrientedBoxWidget.cxx
-  vtkPolylineDecimation.cxx
   vtkViewImage.cxx
   vtkViewImage2D.cxx
   vtkViewImage2DCollection.cxx
