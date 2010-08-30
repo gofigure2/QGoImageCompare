@@ -279,8 +279,23 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
   memcpy( spacingBa.data(), &spacing_a, contentLength );
   ba.append( spacingBa );
 
-  // The FinalizationString
-  ba.append( "The image has arrived!\n" );
+  // The ValueHistoryCount
+  PyObject * gdb_m = PyImport_ImportModule( "gdb" );
+  if( gdb_m == NULL )
+    return NULL;
+  PyObject * valueHistoryCount = PyObject_CallMethod( gdb_m, "value_history_count", NULL );
+  Py_DECREF( gdb_m );
+  if( valueHistoryCount == NULL )
+    return NULL;
+  PyObject * valueHistoryCount_s = PyObject_Str( valueHistoryCount );
+  Py_DECREF( valueHistoryCount );
+  if( valueHistoryCount_s == NULL )
+    return NULL;
+  char * valueHistoryCount_c = PyString_AsString( valueHistoryCount_s );
+  QByteArray valueHistoryCountBa( valueHistoryCount_c );
+  valueHistoryCountBa.append( '\n' );
+  ba.append( valueHistoryCountBa );
+  Py_DECREF( valueHistoryCount_s );
 
   socket->write( ba );
   if( !socket->waitForBytesWritten( 3000 ) )

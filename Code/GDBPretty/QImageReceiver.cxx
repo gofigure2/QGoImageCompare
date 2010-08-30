@@ -9,10 +9,10 @@
 #include <QtGui/QMessageBox>
 
 QImageReceiver
-::QImageReceiver( QObject * parent ):
-  QObject( parent ),
+::QImageReceiver( QGoSynchronizedViewManager * manager ):
+  QObject( manager ),
   m_ImageIndex( 0 ),
-  m_ExpectedContent( InitializationString )
+  m_ViewManager( manager )
 {
   m_Socket = new QLocalSocket( this );
 
@@ -81,7 +81,8 @@ QImageReceiver
   this->applyContent( ImageSpacing, ba );
 
   ba = m_Socket->readLine();
-  this->applyContent( FinalizationString, ba );
+  ba.prepend( "gdb pretty print of $" );
+  this->applyContent( ValueHistoryCount, ba );
 }
 
 
@@ -134,6 +135,7 @@ QImageReceiver
         }
       m_Images[m_ImageIndex]->SetDimensions( dims );
       }
+    m_Images[m_ImageIndex]->AllocateScalars();
     break;
 
   case ImageOrigin:
@@ -150,9 +152,11 @@ QImageReceiver
       }
     break;
 
-  case FinalizationString:
+  case ValueHistoryCount:
     // @todo add the image to the visualization
-    m_Images[m_ImageIndex]->Print( std::cout );
+    m_ViewManager->newSynchronizedView( ba.data(), m_Images[m_ImageIndex] );
+    m_ViewManager->Update();
+    m_ViewManager->show();
     ++m_ImageIndex;
     break;
 

@@ -9,6 +9,8 @@
 
 #include <vector>
 
+#include "QGoSynchronizedViewManager.h"
+
 /** @brief Receives an image from the python module with a local socket and
  * shared memory. */
 class QImageReceiver: public QObject
@@ -22,10 +24,10 @@ public:
     ImageSize,
     ImageOrigin,
     ImageSpacing,
-    FinalizationString
+    ValueHistoryCount
     };
 
-  QImageReceiver( QObject * parent );
+  QImageReceiver( QGoSynchronizedViewManager * manager );
   ~QImageReceiver();
 
 private slots:
@@ -39,7 +41,7 @@ private:
   std::vector< vtkSmartPointer< vtkImageData > > m_Images;
   size_t m_ImageIndex;
 
-  DatagramContent m_ExpectedContent;
+  QGoSynchronizedViewManager * m_ViewManager;
 };
 
 #endif
