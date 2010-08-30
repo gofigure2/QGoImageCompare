@@ -31,7 +31,7 @@ private slots:
   void readPendingDatagram();
 
 private:
-  void applyContent( int content, QByteArray & ba );
+  void applyContent( DatagramContent content, QByteArray & ba );
   QLocalSocket * m_Socket;
 
   std::vector< vtkSmartPointer< vtkImageData > > m_Images;

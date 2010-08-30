@@ -142,7 +142,6 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
   if( type == NULL )
     return NULL;
   PyObject * dimension_o = PyObject_CallMethod( type, "template_argument", "i", 1 );
-  Py_DECREF( type );
   long dimension;
   if( dimension_o == NULL )
     {
@@ -163,6 +162,7 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
     else
       {
       PyErr_Restore( errType, errValue, errTraceback );
+      Py_DECREF( type );
       return NULL;
       }
     }
@@ -171,23 +171,26 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
     dimension = PyInt_AsLong( dimension_o );
     Py_DECREF( dimension_o );
     }
+  PyObject * pixelType_o = PyObject_CallMethod( type, "template_argument", "i", 0 );
+  Py_DECREF( type );
+  if( pixelType_o == NULL )
+    return NULL;
+  PyObject * pixelType_os = PyObject_Str( pixelType_o );
+  Py_DECREF( pixelType_o );
+  if( pixelType_os == NULL )
+    return NULL;
 
   // Send note that the image is on its way.
   QByteArray ba;
-  int content;
-  int* data_p;
   size_t contentLength;
-  content = QImageReceiver::InitializationString;
-  ba.resize( sizeof( int ) );
-  data_p = reinterpret_cast< int* >( ba.data() );
-  *data_p = content;
-  ba.append( "An image is on its way (take cover!)" );
-  socket->write( ba );
-  if( !socket->waitForBytesWritten( 3000 ) )
-    {
-    PyErr_SetString( PyExc_RuntimeError, "Failed to write to socket." );
-    return NULL;
-    }
+  ba.append( "An image is on its way (take cover!)\n" );
+
+  //Send the pixelType ( which is equal to the vtk scalar type until we start
+  //to support more than scalar images ).
+  char * pixelType = PyString_AsString( pixelType_os );
+  ba.append( pixelType );
+  ba.append( '\n' );
+  Py_DECREF( pixelType_os );
 
   // Common vars.
   PyObject * key;
@@ -219,12 +222,15 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
     Py_DECREF( longComponent_o );
     Py_DECREF( key );
     }
-  content = QImageReceiver::ImageSize;
-  contentLength = sizeof( int ) + 3 * sizeof( long );
-  ba.resize( contentLength );
-  data_p = reinterpret_cast< int* >( ba.data() );
-  *data_p = content;
-  memcpy( ba.data() + sizeof( int ), &size_a, contentLength );
+  QByteArray sizeBa;
+  contentLength = 3 * sizeof( long );
+  sizeBa.resize( contentLength );
+  memcpy( sizeBa.data(), &size_a, contentLength );
+  ba.append( sizeBa );
+
+  // The FinalizationString
+  ba.append( "The image has arrived!\n" );
+
   socket->write( ba );
   if( !socket->waitForBytesWritten( 3000 ) )
     {

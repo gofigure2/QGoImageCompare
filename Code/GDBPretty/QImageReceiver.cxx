@@ -61,53 +61,59 @@ void
 QImageReceiver
 ::readPendingDatagram()
 {
-  int content;
   QByteArray ba;
-  while( !m_Socket->atEnd() )
-    {
-    m_Socket->read( reinterpret_cast< char * >( &content ), sizeof( int ) );
 
-    /** Check to make sure the content is as expected.  The pieces of data
-     * describing an image should come in order. */
-    if( content != m_ExpectedContent )
-      {
-      std::cerr <<  "Image datagram did not have its expected content.\n";
-      return;
-      }
-    if( content == FinalizationString )
-      m_ExpectedContent = InitializationString;
-    else
-      m_ExpectedContent = static_cast< DatagramContent >( content + 1 );
+  ba = m_Socket->readLine();
+  this->applyContent( InitializationString, ba );
 
+  ba = m_Socket->readLine();
+  // Remove the newline.
+  ba.chop( 1 );
+  this->applyContent( ScalarType, ba );
 
-    switch( content )
-      {
-    case InitializationString:
-      ba = m_Socket->readLine();
-      std::cout << "****" << ba.data() << "****" << std::endl;
-      break;
-    case ImageSize:
-      ba = m_Socket->read( 3 * sizeof( long ));
-      break;
-    default:
-    // @todo throw an exception here?
-      std::cerr << "Error: Unknown content " << content << std::endl;
-      }
-    }
+  ba = m_Socket->read( 3 * sizeof( long ));
+  this->applyContent( ImageSize, ba );
 
-  this->applyContent( content, ba );
+  ba = m_Socket->readLine();
+  this->applyContent( FinalizationString, ba );
 }
 
 
 void
 QImageReceiver
-::applyContent( int content, QByteArray & ba )
+::applyContent( DatagramContent content, QByteArray & ba )
 {
   switch ( content )
     {
   case InitializationString:
     m_Images.push_back( vtkSmartPointer< vtkImageData >::New() );
     m_Images[m_ImageIndex]->SetNumberOfScalarComponents( 1 );
+    break;
+  case ScalarType:
+    if( ba == "float" )
+      m_Images[m_ImageIndex]->SetScalarTypeToFloat();
+    else if( ba == "double" )
+      m_Images[m_ImageIndex]->SetScalarTypeToDouble();
+    else if( ba == "int" )
+      m_Images[m_ImageIndex]->SetScalarTypeToInt();
+    else if( ba == "unsigned int" )
+      m_Images[m_ImageIndex]->SetScalarTypeToUnsignedInt();
+    else if( ba == "long" )
+      m_Images[m_ImageIndex]->SetScalarTypeToLong();
+    else if( ba == "unsigned long" )
+      m_Images[m_ImageIndex]->SetScalarTypeToUnsignedLong();
+    else if( ba == "short" )
+      m_Images[m_ImageIndex]->SetScalarTypeToShort();
+    else if( ba == "unsigned short" )
+      m_Images[m_ImageIndex]->SetScalarTypeToUnsignedShort();
+    else if( ba == "char" )
+      m_Images[m_ImageIndex]->SetScalarTypeToChar();
+    else if( ba == "signed char" )
+      m_Images[m_ImageIndex]->SetScalarTypeToSignedChar();
+    else if( ba == "unsigned char" )
+      m_Images[m_ImageIndex]->SetScalarTypeToUnsignedChar();
+    else
+      std::cerr << "Unknown scalar type: " << ba.data() << std::endl;
     break;
   case ImageSize:
       {
@@ -122,11 +128,11 @@ QImageReceiver
       break;
       }
   case FinalizationString:
-    ++m_ImageIndex;
     // @todo add the image to the visualization
+    m_Images[m_ImageIndex]->Print( std::cout );
+    ++m_ImageIndex;
     break;
   default:
-    // @todo throw an exception here?
     std::cerr << "Error: Unknown content " << content << std::endl;
     }
 }
