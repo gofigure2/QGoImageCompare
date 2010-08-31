@@ -45,19 +45,18 @@ QImageReceiver
   switch ( socketError )
   {
   case QLocalSocket::ServerNotFoundError:
-    QMessageBox::information(0, tr("icpGui"),
-                               tr("The host was not found." ));
+    QMessageBox::critical(0, tr("icpGui"),
+      tr("The host was not found." ));
     break;
   case QLocalSocket::ConnectionRefusedError:
-    QMessageBox::information(0, tr("icpGui"),
-                               tr("The connection was refused by the peer. " ));
+    QMessageBox::critical(0, tr("icpGui"),
+      tr("The connection was refused by the peer. " ));
     break;
   case QLocalSocket::PeerClosedError:
     break;
   default:
-    QMessageBox::information(0, tr("icpGui"),
-                               tr("The following error occurred: %1.")
-                               .arg(m_Socket->errorString()));
+    QMessageBox::critical(0, tr("icpGui"),
+      tr("The following error occurred: %1.").arg(m_Socket->errorString()));
   }
 }
 
@@ -126,7 +125,8 @@ QImageReceiver
     else if( ba == "unsigned char" )
       m_Images[m_ImageIndex]->SetScalarTypeToUnsignedChar();
     else
-      std::cerr << "Unknown scalar type: " << ba.data() << std::endl;
+      QMessageBox::critical( 0, tr("icpGui"),
+        tr( "Unknown scalar type: %1" ).arg( ba.data() ));
     break;
 
   case ImageSize:
@@ -160,7 +160,8 @@ QImageReceiver
   case ValueHistoryCount:
     // Copy the scalar data to the image.
     if( !m_ScalarMemory->attach() )
-      std::cerr << "Error: Could not attach to scalar shared memory." << std::endl;
+      QMessageBox::critical( 0, tr("icpGui"),
+        tr( "Could not attach to scalar shared memory." ));
     m_ScalarMemory->lock();
     memcpy( m_Images[m_ImageIndex]->GetScalarPointer(), m_ScalarMemory->constData(), m_ScalarMemory->size() );
     m_ScalarMemory->unlock();
@@ -176,6 +177,7 @@ QImageReceiver
     break;
 
   default:
-    std::cerr << "Error: Unknown content " << content << std::endl;
+    QMessageBox::critical( 0, tr("icpGui"),
+      tr( "Unknown content: %1" ).arg( content ));
     }
 }
