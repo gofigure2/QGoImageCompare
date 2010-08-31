@@ -6,6 +6,7 @@
 
 #include <QtCore/QObject>
 #include <QLocalSocket>
+#include <QSharedMemory>
 
 #include <vector>
 
@@ -42,6 +43,7 @@ private:
   size_t m_ImageIndex;
 
   QGoSynchronizedViewManager * m_ViewManager;
+  QSharedMemory * m_ScalarMemory;
 };
 
 #endif

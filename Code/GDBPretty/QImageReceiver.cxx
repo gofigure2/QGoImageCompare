@@ -15,6 +15,7 @@ QImageReceiver
   m_ViewManager( manager )
 {
   m_Socket = new QLocalSocket( this );
+  m_ScalarMemory = new QSharedMemory( this );
 
   connect( m_Socket, SIGNAL(readyRead()),
     this, SLOT(readPendingDatagram()));
@@ -25,11 +26,15 @@ QImageReceiver
   m_Socket->connectToServer( "icpPythonModule" + pid );
   if( !m_Socket->waitForConnected( 3000 ) )
     this->displayError( m_Socket->error() );
+  m_ScalarMemory->setKey( QString( "icpPythonModuleSharedMemory" ) + pid );
 }
 
 QImageReceiver
 ::~QImageReceiver()
 {
+  // Should never happen, but just in case.
+  if( m_ScalarMemory->isAttached() )
+    m_ScalarMemory->detach();
 }
 
 
@@ -153,10 +158,20 @@ QImageReceiver
     break;
 
   case ValueHistoryCount:
-    // @todo add the image to the visualization
+    // Copy the scalar data to the image.
+    if( !m_ScalarMemory->attach() )
+      std::cerr << "Error: Could not attach to scalar shared memory." << std::endl;
+    m_ScalarMemory->lock();
+    memcpy( m_Images[m_ImageIndex]->GetScalarPointer(), m_ScalarMemory->constData(), m_ScalarMemory->size() );
+    m_ScalarMemory->unlock();
+    m_ScalarMemory->detach();
+
+    // Add the image to the view manager.
     m_ViewManager->newSynchronizedView( ba.data(), m_Images[m_ImageIndex] );
     m_ViewManager->Update();
     m_ViewManager->show();
+
+    // Prepare for the next image.
     ++m_ImageIndex;
     break;
 

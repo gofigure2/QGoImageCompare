@@ -5,6 +5,7 @@
 #include <QtCore/QProcess>
 #include <QLocalServer>
 #include <QLocalSocket>
+#include <QSharedMemory>
 
 #include <cstring>
 #include <iostream>
@@ -15,11 +16,15 @@
 //! This is used for spawning the gui process.
 static QProcess * process = new QProcess();
 static QLocalServer * server = new QLocalServer();
+static QSharedMemory * sharedMemory = new QSharedMemory();
 static QLocalSocket * socket;
 
 
 static PyObject * _cleanup_QProcess( PyObject * self, PyObject * args )
 {
+  if( sharedMemory->isAttached() )
+    sharedMemory->detach();
+  delete sharedMemory;
   if( process->state() == QProcess::Running )
     process->kill();
   delete server;
@@ -124,6 +129,7 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
         PyErr_SetString( PyExc_OSError, server->errorString().toUtf8().data() );
         return NULL;
         }
+      sharedMemory->setKey( QString( "icpPythonModuleSharedMemory" ) + pid );
       }
     if( !process->waitForStarted( 3000 ) )
       {
@@ -175,6 +181,14 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
   Py_DECREF( type );
   if( pixelType_o == NULL )
     return NULL;
+  // Grab the pixel size.  Used later for determining the buffer size;
+  PyObject * pixelSize_o = PyObject_GetAttrString( pixelType_o, "sizeof" );
+  if( pixelSize_o == NULL )
+    {
+    Py_DECREF( pixelType_o );
+    return NULL;
+    }
+  long pixelSize = PyInt_AsLong( pixelSize_o );
   PyObject * pixelType_os = PyObject_Str( pixelType_o );
   Py_DECREF( pixelType_o );
   if( pixelType_os == NULL )
@@ -261,6 +275,7 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
     return NULL;
   key = PyString_FromString( "m_InternalArray" );
   PyObject * spacing = PyObject_GetItem( spacing_o, key );
+  Py_DECREF( key );
   Py_DECREF( spacing_o );
   if( spacing == NULL )
     return NULL;
@@ -296,6 +311,80 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
   valueHistoryCountBa.append( '\n' );
   ba.append( valueHistoryCountBa );
   Py_DECREF( valueHistoryCount_s );
+
+  // Write the image buffer to shared memory.
+  key = PyString_FromString( "m_Buffer" );
+  PyObject * importImageContainerSmartPointer = PyObject_GetItem( self->val, key );
+  Py_DECREF( key );
+  if( importImageContainerSmartPointer == NULL )
+    return NULL;
+  key = PyString_FromString( "m_Pointer" );
+  PyObject * importImageContainer_p = PyObject_GetItem( importImageContainerSmartPointer, key );
+  Py_DECREF( key );
+  Py_DECREF( importImageContainerSmartPointer );
+  if( importImageContainer_p == NULL )
+    return NULL;
+  PyObject * importImageContainer = PyObject_CallMethod( importImageContainer_p, "dereference", NULL );
+  if( importImageContainer == NULL )
+    return NULL;
+  Py_DECREF( importImageContainer_p );
+  key = PyString_FromString( "m_ImportPointer" );
+  PyObject * address = PyObject_GetItem( importImageContainer, key );
+  Py_DECREF( key );
+  Py_DECREF( importImageContainer );
+  if( address == NULL )
+    return NULL;
+  int bufferBytes = 1;
+  for( i = 0; i < dimension; ++i )
+    {
+    bufferBytes *= size_a[i];
+    }
+  bufferBytes *= pixelSize;
+  gdb_m = PyImport_ImportModule( "gdb" );
+  PyObject * inferiors = PyObject_CallMethod( gdb_m, "inferiors", NULL );
+  Py_DECREF( gdb_m );
+  if( PyTuple_Size( inferiors ) != 1 )
+    {
+    PyErr_SetString( PyExc_LookupError, "Don't know what to do when there is more than one inferior." );
+    Py_DECREF( address );
+    return NULL;
+    }
+  PyObject * inf = PyTuple_GetItem( inferiors, 0 );
+  Py_DECREF( inferiors );
+  if( inf == NULL )
+    {
+    Py_DECREF( address );
+    return NULL;
+    }
+  PyObject * buf = PyObject_CallMethod( inf, "read_memory", "Oi", address, bufferBytes );
+  Py_DECREF( inf );
+  Py_DECREF( address );
+  if( buf == NULL )
+    return NULL;
+  if( buf->ob_type->tp_as_buffer->bf_getreadbuffer == NULL )
+    {
+    PyErr_SetString( PyExc_NotImplementedError, "Expected an old style buffer object from the gdb Inferior object's read_memory method." );
+    Py_DECREF( buf );
+    return NULL;
+    }
+  void **ptrptr;
+  if( (*buf->ob_type->tp_as_buffer->bf_getreadbuffer)( buf, 0, ptrptr ) == -1 )
+    {
+    Py_DECREF( buf );
+    return NULL;
+    }
+  Py_DECREF( buf );
+
+  if( sharedMemory->isAttached() )
+    sharedMemory->detach();
+  if( !sharedMemory->create( bufferBytes ) )
+    {
+    PyErr_SetString( PyExc_RuntimeError, "Failed to write to socket." );
+    return NULL;
+    }
+  sharedMemory->lock();
+  memcpy( sharedMemory->data(), *ptrptr, qMin( sharedMemory->size(), bufferBytes ));
+  sharedMemory->unlock();
 
   socket->write( ba );
   if( !socket->waitForBytesWritten( 3000 ) )
