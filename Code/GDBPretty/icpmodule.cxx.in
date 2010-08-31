@@ -147,7 +147,7 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
   PyObject * type = PyObject_GetAttrString( self->val, "type" );
   if( type == NULL )
     return NULL;
-  PyObject * dimension_o = PyObject_CallMethod( type, "template_argument", "i", 1 );
+  PyObject * dimension_o = PyObject_CallMethod( type, (char *)"template_argument", (char *)"i", 1 );
   long dimension;
   if( dimension_o == NULL )
     {
@@ -177,7 +177,7 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
     dimension = PyInt_AsLong( dimension_o );
     Py_DECREF( dimension_o );
     }
-  PyObject * pixelType_o = PyObject_CallMethod( type, "template_argument", "i", 0 );
+  PyObject * pixelType_o = PyObject_CallMethod( type, (char *)"template_argument", (char *)"i", 0 );
   Py_DECREF( type );
   if( pixelType_o == NULL )
     return NULL;
@@ -298,7 +298,7 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
   PyObject * gdb_m = PyImport_ImportModule( "gdb" );
   if( gdb_m == NULL )
     return NULL;
-  PyObject * valueHistoryCount = PyObject_CallMethod( gdb_m, "value_history_count", NULL );
+  PyObject * valueHistoryCount = PyObject_CallMethod( gdb_m, (char *)"value_history_count", NULL );
   Py_DECREF( gdb_m );
   if( valueHistoryCount == NULL )
     return NULL;
@@ -324,7 +324,7 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
   Py_DECREF( importImageContainerSmartPointer );
   if( importImageContainer_p == NULL )
     return NULL;
-  PyObject * importImageContainer = PyObject_CallMethod( importImageContainer_p, "dereference", NULL );
+  PyObject * importImageContainer = PyObject_CallMethod( importImageContainer_p, (char *)"dereference", NULL );
   if( importImageContainer == NULL )
     return NULL;
   Py_DECREF( importImageContainer_p );
@@ -341,7 +341,7 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
     }
   bufferBytes *= pixelSize;
   gdb_m = PyImport_ImportModule( "gdb" );
-  PyObject * inferiors = PyObject_CallMethod( gdb_m, "inferiors", NULL );
+  PyObject * inferiors = PyObject_CallMethod( gdb_m, (char *)"inferiors", NULL );
   Py_DECREF( gdb_m );
   if( PyTuple_Size( inferiors ) != 1 )
     {
@@ -356,7 +356,7 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
     Py_DECREF( address );
     return NULL;
     }
-  PyObject * buf = PyObject_CallMethod( inf, "read_memory", "Oi", address, bufferBytes );
+  PyObject * buf = PyObject_CallMethod( inf, (char *)"read_memory", (char *)"Oi", address, bufferBytes );
   Py_DECREF( inf );
   Py_DECREF( address );
   if( buf == NULL )
@@ -414,8 +414,8 @@ static PyMethodDef ICPPrinter_methods[] = {
 };
 
 static PyMemberDef ICPPrinter_members[] = {
-    {"val", T_OBJECT_EX, offsetof(ICPPrinter, val), 0,
-     "gdb.Value to print."},
+    {(char *)"val", T_OBJECT_EX, offsetof(ICPPrinter, val), 0,
+     (char *)"gdb.Value to print."},
     {NULL}  /* Sentinel */
 };
 
