@@ -403,9 +403,7 @@ subprocess.Popen( ['" ) + program + "', '" + pidString + "'] )\n";
     }
   if( !sharedMemory->create( bufferBytes ) )
     {
-    std::cout << "bufferBytes: " << bufferBytes << std::endl;
-    std::cout << "error number: " << sharedMemory->error() << std::endl;
-    PyErr_SetString( PyExc_RuntimeError, "Failed to write to shared memory because of error: " );
+    PyErr_SetString( PyExc_RuntimeError, "Failed to write to shared memory." );
     return NULL;
     }
   sharedMemory->lock();
