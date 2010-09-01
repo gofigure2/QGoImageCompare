@@ -5,11 +5,11 @@
 #include <stdexcept>
 
 #include <QtCore/QFile>
-#include <QCoreApplication>
 #include <QtGui/QMessageBox>
 
 QImageReceiver
-::QImageReceiver( QGoSynchronizedViewManager * manager ):
+::QImageReceiver( QGoSynchronizedViewManager * manager,
+  const char * pid ):
   QObject( manager ),
   m_ImageIndex( 0 ),
   m_ViewManager( manager )
@@ -21,10 +21,8 @@ QImageReceiver
     this, SLOT(readPendingDatagram()));
   connect( m_Socket, SIGNAL(error(QLocalSocket::LocalSocketError)),
     this, SLOT(displayError(QLocalSocket::LocalSocketError)));
-  QString pid;
-  pid.setNum( QCoreApplication::applicationPid() );
-  m_Socket->connectToServer( "icpPythonModule" + pid );
-  if( !m_Socket->waitForConnected( 3000 ) )
+  m_Socket->connectToServer( QString( "icpPythonModule" ) + pid );
+  if( !m_Socket->waitForConnected( 5000 ) )
     this->displayError( m_Socket->error() );
   m_ScalarMemory->setKey( QString( "icpPythonModuleSharedMemory" ) + pid );
 }
@@ -68,6 +66,13 @@ QImageReceiver
   QByteArray ba;
 
   ba = m_Socket->readLine();
+  if( ba == QByteArray( "syn\n" ))
+    {
+    if( m_Socket->write( "ack\n" ) == -1 )
+      QMessageBox::critical(0, tr("icpGui"),
+        tr("Could not send ack."));
+    return;
+    }
   this->applyContent( InitializationString, ba );
 
   ba = m_Socket->readLine();
@@ -159,9 +164,10 @@ QImageReceiver
 
   case ValueHistoryCount:
     // Copy the scalar data to the image.
+
     if( !m_ScalarMemory->attach() )
       QMessageBox::critical( 0, tr("icpGui"),
-        tr( "Could not attach to scalar shared memory." ));
+        tr( "Could not attach to scalar shared memory because of error %1." ).arg( m_ScalarMemory->error() ));
     m_ScalarMemory->lock();
     memcpy( m_Images[m_ImageIndex]->GetScalarPointer(), m_ScalarMemory->constData(), m_ScalarMemory->size() );
     m_ScalarMemory->unlock();

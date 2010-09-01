@@ -2,10 +2,12 @@
 #include "structmember.h"
 
 #include <QtCore/QByteArray>
-#include <QtCore/QProcess>
+#include <QCoreApplication>
+#include <QFileInfo>
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QSharedMemory>
+#include <QString>
 
 #include <cstring>
 #include <iostream>
@@ -13,27 +15,23 @@
 
 #include "QImageReceiver.h"
 
+static const char icpGuiBuildLocation[] = "@ICPGUI_BUILD_LOCATION@";
+static const char icpGuiInstallLocation[] = "@ICPGUI_INSTALL_LOCATION@";
+
 //! This is used for spawning the gui process.
-static QProcess * process = new QProcess();
 static QLocalServer * server = new QLocalServer();
 static QSharedMemory * sharedMemory = new QSharedMemory();
-static QLocalSocket * socket;
+static QLocalSocket * socket = NULL;
 
-
-static PyObject * _cleanup_QProcess( PyObject * self, PyObject * args )
+static PyObject * _cleanup_icp( PyObject * self, PyObject * args )
 {
   if( sharedMemory->isAttached() )
     sharedMemory->detach();
   delete sharedMemory;
-  if( process->state() == QProcess::Running )
-    process->kill();
   delete server;
   Py_INCREF( Py_None );
   return Py_None;
 }
-
-static const char icpGuiBuildLocation[] = "@ICPGUI_BUILD_LOCATION@";
-static const char icpGuiInstallLocation[] = "@ICPGUI_INSTALL_LOCATION@";
 
 /** Our gdb pretty printer class.  An instantiation of this struct is like a C++
  * class this*, but in python it is traditionally call self*.
@@ -107,36 +105,58 @@ ICPPrinter_init( ICPPrinter * self, PyObject * args, PyObject * kwds )
 
 static PyObject * ICPPrinter_to_string( ICPPrinter * self )
 {
-  QString program = icpGuiBuildLocation;
-  if( process->state() == QProcess::NotRunning )
+  bool startupProcess = false;
+  if( socket == NULL ) // first run
+    startupProcess = true;
+  else
     {
-    // @todo These two can eventually be commented out for Windows compatibility.
-    process->setStandardOutputFile( "/dev/stdout", QIODevice::Append );
-    process->setStandardOutputFile( "/dev/stderr", QIODevice::Append );
-    process->start( program );
+    // Check if an icpGui is still listening ( it may have been closed by the
+    // user ).
+    socket->write( "syn\n" );
+    if( !socket->waitForBytesWritten( 1000 ) )
+      {
+      startupProcess = true;
+      }
+    if( socket->waitForReadyRead( 3000 ))
+      {
+      QByteArray response = socket->readLine();
+      if( response != QByteArray( "ack\n" ))
+        startupProcess = true;
+      }
+    else
+      startupProcess = true;
+    }
+
+
+  if( startupProcess )
+    {
+    QString pidString;
+    pidString.setNum( QCoreApplication::applicationPid() );
+    QString program;
+    if( QFileInfo( icpGuiBuildLocation ).exists() )
+      program = icpGuiBuildLocation;
+    else if( QFileInfo( icpGuiInstallLocation ).exists() )
+      program = icpGuiInstallLocation;
+    else
+      {
+      PyErr_SetString( PyExc_IOError, "icpGui executable could not be found." );
+      return NULL;
+      }
     if( !server->isListening() )
       {
-      QString pid;
-#ifdef Q_OS_WIN
-      // @todo this needs to be tested that it returns the same as
-      // QCoreApplication::applicationPid() used int QImageReceiver.
-      pid.setNum( process->pid()->dwProcessId );
-#else
-      pid.setNum( process->pid() );
-#endif
-      if( !server->listen( QString( "icpPythonModule" ) + pid ))
+      if( !server->listen( QString( "icpPythonModule" ) + pidString ))
         {
         PyErr_SetString( PyExc_OSError, server->errorString().toUtf8().data() );
         return NULL;
         }
-      sharedMemory->setKey( QString( "icpPythonModuleSharedMemory" ) + pid );
+      sharedMemory->setKey( QString( "icpPythonModuleSharedMemory" ) + pidString );
       }
-    if( !process->waitForStarted( 3000 ) )
-      {
-      PyErr_SetString( PyExc_OSError, "Could not start the icpGui." );
+    QString launchString = QString( "\
+import subprocess\n\
+subprocess.Popen( ['" ) + program + "', '" + pidString + "'] )\n";
+    if( PyRun_SimpleString( launchString.toAscii().data() ) == -1 )
       return NULL;
-      }
-    if( !server->waitForNewConnection( 3000 ) )
+    if( !server->waitForNewConnection( 5000 ) )
       {
       PyErr_SetString( PyExc_OSError, "icpGui did not connect to local server." );
       return NULL;
@@ -377,9 +397,15 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
 
   if( sharedMemory->isAttached() )
     sharedMemory->detach();
+  if( bufferBytes == 0 )
+    {
+    return PyString_FromString( "The image's buffer size is 0 and will not be visualized with icpGui." );
+    }
   if( !sharedMemory->create( bufferBytes ) )
     {
-    PyErr_SetString( PyExc_RuntimeError, "Failed to write to socket." );
+    std::cout << "bufferBytes: " << bufferBytes << std::endl;
+    std::cout << "error number: " << sharedMemory->error() << std::endl;
+    PyErr_SetString( PyExc_RuntimeError, "Failed to write to shared memory because of error: " );
     return NULL;
     }
   sharedMemory->lock();
@@ -393,16 +419,7 @@ static PyObject * ICPPrinter_to_string( ICPPrinter * self )
     return NULL;
     }
 
-  QString pid;
-#ifdef Q_OS_WIN
-  // @todo this needs to be tested that it returns the same as
-  // QCoreApplication::applicationPid() used int QImageReceiver.
-  pid.setNum( process->pid()->dwProcessId );
-#else
-  pid.setNum( process->pid() );
-#endif
-  pid.prepend( "icpGui pid = " );
-  return PyString_FromString( pid.toUtf8().data() );
+  return PyString_FromString( "Image sent to icpGui." );
 }
 
 /** The python class members for ICPPrinter. */
@@ -521,7 +538,7 @@ static PyObject * icpError;
 
 static PyMethodDef icpMethods[] =
 {
-  {"_cleanup_QProcess", _cleanup_QProcess, METH_NOARGS,
+  {"_cleanup_icp", _cleanup_icp, METH_NOARGS,
     "Internal method for cleanup of the module." },
   {NULL, NULL, 0, NULL} /* Sentinel */
 };
@@ -563,10 +580,10 @@ PyMODINIT_FUNC  initicp(void)
   Py_DECREF( atexit );
   if( register_m == NULL )
     return;
-  PyObject * _cleanup_QProcess_m = PyObject_GetAttrString( m, "_cleanup_QProcess" );
-  if( _cleanup_QProcess_m == NULL )
+  PyObject * _cleanup_icp_m = PyObject_GetAttrString( m, "_cleanup_icp" );
+  if( _cleanup_icp_m == NULL )
     return;
-  PyObject * registerArgs = Py_BuildValue( "(O)", _cleanup_QProcess_m );
+  PyObject * registerArgs = Py_BuildValue( "(O)", _cleanup_icp_m );
   PyObject * registerReturn = PyEval_CallObject( register_m, registerArgs );
   Py_DECREF( registerArgs );
   Py_DECREF( register_m );

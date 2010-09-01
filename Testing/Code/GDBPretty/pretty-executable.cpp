@@ -1,5 +1,6 @@
 /** An executable to test the gdb pretty printer on. */
 
+#include "itkBoxMeanImageFilter.h"
 #include "itkImageFileReader.h"
 
 int main( int argc, char** argv )
@@ -29,5 +30,24 @@ int main( int argc, char** argv )
     }
 
   ImageType::ConstPointer output = reader->GetOutput();
+
+  typedef itk::BoxMeanImageFilter< ImageType, ImageType > FilterType;
+  FilterType::Pointer filter = FilterType::New();
+  filter->SetInput( reader->GetOutput() );
+
+  FilterType::RadiusType radius;
+  radius.Fill( 3 );
+  filter->SetRadius( radius );
+
+  try
+    {
+    filter->Update();
+    }
+  catch( itk::ExceptionObject& e )
+    {
+    std::cerr << "Error: " << e << std::endl;
+    return 1;
+    }
+
   return 0;
 }

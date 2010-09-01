@@ -28,7 +28,8 @@ public:
     ValueHistoryCount
     };
 
-  QImageReceiver( QGoSynchronizedViewManager * manager );
+  QImageReceiver( QGoSynchronizedViewManager * manager,
+    const char * pid );
   ~QImageReceiver();
 
 private slots:
