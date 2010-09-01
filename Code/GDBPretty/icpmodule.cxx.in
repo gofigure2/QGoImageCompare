@@ -387,8 +387,8 @@ subprocess.Popen( ['" ) + program + "', '" + pidString + "'] )\n";
     Py_DECREF( buf );
     return NULL;
     }
-  void **ptrptr;
-  if( (*buf->ob_type->tp_as_buffer->bf_getreadbuffer)( buf, 0, ptrptr ) == -1 )
+  void *bufptr;
+  if( (*buf->ob_type->tp_as_buffer->bf_getreadbuffer)( buf, 0, &bufptr ) == -1 )
     {
     Py_DECREF( buf );
     return NULL;
@@ -407,7 +407,7 @@ subprocess.Popen( ['" ) + program + "', '" + pidString + "'] )\n";
     return NULL;
     }
   sharedMemory->lock();
-  memcpy( sharedMemory->data(), *ptrptr, qMin( sharedMemory->size(), bufferBytes ));
+  memcpy( sharedMemory->data(), bufptr, qMin( sharedMemory->size(), bufferBytes ));
   sharedMemory->unlock();
 
   socket->write( ba );
