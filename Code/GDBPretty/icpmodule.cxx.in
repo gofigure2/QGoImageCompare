@@ -15,8 +15,8 @@
 
 #include "QImageReceiver.h"
 
-static const char icpGuiBuildLocation[] = "@ICPGUI_BUILD_LOCATION@";
-static const char icpGuiInstallLocation[] = "@ICPGUI_INSTALL_LOCATION@";
+static const char icpGuiBuildLocation[] = "@ICPGUI_BUILD_LOCATION@/icpGui";
+static const char icpGuiInstallLocation[] = "@ICPGUI_INSTALL_LOCATION@/icpGui";
 
 //! This is used for spawning the gui process.
 static QLocalServer * server = new QLocalServer();
