@@ -2,15 +2,11 @@ SET( QGOGUILIB_EXAMPLE_SRC
   qgoimageview2d
   qgoimageview3d
   qgolutdialog
-
   qgosynchronizedview2dtest
   qgosynchronizedview3dtest
   qgosynchronizedviewmanagertest
-
   compareexample
   comparepipelineexample
-  compareguiexample
-
 )
 
 

@@ -246,6 +246,8 @@ IF( VTK_FOUND )
       INCLUDE ( CTest )
     ENDIF( BUILD_TESTING )
 
+    ADD_SUBDIRECTORY( Main )
+
     IF( BUILD_EXAMPLES )
       ADD_SUBDIRECTORY( Examples )
       OPTION( BUILD_TESTING "Test the project" ON )
