@@ -23,6 +23,7 @@ int main( int argc, char** argv )
 
   QGoSynchronizedViewManager * viewManager = new QGoSynchronizedViewManager ( );
   QImageReceiver * imageReceiver = new QImageReceiver( viewManager, argv[1] );
+  (void) imageReceiver;
 
   viewManager->show();
   viewManager->synchronizeOpenSynchronizedViews();
