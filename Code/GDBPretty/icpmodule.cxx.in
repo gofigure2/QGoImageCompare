@@ -1,0 +1,592 @@
+#include "Python.h"
+#include "structmember.h"
+
+#include <QtCore/QByteArray>
+#include <QCoreApplication>
+#include <QFileInfo>
+#include <QLocalServer>
+#include <QLocalSocket>
+#include <QSharedMemory>
+#include <QString>
+
+#include <cstring>
+#include <iostream>
+#include <sstream>
+
+#include "QImageReceiver.h"
+
+static const char icpGuiBuildLocation[] = "@ICPGUI_BUILD_LOCATION@/icpGui";
+static const char icpGuiInstallLocation[] = "@ICPGUI_INSTALL_LOCATION@/icpGui";
+
+//! This is used for spawning the gui process.
+static QLocalServer * server = new QLocalServer();
+static QSharedMemory * sharedMemory = new QSharedMemory();
+static QLocalSocket * socket = NULL;
+
+static PyObject * _cleanup_icp( PyObject * self, PyObject * args )
+{
+  if( sharedMemory->isAttached() )
+    sharedMemory->detach();
+  delete sharedMemory;
+  delete server;
+  Py_INCREF( Py_None );
+  return Py_None;
+}
+
+/** Our gdb pretty printer class.  An instantiation of this struct is like a C++
+ * class this*, but in python it is traditionally call self*.
+ */
+typedef struct
+{
+  PyObject_HEAD
+  PyObject * val; //  the gdb.Value to be 'printed'
+} ICPPrinter;
+
+/** This is equivalent in C++ to the constructor for ICPPrinter. */
+static PyObject *
+ICPPrinter_new( PyTypeObject *type, PyObject *args, PyObject *kwds )
+{
+  ICPPrinter *self;
+
+  self = (ICPPrinter *)type->tp_alloc(type, 0);
+  if ( self != NULL )
+  {
+  PyObject * gdbModule = PyImport_ImportModule( "gdb" );
+  if( gdbModule == NULL )
+    return NULL;
+  PyObject * valueClass = PyObject_GetAttrString( gdbModule, "Value" );
+  Py_DECREF( gdbModule );
+  if( valueClass == NULL )
+    return NULL;
+  PyObject * valueArgs = Py_BuildValue( "(i)", 0 );
+  self->val = PyEval_CallObject( valueClass, valueArgs );
+  Py_DECREF( valueArgs );
+  Py_DECREF( valueClass );
+  if( self->val == NULL )
+    {
+    Py_DECREF( self );
+    return NULL;
+    }
+  }
+
+  return (PyObject *)self;
+}
+
+/** This is equivalent in C++ to the destructor for ICPPrinter. */
+static void
+ICPPrinter_dealloc( ICPPrinter * self )
+{
+  Py_XDECREF( self->val );
+  self->ob_type->tp_free((PyObject*)self);
+}
+
+
+/** This defines the python constructor that would normally be defined with
+ * __init__(self) in python. */
+static int
+ICPPrinter_init( ICPPrinter * self, PyObject * args, PyObject * kwds )
+{
+  PyObject * val = NULL;
+  PyObject * tmp;
+
+  if ( !PyArg_ParseTuple( args, "O", &val ))
+    return -1;
+
+  if (val)
+    {
+    tmp = self->val;
+    Py_INCREF(val);
+    self->val = val;
+    Py_XDECREF(tmp);
+    }
+
+  return 0;
+}
+
+static PyObject * ICPPrinter_to_string( ICPPrinter * self )
+{
+  bool startupProcess = false;
+  if( socket == NULL ) // first run
+    startupProcess = true;
+  else
+    {
+    // Check if an icpGui is still listening ( it may have been closed by the
+    // user ).
+    socket->write( "syn\n" );
+    if( !socket->waitForBytesWritten( 1000 ) )
+      {
+      startupProcess = true;
+      }
+    if( socket->waitForReadyRead( 3000 ))
+      {
+      QByteArray response = socket->readLine();
+      if( response != QByteArray( "ack\n" ))
+        startupProcess = true;
+      }
+    else
+      startupProcess = true;
+    }
+
+
+  if( startupProcess )
+    {
+    QString pidString;
+    pidString.setNum( QCoreApplication::applicationPid() );
+    QString program;
+    if( QFileInfo( icpGuiBuildLocation ).exists() )
+      program = icpGuiBuildLocation;
+    else if( QFileInfo( icpGuiInstallLocation ).exists() )
+      program = icpGuiInstallLocation;
+    else
+      {
+      PyErr_SetString( PyExc_IOError, "icpGui executable could not be found." );
+      return NULL;
+      }
+    if( !server->isListening() )
+      {
+      if( !server->listen( QString( "icpPythonModule" ) + pidString ))
+        {
+        PyErr_SetString( PyExc_OSError, server->errorString().toUtf8().data() );
+        return NULL;
+        }
+      sharedMemory->setKey( QString( "icpPythonModuleSharedMemory" ) + pidString );
+      }
+    QString launchString = QString( "\
+import subprocess\n\
+subprocess.Popen( ['" ) + program + "', '" + pidString + "'] )\n";
+    if( PyRun_SimpleString( launchString.toAscii().data() ) == -1 )
+      return NULL;
+    if( !server->waitForNewConnection( 5000 ) )
+      {
+      PyErr_SetString( PyExc_OSError, "icpGui did not connect to local server." );
+      return NULL;
+      }
+    socket = server->nextPendingConnection();
+    }
+
+  PyObject * type = PyObject_GetAttrString( self->val, "type" );
+  if( type == NULL )
+    return NULL;
+  PyObject * dimension_o = PyObject_CallMethod( type, (char *)"template_argument", (char *)"i", 1 );
+  long dimension;
+  if( dimension_o == NULL )
+    {
+    PyObject * errType;
+    PyObject * errValue;
+    PyObject * errTraceback;
+    PyErr_Fetch( &errType, &errValue, &errTraceback );
+    if( errValue != NULL &&
+      PyString_Check( errValue ) )
+      {
+      char * dimension_c = PyString_AS_STRING( errValue );
+      // Counting on the location of the dimension not changing in the error
+      // string.  Right now it is "No type named 3u."
+      std::string dimension_s( 1, dimension_c[14] );
+      std::istringstream istr( dimension_s );
+      istr >> dimension;
+      }
+    else
+      {
+      PyErr_Restore( errType, errValue, errTraceback );
+      Py_DECREF( type );
+      return NULL;
+      }
+    }
+  else
+    {
+    dimension = PyInt_AsLong( dimension_o );
+    Py_DECREF( dimension_o );
+    }
+  PyObject * pixelType_o = PyObject_CallMethod( type, (char *)"template_argument", (char *)"i", 0 );
+  Py_DECREF( type );
+  if( pixelType_o == NULL )
+    return NULL;
+  // Grab the pixel size.  Used later for determining the buffer size;
+  PyObject * pixelSize_o = PyObject_GetAttrString( pixelType_o, "sizeof" );
+  if( pixelSize_o == NULL )
+    {
+    Py_DECREF( pixelType_o );
+    return NULL;
+    }
+  long pixelSize = PyInt_AsLong( pixelSize_o );
+  PyObject * pixelType_os = PyObject_Str( pixelType_o );
+  Py_DECREF( pixelType_o );
+  if( pixelType_os == NULL )
+    return NULL;
+
+  // Send note that the image is on its way.
+  QByteArray ba;
+  size_t contentLength;
+  ba.append( "An image is on its way (take cover!)\n" );
+
+  //Send the pixelType ( which is equal to the vtk scalar type until we start
+  //to support more than scalar images ).
+  char * pixelType = PyString_AsString( pixelType_os );
+  ba.append( pixelType );
+  ba.append( '\n' );
+  Py_DECREF( pixelType_os );
+
+  // Common vars.
+  PyObject * key;
+  long i = 0;
+  PyObject * longComponent_o;
+  PyObject * doubleComponent_o;
+
+  // Get the size of the buffered region.
+  key = PyString_FromString( "m_BufferedRegion" );
+  PyObject * bufferedRegion = PyObject_GetItem( self->val, key );
+  Py_DECREF( key );
+  if( bufferedRegion == NULL )
+    return NULL;
+  key = PyString_FromString( "m_Size" );
+  PyObject * size = PyObject_GetItem( bufferedRegion, key );
+  Py_DECREF( bufferedRegion );
+  PyObject * size_size = PyObject_GetItem( size, key );
+  Py_DECREF( size );
+  Py_DECREF( key );
+  if( size_size == NULL )
+    return NULL;
+  long size_a[3] = {1, 1, 1};
+  for( i = 0; i < dimension; ++i )
+    {
+    key = PyInt_FromLong( i );
+    longComponent_o = PyObject_GetItem( size_size, key );
+    size_a[i] = PyInt_AsLong( longComponent_o );
+    Py_DECREF( longComponent_o );
+    Py_DECREF( key );
+    }
+  QByteArray sizeBa;
+  contentLength = 3 * sizeof( long );
+  sizeBa.resize( contentLength );
+  memcpy( sizeBa.data(), &size_a, contentLength );
+  ba.append( sizeBa );
+
+  // Get the origin.
+  key = PyString_FromString( "m_Origin" );
+  PyObject * point = PyObject_GetItem( self->val, key );
+  Py_DECREF( key );
+  if( point == NULL )
+    return NULL;
+  key = PyString_FromString( "m_InternalArray" );
+  PyObject * origin = PyObject_GetItem( point, key );
+  Py_DECREF( point );
+  if( origin == NULL )
+    return NULL;
+  double origin_a[3] = {0.0, 0.0, 0.0};
+  for( i = 0; i < dimension; ++i )
+    {
+    key = PyInt_FromLong( i );
+    doubleComponent_o = PyObject_GetItem( origin, key );
+    origin_a[i] = PyFloat_AsDouble( doubleComponent_o );
+    Py_DECREF( doubleComponent_o );
+    Py_DECREF( key );
+    }
+  QByteArray originBa;
+  contentLength = 3 * sizeof( double );
+  originBa.resize( contentLength );
+  memcpy( originBa.data(), &origin_a, contentLength );
+  ba.append( originBa );
+
+  // Get the spacing.
+  key = PyString_FromString( "m_Spacing" );
+  PyObject * spacing_o = PyObject_GetItem( self->val, key );
+  Py_DECREF( key );
+  if( spacing_o == NULL )
+    return NULL;
+  key = PyString_FromString( "m_InternalArray" );
+  PyObject * spacing = PyObject_GetItem( spacing_o, key );
+  Py_DECREF( key );
+  Py_DECREF( spacing_o );
+  if( spacing == NULL )
+    return NULL;
+  double spacing_a[3] = {1.0, 1.0, 1.0};
+  for( i = 0; i < dimension; ++i )
+    {
+    key = PyInt_FromLong( i );
+    doubleComponent_o = PyObject_GetItem( spacing, key );
+    spacing_a[i] = PyFloat_AsDouble( doubleComponent_o );
+    Py_DECREF( doubleComponent_o );
+    Py_DECREF( key );
+    }
+  QByteArray spacingBa;
+  contentLength = 3 * sizeof( double );
+  spacingBa.resize( contentLength );
+  memcpy( spacingBa.data(), &spacing_a, contentLength );
+  ba.append( spacingBa );
+
+  // The ValueHistoryCount
+  PyObject * gdb_m = PyImport_ImportModule( "gdb" );
+  if( gdb_m == NULL )
+    return NULL;
+  PyObject * valueHistoryCount = PyObject_CallMethod( gdb_m, (char *)"value_history_count", NULL );
+  Py_DECREF( gdb_m );
+  if( valueHistoryCount == NULL )
+    return NULL;
+  PyObject * valueHistoryCount_s = PyObject_Str( valueHistoryCount );
+  Py_DECREF( valueHistoryCount );
+  if( valueHistoryCount_s == NULL )
+    return NULL;
+  char * valueHistoryCount_c = PyString_AsString( valueHistoryCount_s );
+  QByteArray valueHistoryCountBa( valueHistoryCount_c );
+  valueHistoryCountBa.append( '\n' );
+  ba.append( valueHistoryCountBa );
+  Py_DECREF( valueHistoryCount_s );
+
+  // Write the image buffer to shared memory.
+  key = PyString_FromString( "m_Buffer" );
+  PyObject * importImageContainerSmartPointer = PyObject_GetItem( self->val, key );
+  Py_DECREF( key );
+  if( importImageContainerSmartPointer == NULL )
+    return NULL;
+  key = PyString_FromString( "m_Pointer" );
+  PyObject * importImageContainer_p = PyObject_GetItem( importImageContainerSmartPointer, key );
+  Py_DECREF( key );
+  Py_DECREF( importImageContainerSmartPointer );
+  if( importImageContainer_p == NULL )
+    return NULL;
+  PyObject * importImageContainer = PyObject_CallMethod( importImageContainer_p, (char *)"dereference", NULL );
+  if( importImageContainer == NULL )
+    return NULL;
+  Py_DECREF( importImageContainer_p );
+  key = PyString_FromString( "m_ImportPointer" );
+  PyObject * address = PyObject_GetItem( importImageContainer, key );
+  Py_DECREF( key );
+  Py_DECREF( importImageContainer );
+  if( address == NULL )
+    return NULL;
+  int bufferBytes = 1;
+  for( i = 0; i < dimension; ++i )
+    {
+    bufferBytes *= size_a[i];
+    }
+  bufferBytes *= pixelSize;
+  gdb_m = PyImport_ImportModule( "gdb" );
+  PyObject * inferiors = PyObject_CallMethod( gdb_m, (char *)"inferiors", NULL );
+  Py_DECREF( gdb_m );
+  if( PyTuple_Size( inferiors ) != 1 )
+    {
+    PyErr_SetString( PyExc_LookupError, "Don't know what to do when there is more than one inferior." );
+    Py_DECREF( address );
+    return NULL;
+    }
+  PyObject * inf = PyTuple_GetItem( inferiors, 0 );
+  Py_DECREF( inferiors );
+  if( inf == NULL )
+    {
+    Py_DECREF( address );
+    return NULL;
+    }
+  PyObject * buf = PyObject_CallMethod( inf, (char *)"read_memory", (char *)"Oi", address, bufferBytes );
+  Py_DECREF( inf );
+  Py_DECREF( address );
+  if( buf == NULL )
+    return NULL;
+  if( buf->ob_type->tp_as_buffer->bf_getreadbuffer == NULL )
+    {
+    PyErr_SetString( PyExc_NotImplementedError, "Expected an old style buffer object from the gdb Inferior object's read_memory method." );
+    Py_DECREF( buf );
+    return NULL;
+    }
+  void *bufptr;
+  if( (*buf->ob_type->tp_as_buffer->bf_getreadbuffer)( buf, 0, &bufptr ) == -1 )
+    {
+    Py_DECREF( buf );
+    return NULL;
+    }
+  Py_DECREF( buf );
+
+  if( sharedMemory->isAttached() )
+    sharedMemory->detach();
+  if( bufferBytes == 0 )
+    {
+    return PyString_FromString( "The image's buffer size is 0 and will not be visualized with icpGui." );
+    }
+  if( !sharedMemory->create( bufferBytes ) )
+    {
+    PyErr_SetString( PyExc_RuntimeError, "Failed to write to shared memory." );
+    return NULL;
+    }
+  sharedMemory->lock();
+  memcpy( sharedMemory->data(), bufptr, qMin( sharedMemory->size(), bufferBytes ));
+  sharedMemory->unlock();
+
+  socket->write( ba );
+  if( !socket->waitForBytesWritten( 3000 ) )
+    {
+    PyErr_SetString( PyExc_RuntimeError, "Failed to write to socket." );
+    return NULL;
+    }
+
+  return PyString_FromString( "Image sent to icpGui." );
+}
+
+/** The python class members for ICPPrinter. */
+static PyMethodDef ICPPrinter_methods[] = {
+    {"to_string", (PyCFunction)ICPPrinter_to_string, METH_NOARGS,
+     "Prints information about the image and sends it to the gui."
+    },
+    {NULL}  /* Sentinel */
+};
+
+static PyMemberDef ICPPrinter_members[] = {
+    {(char *)"val", T_OBJECT_EX, offsetof(ICPPrinter, val), 0,
+     (char *)"gdb.Value to print."},
+    {NULL}  /* Sentinel */
+};
+
+/** The PyTypeObject for ICPPrinter.  This defines how ICPPrinter behaves in
+ * python. */
+static PyTypeObject ICPPrinterType = {
+    PyObject_HEAD_INIT(NULL)
+    0,                         /*ob_size*/
+    "icp.ICPPrinter",             /*tp_name*/
+    sizeof( ICPPrinter ),             /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+    (destructor)ICPPrinter_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE, /*tp_flags*/
+    "GDB Pretty Printer that creates a Qt/VTK gui displaying images passed to it.",           /* tp_doc */
+    0,                         /* tp_traverse */
+    0,                         /* tp_clear */
+    0,                         /* tp_richcompare */
+    0,                         /* tp_weaklistoffset */
+    0,                         /* tp_iter */
+    0,                         /* tp_iternext */
+    ICPPrinter_methods,             /* tp_methods */
+    ICPPrinter_members,             /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc)ICPPrinter_init,      /* tp_init */
+    0,                         /* tp_alloc */
+    ICPPrinter_new,                 /* tp_new */
+};
+
+/** Create the lookup_function Python function.  This is a function associated
+ * with the module expected by my version of gdb.pretty used for by register
+ * function.
+ *
+ * The PyObject* is return, or NULL if a failure occurred.
+ */
+static PyObject * lookup_function( PyObject * icpPrinter )
+{
+  PyObject * npArrayModule = PyImport_ImportModule( "itk.v3.numpy.array" );
+  if( npArrayModule == NULL )
+    return NULL;
+  PyObject * lookupFunctionClass = PyObject_GetAttrString( npArrayModule, "RELookupFunctionTagNumpyType" );
+  if( lookupFunctionClass == NULL )
+    {
+    Py_DECREF( npArrayModule );
+    return NULL;
+    }
+
+  PyObject * prettyPrintersDict = PyDict_New();
+  PyObject * re_dict = PyObject_GetAttrString( npArrayModule, "re_dict" );
+  Py_DECREF( npArrayModule );
+  if( re_dict == NULL )
+    {
+    Py_DECREF( prettyPrintersDict );
+    Py_DECREF( re_dict );
+    return NULL;
+    }
+  PyObject * reImage = PyDict_GetItemString( re_dict, "Image" );
+  Py_DECREF( re_dict );
+  if( reImage == NULL )
+    {
+    Py_DECREF( prettyPrintersDict );
+    return NULL;
+    }
+  if( PyDict_SetItem( prettyPrintersDict, reImage, icpPrinter ) == -1 )
+    {
+    Py_DECREF( prettyPrintersDict );
+    return NULL;
+    }
+
+  PyObject * prettyPrintersDictArgs = Py_BuildValue( "(O)", prettyPrintersDict );
+  PyObject * lookupFunction = PyEval_CallObject( lookupFunctionClass,  prettyPrintersDictArgs );
+  Py_DECREF( prettyPrintersDict );
+  Py_DECREF( prettyPrintersDictArgs );
+  Py_DECREF( lookupFunctionClass );
+  if( lookupFunction == NULL )
+    return NULL;
+
+  return lookupFunction;
+}
+
+extern "C"
+{
+
+static PyObject * icpError;
+
+static PyMethodDef icpMethods[] =
+{
+  {"_cleanup_icp", _cleanup_icp, METH_NOARGS,
+    "Internal method for cleanup of the module." },
+  {NULL, NULL, 0, NULL} /* Sentinel */
+};
+
+PyMODINIT_FUNC  initicp(void)
+{
+  // The module object
+  PyObject * m;
+  m = Py_InitModule3( "icp", icpMethods, "Use itkCompareProject to examine images while with the gdb's pretty printers." );
+  if( m == NULL )
+    return;
+
+  // Create a module specific exception.  This will be used when encountering
+  // itk::Exception's, etc.
+  icpError = PyErr_NewException(const_cast<char*>("icp.error"), NULL, NULL);
+  Py_INCREF(icpError);
+  PyModule_AddObject( m, "error", icpError );
+
+  // Create the ICPPrinter gdb pretty printer.
+  if( PyType_Ready( &ICPPrinterType ) < 0 )
+    return;
+  Py_INCREF( &ICPPrinterType );
+  PyModule_AddObject( m, "ICPPrinter", (PyObject *)&ICPPrinterType );
+
+  // Create lookup_function.
+  PyObject * lookupFunction = lookup_function( (PyObject *)&ICPPrinterType );
+  if( lookupFunction == NULL )
+    return;
+  PyModule_AddObject( m, "lookup_function", lookupFunction );
+
+  // We use the atexit module here because, at least at this time, it appears
+  // gdb cannot call Py_Finalize without
+  // "Fatal Python error: auto-releasing thread-state, but no thread-state for
+  // this thread".
+  PyObject * atexit = PyImport_ImportModule( "atexit" );
+  if( atexit == NULL )
+    return;
+  PyObject * register_m = PyObject_GetAttrString( atexit, "register" );
+  Py_DECREF( atexit );
+  if( register_m == NULL )
+    return;
+  PyObject * _cleanup_icp_m = PyObject_GetAttrString( m, "_cleanup_icp" );
+  if( _cleanup_icp_m == NULL )
+    return;
+  PyObject * registerArgs = Py_BuildValue( "(O)", _cleanup_icp_m );
+  PyObject * registerReturn = PyEval_CallObject( register_m, registerArgs );
+  Py_DECREF( registerArgs );
+  Py_DECREF( register_m );
+  if( registerReturn == NULL )
+    return;
+  Py_DECREF( registerReturn );
+}
+} // end extern "C"

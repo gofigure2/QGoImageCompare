@@ -1,0 +1,30 @@
+# We modify the python path so it can see our new module.
+python
+import sys
+sys.path.insert( 0, '@CMAKE_LIBRARY_OUTPUT_DIRECTORY@' )
+end
+
+# Specify the program (executable we will be examining).
+file @CMAKE_RUNTIME_OUTPUT_DIRECTORY@/pretty-executable
+
+# Set the arguments to the executable.
+set args @TESTING_DATA_PATH@/Circle3D.mhd
+
+# Set a breakpoint
+break pretty-executable.cpp:35
+
+# Start executing our pretty-executable.
+run
+
+# Print an image.
+print output
+
+# print the filtered image
+break 52
+continue
+print *(filter.m_Pointer->GetOutput())
+
+shell sleep 1
+
+# @todo make sure this will work in cygwin
+shell killall icpGui
