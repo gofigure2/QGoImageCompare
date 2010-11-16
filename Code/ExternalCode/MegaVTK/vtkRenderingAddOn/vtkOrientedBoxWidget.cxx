@@ -95,27 +95,27 @@ vtkStandardNewMacro(vtkOrientedBoxWidget);
 
 //----------------------------------------------------------------------------
 vtkOrientedBoxWidget::vtkOrientedBoxWidget()
-  {
+{
   this->OrientationMatrix = vtkMatrix4x4::New();
   this->OrientationMatrix->Identity();
 
   this->InvertedOrientationMatrix = vtkMatrix4x4::New();
   this->InvertedOrientationMatrix->Identity();
-  }
+}
 
 //----------------------------------------------------------------------------
 vtkOrientedBoxWidget::~vtkOrientedBoxWidget()
-  {
+{
   this->OrientationMatrix->Delete();
   this->InvertedOrientationMatrix->Delete();
-  }
+}
 
 //----------------------------------------------------------------------------
-void vtkOrientedBoxWidget::SetOrientationMatrix(vtkMatrix4x4* matrix)
+void vtkOrientedBoxWidget::SetOrientationMatrix(vtkMatrix4x4 *matrix)
 {
-  if (matrix == this->OrientationMatrix) return;
+  if ( matrix == this->OrientationMatrix ) { return; }
 
-  if (this->OrientationMatrix)
+  if ( this->OrientationMatrix )
     {
     this->OrientationMatrix->UnRegister (this);
     this->OrientationMatrix = NULL;
@@ -123,29 +123,29 @@ void vtkOrientedBoxWidget::SetOrientationMatrix(vtkMatrix4x4* matrix)
 
   this->OrientationMatrix = matrix;
 
-  if (this->OrientationMatrix)
+  if ( this->OrientationMatrix )
     {
-
     // move all the actors according to the user-matrix
     this->HexActor->SetUserMatrix (matrix);
     this->HexFace->SetUserMatrix (matrix);
     this->HexOutline->SetUserMatrix (matrix);
 
-    for (unsigned int i = 0; i < 7; i++)
+    for ( unsigned int i = 0; i < 7; i++ )
+      {
       this->Handle[i]->SetUserMatrix (matrix);
+      }
 
     // initialize inverse matrix
     vtkMatrix4x4::Invert (this->OrientationMatrix, this->InvertedOrientationMatrix);
     }
-
 }
 
 //----------------------------------------------------------------------------
 void vtkOrientedBoxWidget::OnMouseMove()
 {
   // See whether we're active
-  if (this->State == vtkBoxWidget::Outside ||
-      this->State == vtkBoxWidget::Start)
+  if ( this->State == vtkBoxWidget::Outside
+       || this->State == vtkBoxWidget::Start )
     {
     return;
     }
@@ -159,7 +159,7 @@ void vtkOrientedBoxWidget::OnMouseMove()
   double z, vpn[3];
 
   vtkCamera *camera = this->CurrentRenderer->GetActiveCamera();
-  if (!camera)
+  if ( !camera )
     {
     return;
     }
@@ -170,10 +170,10 @@ void vtkOrientedBoxWidget::OnMouseMove()
                               this->LastPickPosition[2], focalPoint);
   z = focalPoint[2];
   this->ComputeDisplayToWorld(
-    static_cast<double>(this->Interactor->GetLastEventPosition()[0]),
-    static_cast<double>(this->Interactor->GetLastEventPosition()[1]),
+    static_cast< double >( this->Interactor->GetLastEventPosition()[0] ),
+    static_cast< double >( this->Interactor->GetLastEventPosition()[1] ),
     z, prevPickPoint);
-  this->ComputeDisplayToWorld(static_cast<double>(X), static_cast<double>(Y),
+  this->ComputeDisplayToWorld(static_cast< double >( X ), static_cast< double >( Y ),
                               z, pickPoint);
 
   // multiply pick points by the inverted orientation matrix
@@ -182,51 +182,51 @@ void vtkOrientedBoxWidget::OnMouseMove()
   this->InvertedOrientationMatrix->MultiplyPoint (pickPoint, pickPoint);
 
   // Process the motion
-  if (this->State == vtkBoxWidget::Moving)
+  if ( this->State == vtkBoxWidget::Moving )
     {
     // Okay to process
-    if (this->CurrentHandle)
+    if ( this->CurrentHandle )
       {
-      if (this->RotationEnabled && this->CurrentHandle == this->HexFace)
+      if ( this->RotationEnabled && this->CurrentHandle == this->HexFace )
         {
         camera->GetViewPlaneNormal(vpn);
         this->Rotate(X, Y, prevPickPoint, pickPoint, vpn);
         }
-      else if (this->TranslationEnabled &&
-               this->CurrentHandle == this->Handle[6])
+      else if ( this->TranslationEnabled
+                && this->CurrentHandle == this->Handle[6] )
         {
         this->Translate(prevPickPoint, pickPoint);
         }
-      else if (this->TranslationEnabled && this->ScalingEnabled)
+      else if ( this->TranslationEnabled && this->ScalingEnabled )
         {
-        if (this->CurrentHandle == this->Handle[0])
+        if ( this->CurrentHandle == this->Handle[0] )
           {
           this->MoveMinusXFace(prevPickPoint, pickPoint);
           }
-        else if (this->CurrentHandle == this->Handle[1])
+        else if ( this->CurrentHandle == this->Handle[1] )
           {
           this->MovePlusXFace(prevPickPoint, pickPoint);
           }
-        else if (this->CurrentHandle == this->Handle[2])
+        else if ( this->CurrentHandle == this->Handle[2] )
           {
           this->MoveMinusYFace(prevPickPoint, pickPoint);
           }
-        else if (this->CurrentHandle == this->Handle[3])
+        else if ( this->CurrentHandle == this->Handle[3] )
           {
           this->MovePlusYFace(prevPickPoint, pickPoint);
           }
-        else if (this->CurrentHandle == this->Handle[4])
+        else if ( this->CurrentHandle == this->Handle[4] )
           {
           this->MoveMinusZFace(prevPickPoint, pickPoint);
           }
-        else if (this->CurrentHandle == this->Handle[5])
+        else if ( this->CurrentHandle == this->Handle[5] )
           {
           this->MovePlusZFace(prevPickPoint, pickPoint);
           }
         }
       }
     }
-  else if (this->ScalingEnabled && this->State == vtkBoxWidget::Scaling)
+  else if ( this->ScalingEnabled && this->State == vtkBoxWidget::Scaling )
     {
     this->Scale(prevPickPoint, pickPoint, X, Y);
     }

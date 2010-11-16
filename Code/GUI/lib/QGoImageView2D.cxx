@@ -1,10 +1,4 @@
 /*=========================================================================
-  Author: $Author$  // Author of last commit
-  Version: $Rev$  // Revision of last commit
-  Date: $Date$  // Date of last commit
-=========================================================================*/
-
-/*=========================================================================
  Authors: The GoFigure Dev. Team.
  at Megason Lab, Systems biology, Harvard Medical school, 2009-10
 
@@ -51,14 +45,13 @@
 #include "vtkViewImage2D.h"
 
 //--------------------------------------------------------------------------
-QGoImageView2D::
-QGoImageView2D(QWidget* iiParent) : QGoImageView(iiParent)
-  {
+QGoImageView2D::QGoImageView2D(QWidget *iiParent):QGoImageView(iiParent)
+{
   m_VTKEventQtConnector = vtkEventQtSlotConnect::New();
 
   this->setupUi(this);
 
-  vtkViewImage2D* View = vtkViewImage2D::New();
+  vtkViewImage2D *View = vtkViewImage2D::New();
 
   SetupViewGivenQVTKWidget(View, m_QVTKWidgetXY);
 
@@ -69,21 +62,20 @@ QGoImageView2D(QWidget* iiParent) : QGoImageView(iiParent)
   QGoImageView::InitializeDistanceWidget();
   QGoImageView::InitializeAngleWidget();
   QGoImageView::InitializeContourWidget();
-  }
+}
 
 //--------------------------------------------------------------------------
 QGoImageView2D::
 ~QGoImageView2D()
-  {
+{
   m_VTKEventQtConnector->Delete();
-  }
+}
 
 //--------------------------------------------------------------------------
 void
-QGoImageView2D::
-setupUi(QWidget* iiParent)
+QGoImageView2D::setupUi(QWidget *iiParent)
 {
-  if (iiParent->objectName().isEmpty())
+  if ( iiParent->objectName().isEmpty() )
     {
     iiParent->resize(800, 800);
     }
@@ -101,22 +93,21 @@ setupUi(QWidget* iiParent)
 
 //--------------------------------------------------------------------------
 void
-QGoImageView2D::
-retranslateUi(QWidget *iParent)
+QGoImageView2D::retranslateUi(QWidget *iParent)
 {
-  iParent->setWindowTitle(tr("QGoImageView2D"));
+  iParent->setWindowTitle( tr("QGoImageView2D") );
   Q_UNUSED(iParent);
 }
 
 //--------------------------------------------------------------------------
 void
-QGoImageView2D::
-SetImage(vtkImageData* iImage)
+QGoImageView2D::SetImage(vtkImageData *iImage)
 {
   int dim[3];
+
   iImage->GetDimensions(dim);
 
-  if ((dim[0] > 1) && (dim[1] > 1) && (dim[2] > 1))
+  if ( ( dim[0] > 1 ) && ( dim[1] > 1 ) && ( dim[2] > 1 ) )
     {
     std::cout << "void QGoTabImageView2D::SetImage( vtkImageData* iImage )"
               << std::endl;
@@ -130,11 +121,10 @@ SetImage(vtkImageData* iImage)
 }
 
 //--------------------------------------------------------------------------
-QVTKInteractor*
-QGoImageView2D::
-GetInteractor(const int& i)
+QVTKInteractor *
+QGoImageView2D::GetInteractor(const int & i)
 {
-  if (i == 0)
+  if ( i == 0 )
     {
     return m_QVTKWidgetXY->GetInteractor();
     }
@@ -146,10 +136,10 @@ GetInteractor(const int& i)
 
 //--------------------------------------------------------------------------
 void
-QGoImageView2D::
-Update()
+QGoImageView2D::Update()
 {
-  vtkViewImage2D* View = m_Pool->GetItem(0);
+  vtkViewImage2D *View = m_Pool->GetItem(0);
+
   View->SetInput(this->m_Image);
   View->GetTextProperty()->SetFontFamilyToArial();
   View->GetTextProperty()->SetFontSize(20);
@@ -166,8 +156,7 @@ Update()
 
 //--------------------------------------------------------------------------
 QString
-QGoImageView2D::
-SnapshotViewXY(const GoFigure::FileType& iType, const QString& iBaseName)
+QGoImageView2D::SnapshotViewXY(const GoFigure::FileType & iType, const QString & iBaseName)
 {
   QString filename = SnapshotView(this->m_QVTKWidgetXY, iType,
                                   iBaseName, m_SnapshotId);
@@ -178,8 +167,7 @@ SnapshotViewXY(const GoFigure::FileType& iType, const QString& iBaseName)
 
 //-------------------------------------------------------------------------
 void
-QGoImageView2D::
-ChangeCursorShape(QCursor iCursorShape)
+QGoImageView2D::ChangeCursorShape(QCursor iCursorShape)
 {
   //Change cursor
   m_QVTKWidgetXY->setCursor(iCursorShape);

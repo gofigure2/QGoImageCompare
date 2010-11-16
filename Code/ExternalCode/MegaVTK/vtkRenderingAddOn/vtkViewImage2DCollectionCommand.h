@@ -52,43 +52,45 @@ class vtkProp3D;
 /**
  * \class vtkViewImage2DCollectionCommand
  * \ingroup MegaVTK
- * \brief Manage events occuring in a 2D view and aapply it to a collec
+ * \brief Manage events occuring in a 2D view and apply it to a collection
  */
 
-class VTK_RENDERINGADDON2_EXPORT vtkViewImage2DCollectionCommand :
+class VTK_RENDERINGADDON2_EXPORT vtkViewImage2DCollectionCommand:
   public vtkCommand
-  {
+{
 public:
+    /**
+     * \brief Convenient method to access the constructor.
+     */
+  static vtkViewImage2DCollectionCommand * New();
 
-  static vtkViewImage2DCollectionCommand* New();
+  /**
+   * \brief Get the current collection
+   * \return vtkViewImage2DCollection pointer to the current collection
+   */
+  vtkViewImage2DCollection * GetCollection();
 
-  vtkViewImage2DCollection* GetCollection();
-  void SetCollection(vtkViewImage2DCollection* p);
+  /**
+   * \brief Set the current collection
+   * \param[in] p vtkViewImage2DCollection pointer to the current collection
+   */
+  void SetCollection(vtkViewImage2DCollection *p);
 
   // Description:
   // Satisfy the superclass API for callbacks. Recall that the caller is
   // the instance invoking the event; eid is the event id (see
   // vtkCommand.h); and calldata is information sent when the callback
   // was invoked (e.g., progress value in the vtkCommand::ProgressEvent).
-  virtual void Execute(vtkObject * caller, unsigned long event,
-                       void *vtkNotUsed(callData));
-
-  std::list<vtkProp3D*> GetListOfPickedActors();
-  std::list<vtkProp3D*> GetListOfUnPickedActors();
-
+  virtual void Execute( vtkObject * caller, unsigned long event,
+                        void *vtkNotUsed(callData) );
 protected:
-
   vtkViewImage2DCollectionCommand();
   ~vtkViewImage2DCollectionCommand();
-
 private:
-  vtkViewImage2DCollection* Collection;
+  vtkViewImage2DCollection *Collection;
 
   double InitialWindow;
   double InitialLevel;
-
-  std::list<vtkProp3D*> ListOfPickedActors;
-  std::list<vtkProp3D*> ListOfUnPickedActors;
-  };
+};
 
 #endif

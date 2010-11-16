@@ -1,10 +1,4 @@
 /*=========================================================================
-  Author: $Author$  // Author of last commit
-  Version: $Rev$  // Revision of last commit
-  Date: $Date$  // Date of last commit
-=========================================================================*/
-
-/*=========================================================================
  Authors: The GoFigure Dev. Team.
  at Megason Lab, Systems biology, Harvard Medical school, 2009-10
 
@@ -55,21 +49,20 @@ class QGoImageView2D;
 
 /**
  * \class QGoSynchronizedView2D
- * \brief class is used to display a QWidget containing a two dimensional
- * vtkimagedata* or itkimage*. QGoSynchronizedView2D provides the interface
- * to synchronize cameras among several GoSynchronizedView2D objects.
- * \example GUI/lib/qgosynchronizedview2dtest.cxx
+ * \brief class used to display a QWidget containing a two dimensional
+ * a vtkimagedata* or an itkimage*.
+ * QGoSynchronizedView2D provide the interface to synchronize cameras among
+ * several GoSynchronizedView2D.
  */
-class QGoSynchronizedView2D : public QGoSynchronizedView
-  {
+class QGoSynchronizedView2D:public QGoSynchronizedView
+{
   // QT macro
   Q_OBJECT
   // itk typedef :
   // type of itk image for visualization
-  typedef itk::Image<unsigned char, 2> VisuImageType;
+  typedef itk::Image< unsigned char, 2 > VisuImageType;
   // itk to vtk connector typdef
-  typedef itk::ImageToVTKImageFilter<VisuImageType> itkvtkConnectorType;
-
+  typedef itk::ImageToVTKImageFilter< VisuImageType > itkvtkConnectorType;
 public:
   explicit QGoSynchronizedView2D(QString iViewName, QWidget *iParent = 0);
 
@@ -77,42 +70,40 @@ public:
 
   /** \brief Set image displayed by the SynchronizedView
    */
-  void SetImage(vtkImageData* iImage);
+  void SetImage(vtkImageData *iImage);
 
   /** \brief Update the viewer contained in the widget
    */
-  void Update( void );
+  void Update(void);
 
   /** \brief render the viewer contained in the widget if any
    */
-  void Render( void );
+  void Render(void);
 
   /** \brief get the camera of the current viewer
    */
-  vtkCamera* GetCamera( void );
+  vtkCamera * GetCamera(void);
 
   /** \brief true if the widget has a viewer
    */
-  bool HasViewer( void );
+  bool HasViewer(void);
 
   /** \brief Print self informations
    */
-  void PrintOs(ostream& os);
+  void PrintOs(ostream & os);
 
   /** \brief returns the type of SynchronizedView (2 for 2D, 3 for 3D)
    */
-  int GetSynchronizedViewType( void );
-
-
+  int GetSynchronizedViewType(void);
 
   /** \brief Set ITK image displayed by the SynchronizedView
    */
-  template<typename TPixel>
-  void SetImage(typename itk::Image<TPixel, 2>::Pointer iImage)
+  template< typename TPixel >
+  void SetImage(typename itk::Image< TPixel, 2 >::Pointer iImage)
   {
-    typedef itk::Image<TPixel, 2> InputImageType;
+    typedef itk::Image< TPixel, 2 > InputImageType;
     // we cast the input to have a known image to display
-    typedef itk::CastImageFilter<InputImageType, VisuImageType>
+    typedef itk::CastImageFilter< InputImageType, VisuImageType >
     CastFilterType;
     typedef typename CastFilterType::Pointer CastFilterTypePointer;
 
@@ -121,38 +112,36 @@ public:
 
     castITKFilter->SetInput(iImage);
     castITKFilter->Update();
-    m_itkvtkConnector->SetInput(castITKFilter->GetOutput());
+    m_itkvtkConnector->SetInput( castITKFilter->GetOutput() );
     m_itkvtkConnector->Update();
 
-    SetImage(m_itkvtkConnector->GetOutput());
+    SetImage( m_itkvtkConnector->GetOutput() );
     Update();
   }
 
   /** \brief Returns the imageview managed by this SynchronizedView
    */
-  QGoImageView2D* GetImageView( void );
+  QGoImageView2D * GetImageView(void);
 
 public slots:
   /** \brief Save a screenshot of the viewer's content
    */
-  QString SnapshotViewXY(const GoFigure::FileType& iType,
-                         const QString& iBaseName = tr("Snapshot"));
+  QString SnapshotViewXY( const GoFigure::FileType & iType,
+                          const QString & iBaseName = tr("Snapshot") );
 
-private:
+protected:
   /** delete the viewer contained in the widget
    */
-  void deleteViewer( void );
+  void deleteViewer(void);
 
   /** \brief create the viewer contained in the widget
    */
-  void createViewer( void );
+  void createViewer(void);
 
-
-  QGoImageView2D*               m_currentView;
+  QGoImageView2D *             m_View;
   itkvtkConnectorType::Pointer m_itkvtkConnector;
-
-
+private:
   Q_DISABLE_COPY(QGoSynchronizedView2D);
-  };
+};
 
 #endif // __QGoSynchronizedView2D_h

@@ -74,8 +74,8 @@
 class vtkMatrix4x4;
 
 /**
-   \author Nicolas Toussaint
    \class vtkOrientedBoxWidget
+   \ingroup MegaVTK
    \brief orthogonal hexahedron 3D widget with pre-defined orientation
 
    Description
@@ -87,16 +87,23 @@ class vtkMatrix4x4;
 
    \see vtk3DWidget vtkBoxWidget
  */
-class VTK_RENDERINGADDON2_EXPORT vtkOrientedBoxWidget : public vtkBoxWidget
-  {
-
+class VTK_RENDERINGADDON2_EXPORT vtkOrientedBoxWidget:public vtkBoxWidget
+{
 public:
 
-  static vtkOrientedBoxWidget* New();
+  /**
+   * \brief Convenient method to access the constructor.
+   */
+  static vtkOrientedBoxWidget * New();
+
   vtkTypeRevisionMacro(vtkOrientedBoxWidget, vtkBoxWidget);
 
+  /**
+   * \brief Get the orientation matrix of the vtkBoxWidget
+   */
   vtkGetObjectMacro (OrientationMatrix, vtkMatrix4x4);
-  virtual void SetOrientationMatrix(vtkMatrix4x4* matrix);
+  // Set the orientation matrix of the vtkBoxWidget
+  virtual void SetOrientationMatrix(vtkMatrix4x4 *matrix);
 
 protected:
 
@@ -105,9 +112,8 @@ protected:
 
   virtual void OnMouseMove();
 
-  vtkMatrix4x4* OrientationMatrix;
-  vtkMatrix4x4* InvertedOrientationMatrix;
-
-  };
+  vtkMatrix4x4 *OrientationMatrix;
+  vtkMatrix4x4 *InvertedOrientationMatrix;
+};
 
 #endif /* _vtkOrientedBoxWidget_h_ */

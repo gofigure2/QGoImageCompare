@@ -1,10 +1,4 @@
 /*=========================================================================
-  Author: $Author$  // Author of last commit
-  Version: $Rev$  // Revision of last commit
-  Date: $Date$  // Date of last commit
-=========================================================================*/
-
-/*=========================================================================
  Authors: The GoFigure Dev. Team.
  at Megason Lab, Systems biology, Harvard Medical school, 2009-10
 
@@ -47,6 +41,7 @@
 #include "itkSmartPointer.h"
 
 #include "QGoSynchronizedViewManager.h"
+
 class QGoSynchronizedView;
 class QGoSynchronizedView3D;
 class vtkImageData;
@@ -58,7 +53,6 @@ class QMdiArea;
 class QMdiSubWindow;
 class QSignalMapper;
 QT_END_NAMESPACE
-
 
 /**
  * \class QGoSynchronizedViewMainWindow
@@ -72,34 +66,35 @@ QT_END_NAMESPACE
  * QGoSynchronizedView2DCallbacks
  * It is not documented.
  * It is used by the example program : qgosynchronizedviewguitest.cxx
- * \example GUI/lib/qgosynchronizedviewguitest.cxx
  */
 
-class QGoSynchronizedViewMainWindow : public QMainWindow
-  {
+// \example GUI/lib/qgosynchronizedviewguitest.cxx
+
+class QGoSynchronizedViewMainWindow:public QMainWindow
+{
 // QT macro
   Q_OBJECT
-
 public:
 
   QGoSynchronizedViewMainWindow();
   ~QGoSynchronizedViewMainWindow();
 
-  QGoSynchronizedViewManager* GetSynchronizedViewManager();
+  QGoSynchronizedViewManager * GetSynchronizedViewManager();
 
   void Update();
 
-  QGoSynchronizedView* newSynchronizedView(
+  QGoSynchronizedView * newSynchronizedView(
     QString iSynchronizedViewName,
-    vtkImageData* iImage);
+    vtkImageData *iImage);
 
-  template<typename TPixel>
-  QGoSynchronizedView* newSynchronizedView(
+  template< typename TPixel >
+  QGoSynchronizedView * newSynchronizedView(
     QString iSynchronizedViewName,
-    typename itk::Image<TPixel, 3>::Pointer iImage)
+    typename itk::Image< TPixel, 3 >::Pointer iImage)
   {
-    QGoSynchronizedView* synchronizedView;
-    synchronizedView = m_SynchronizedViewManager->newSynchronizedView<TPixel>(
+    QGoSynchronizedView *synchronizedView;
+
+    synchronizedView = m_SynchronizedViewManager->newSynchronizedView< TPixel >(
       iSynchronizedViewName, iImage);
 
     mdiArea->addSubWindow(synchronizedView, Qt::SubWindow);
@@ -110,13 +105,14 @@ public:
     return synchronizedView;
   }
 
-  template<typename TPixel>
-  QGoSynchronizedView* newSynchronizedView(
+  template< typename TPixel >
+  QGoSynchronizedView * newSynchronizedView(
     QString iSynchronizedViewName,
-    typename itk::Image<TPixel, 2>::Pointer iImage)
+    typename itk::Image< TPixel, 2 >::Pointer iImage)
   {
-    QGoSynchronizedView* synchronizedView;
-    synchronizedView = m_SynchronizedViewManager->newSynchronizedView<TPixel>(
+    QGoSynchronizedView *synchronizedView;
+
+    synchronizedView = m_SynchronizedViewManager->newSynchronizedView< TPixel >(
       iSynchronizedViewName, iImage);
 
     mdiArea->addSubWindow(synchronizedView, Qt::SubWindow);
@@ -127,10 +123,11 @@ public:
     return synchronizedView;
   }
 
-  void OpenSynchronizedViewForFile(QString& iFile);
+  void OpenSynchronizedViewForFile(QString & iFile);
 
-  void deleteSynchronizedView2D(const int& iId);
-  void deleteSynchronizedView3D(const int& iId);
+  void deleteSynchronizedView2D(const int & iId);
+
+  void deleteSynchronizedView3D(const int & iId);
 
 protected:
   void closeEvent(QCloseEvent *event);
@@ -138,34 +135,52 @@ protected:
 private slots:
 
   void openfile();
+
   void snapshotAs();
+
   void about();
+
   void aboutGF2();
+
   void updateMenus();
+
   void updateWindowMenu();
+
   void setActiveSubWindow(QWidget *window);
+
   void synchronize();
 
   void FullscreenXY();
+
   void FullscreenXZ();
+
   void FullscreenYZ();
+
   void FullscreenXYZ();
+
   void Quadscreen();
 
 private:
 
-  void SaveSnapshotInFile(QString& iFile, QGoSynchronizedView* SynchronizedView);
+  void SaveSnapshotInFile(QString & iFile, QGoSynchronizedView *SynchronizedView);
+
   void createActions();
+
   void createMenus();
+
   void createToolBars();
+
   void createStatusBar();
+
   void readSettings();
+
   void writeSettings();
 
   void imageinfo();
 
-  QGoSynchronizedView *activeSynchronizedView();
-  QMdiSubWindow *findSynchronizedView(const QString& iSynchronizedViewName);
+  QGoSynchronizedView * activeSynchronizedView();
+
+  QMdiSubWindow * findSynchronizedView(const QString & iSynchronizedViewName);
 
   QMdiArea *     mdiArea;
   QSignalMapper *windowMapper;
@@ -180,22 +195,22 @@ private:
   QAction * syncAct;
   QAction * openfileAct;
 //  QAction * openmemAct;
-  QAction * snapshotAsAct;
-  QAction * exitAct;
-  QAction * closeAct;
-  QAction * closeAllAct;
-  QAction * tileAct;
-  QAction * cascadeAct;
-  QAction * aboutAct;
-  QAction * aboutQtAct;
-  QAction * aboutGF2Act;
-  QAction * XYviewAct;
-  QAction * XZviewAct;
-  QAction * YZviewAct;
-  QAction * XYZviewAct;
-  QAction * QuadviewAct;
+  QAction *snapshotAsAct;
+  QAction *exitAct;
+  QAction *closeAct;
+  QAction *closeAllAct;
+  QAction *tileAct;
+  QAction *cascadeAct;
+  QAction *aboutAct;
+  QAction *aboutQtAct;
+  QAction *aboutGF2Act;
+  QAction *XYviewAct;
+  QAction *XZviewAct;
+  QAction *YZviewAct;
+  QAction *XYZviewAct;
+  QAction *QuadviewAct;
 
-  QGoSynchronizedViewManager* m_SynchronizedViewManager;
-  };
+  QGoSynchronizedViewManager *m_SynchronizedViewManager;
+};
 
 #endif // QGOSYNCHRONIZEDVIEWMAINWINDOW_H

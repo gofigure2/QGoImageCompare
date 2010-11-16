@@ -42,8 +42,7 @@
 
 namespace GoFigure
 {
-enum FileType
-  {
+enum FileType {
   BMP = 0,
   JPEG,
   PNG,
@@ -53,8 +52,7 @@ enum FileType
   EPS
   };
 
-enum TabDimensionType
-  {
+enum TabDimensionType {
   TWO_D_WITH_T = 1,
   TWO_D,
   THREE_D,

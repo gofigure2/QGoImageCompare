@@ -1,10 +1,4 @@
 /*=========================================================================
-  Author: $Author$  // Author of last commit
-  Version: $Rev$  // Revision of last commit
-  Date: $Date$  // Date of last commit
-=========================================================================*/
-
-/*=========================================================================
  Authors: The GoFigure Dev. Team.
  at Megason Lab, Systems biology, Harvard Medical school, 2009-10
 
@@ -46,6 +40,7 @@
 #include "itkImage.h"
 #include "QGoSynchronizedView.h"
 #include "vtkSmartPointer.h"
+#include "QGoGUILibConfigure.h"
 
 class vtkCamera;
 class vtkImageData;
@@ -54,21 +49,21 @@ class QGoImageView3D;
 
 /**
  * \class QGoSynchronizedView3D
- * \brief class is used to display a QWidget containing a three dimensional
- * vtkimagedata* or itkimage*. QGoSynchronizedView3D provides the interface
- * to synchronize cameras among several GoSynchronizedView3D obhects.
+ * \brief class used to display a QWidget containing a two dimensional
+ * vtkimagedata* or itkimage*.
+ * QGoSynchronizedView3D provide the interface to synchronize cameras among
+ * several GoSynchronizedView3D.
  * \example GUI/lib/qgosynchronizedview3dtest.cxx
  */
-class QGoSynchronizedView3D : public QGoSynchronizedView
-  {
+class QGOGUILIB_EXPORT QGoSynchronizedView3D:public QGoSynchronizedView
+{
   Q_OBJECT
-
 public:
   // itk typedef :
   // type of itk image for visualization
-  typedef itk::Image<unsigned char, 3> VisuImageType;
+  typedef itk::Image< unsigned char, 3 > VisuImageType;
   // itk to vtk connector
-  typedef itk::ImageToVTKImageFilter<VisuImageType> itkvtkConnectorType;
+  typedef itk::ImageToVTKImageFilter< VisuImageType > itkvtkConnectorType;
 
   explicit QGoSynchronizedView3D(QString iViewName, QWidget *iParent = 0);
 
@@ -76,16 +71,16 @@ public:
 
   /** Set image displayed by the SynchronizedView
    */
-  void SetImage(vtkImageData* iImage);
+  void SetImage(vtkImageData *iImage);
 
   /** \brief Set ITK image displayed by the SynchronizedView
    */
-  template<typename TPixel>
-  void SetImage(typename itk::Image<TPixel, 3>::Pointer iImage)
+  template< typename TPixel >
+  void SetImage(typename itk::Image< TPixel, 3 >::Pointer iImage)
   {
-    typedef itk::Image<TPixel, 3> InputImageType;
+    typedef itk::Image< TPixel, 3 > InputImageType;
     // we cast the input to have a known image to display
-    typedef itk::CastImageFilter<InputImageType, VisuImageType>
+    typedef itk::CastImageFilter< InputImageType, VisuImageType >
     CastFilterType;
     typedef typename CastFilterType::Pointer CastFilterTypePointer;
 
@@ -94,53 +89,53 @@ public:
 
     castITKFilter->SetInput(iImage);
     castITKFilter->Update();
-    m_itkvtkConnector->SetInput(castITKFilter->GetOutput());
+    m_itkvtkConnector->SetInput( castITKFilter->GetOutput() );
     m_itkvtkConnector->Update();
 
-    SetImage(m_itkvtkConnector->GetOutput());
+    SetImage( m_itkvtkConnector->GetOutput() );
     Update();
   }
 
   /** \brief Update the viewer contained in the widget
    */
-  void Update( void );
+  void Update(void);
 
   /** \brief render the all visualizations of the
    *  viewer contained in the widget if any.
    */
-  void Render( void );
+  void Render(void);
 
   /** render the iId'th imageview:
    *  3D visualization usually contains 4 imageviewers :
    *  three 2D projection and a 3D view : iId=[0-3]
    */
-  void Render( const int& iId );
+  void Render(const int & iId);
 
   /** \brief get the camera of the current fullscreen view
   */
-  vtkCamera* GetCamera( void );
+  vtkCamera * GetCamera(void);
 
   /** get the camera of the current viewer;
    *  iId=[0-3]
    */
-  vtkCamera* GetCamera(const int& iId);
+  vtkCamera * GetCamera(const int & iId);
 
   /** \brief true if the widget has a viewer
    */
-  bool HasViewer( void );
+  bool HasViewer(void);
 
   /** print the SynchronizedView information :
    *  it consists in the image information if any.
    */
-  void PrintOs(ostream& os);
+  void PrintOs(ostream & os);
 
   /** \brief returns the type of SynchronizedView (2 for 2D, 3 for 3D)
    */
   int GetSynchronizedViewType(void);
 
-  /** Returns the QGoImageView3D* displayed.
+  /** Returns the QGoImageView3D* displaid.
    */
-  QGoImageView3D* GetImageView();
+  QGoImageView3D * GetImageView();
 
   /** Get the fullscreen view :
    *  0 : Quadview (all 4 views)
@@ -152,17 +147,17 @@ public:
   int GetFullScreenView();
 
 public slots:
-  QString SnapshotViewXY(const GoFigure::FileType& iType,
-                         const QString& iBaseName = tr("Snapshot"));
+  QString SnapshotViewXY( const GoFigure::FileType & iType,
+                          const QString & iBaseName = tr("Snapshot-xy-") );
 
-  QString SnapshotView2(const GoFigure::FileType& iType,
-                        const QString& iBaseName = QString("snapshot"));
+  QString SnapshotViewXZ( const GoFigure::FileType & iType,
+                         const QString & iBaseName = QString("snapshot-xz-") );
 
-  QString SnapshotView3(const GoFigure::FileType& iType,
-                        const QString& iBaseName = QString("snapshot"));
+  QString SnapshotViewYZ( const GoFigure::FileType & iType,
+                         const QString & iBaseName = QString("snapshot-yz-") );
 
-  QString SnapshotViewXYZ(const GoFigure::FileType& iType,
-                          const QString& iBaseName = QString("snapshot"));
+  QString SnapshotViewXYZ( const GoFigure::FileType & iType,
+                           const QString & iBaseName = QString("snapshot-xyz-") );
 
   /** Set the fullscreen view : iId = [0-4]
    *  0 : Quadview (all 4 views)
@@ -171,7 +166,7 @@ public slots:
    *  3 : YZ
    *  4 : 3D view
    */
-  void SetFullScreenView(const int& iId);
+  void SetFullScreenView(const int & iId);
 
   /** Set the fullscreen view : XY
    */
@@ -193,22 +188,21 @@ public slots:
    */
   void SetQuadView();
 
-private:
+protected:
 
   /** delete the viewer contained in the widget
    */
-  void deleteViewer( void );
+  void deleteViewer(void);
 
   /** Create the viewer in the widget
    */
   void createViewer();
 
-
-  QGoImageView3D*               m_currentView;
-  itkvtkConnectorType::Pointer  m_itkvtkConnector;
-
+  QGoImageView3D *             m_View;
+  itkvtkConnectorType::Pointer m_itkvtkConnector;
+private:
 
   Q_DISABLE_COPY(QGoSynchronizedView3D);
-  };
+};
 
 #endif // QGoSynchronizedView3D_H

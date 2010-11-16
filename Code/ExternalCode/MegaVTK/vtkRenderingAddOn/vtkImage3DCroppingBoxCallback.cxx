@@ -72,33 +72,32 @@
 #include "vtkPolyData.h"
 
 void vtkImage3DCroppingBoxCallback::Execute(vtkObject *caller,
-                                            unsigned long, void*)
+                                            unsigned long, void *)
 {
-
-  if (!this->VolumeMapper)
+  if ( !this->VolumeMapper )
     {
     return;
     }
 
   // get the box widget
-  vtkBoxWidget *widget = reinterpret_cast<vtkBoxWidget*>(caller);
+  vtkBoxWidget *widget = reinterpret_cast< vtkBoxWidget * >( caller );
 
-  if (!widget)
+  if ( !widget )
     {
     return;
     }
 
   // Get the poly data defined by the vtkBoxWidget
-  vtkSmartPointer<vtkPolyData> myBox = vtkSmartPointer<vtkPolyData>::New();
+  vtkSmartPointer< vtkPolyData > myBox = vtkSmartPointer< vtkPolyData >::New();
   widget->GetPolyData(myBox);
 
-  double bounds[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  double bounds[6] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
   this->VolumeMapper->GetBounds(bounds);
 
   // myBox contains 15 points and points 8 to 13
   // define the bounding box
   double  xmin, xmax, ymin, ymax, zmin, zmax;
-  double* pt = myBox->GetPoint(8);
+  double *pt = myBox->GetPoint(8);
   xmin = pt[0];
   pt = myBox->GetPoint(9);
   xmax = pt[0];
@@ -111,12 +110,12 @@ void vtkImage3DCroppingBoxCallback::Execute(vtkObject *caller,
   pt = myBox->GetPoint(13);
   zmax = pt[2];
 
-  if (xmin < bounds[0]) xmin = bounds[0];
-  if (ymin < bounds[2]) ymin = bounds[2];
-  if (zmin < bounds[4]) zmin = bounds[4];
-  if (xmax > bounds[1]) xmax = bounds[1];
-  if (ymax > bounds[3]) ymax = bounds[3];
-  if (zmax > bounds[5]) zmax = bounds[5];
+  if ( xmin < bounds[0] ) { xmin = bounds[0]; }
+  if ( ymin < bounds[2] ) { ymin = bounds[2]; }
+  if ( zmin < bounds[4] ) { zmin = bounds[4]; }
+  if ( xmax > bounds[1] ) { xmax = bounds[1]; }
+  if ( ymax > bounds[3] ) { ymax = bounds[3]; }
+  if ( zmax > bounds[5] ) { zmax = bounds[5]; }
 
   this->VolumeMapper->SetCroppingRegionFlagsToSubVolume();
   this->VolumeMapper->SetCroppingRegionPlanes(xmin, xmax,

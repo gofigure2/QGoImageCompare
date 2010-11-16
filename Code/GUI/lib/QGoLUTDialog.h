@@ -1,10 +1,4 @@
 /*=========================================================================
-  Author: $Author$  // Author of last commit
-  Version: $Revision$  // Revision of last commit
-  Date: $Date$  // Date of last commit
-=========================================================================*/
-
-/*=========================================================================
  Authors: The GoFigure Dev. Team.
  at Megason Lab, Systems biology, Harvard Medical school, 2009-10
 
@@ -63,44 +57,44 @@ class vtkScalarBarActor;
  * \image html QGoLUTDialog.png
  * \example GUI/lib/qgolutdialog.cxx
 */
-class QGOGUILIB_EXPORT QGoLUTDialog : public QDialog
-  {
+class QGOGUILIB_EXPORT QGoLUTDialog:public QDialog
+{
   Q_OBJECT
 public:
   /** \brief Constructor */
-  explicit QGoLUTDialog(QWidget* parent = 0);
+  explicit QGoLUTDialog(QWidget *parent = 0);
 
   /** \brief Destructor */
   virtual ~QGoLUTDialog();
 
   /** \brief get the selected look up table*/
-  vtkLookupTable* GetLookupTable();
+  vtkLookupTable * GetLookupTable();
 
   /** \brief get the selected look up table*/
-  static vtkLookupTable* GetLookupTable(QWidget* iParent,
-                                        const QString& iTitle,
-                                        const int& iIdx = 0 );
+  static vtkLookupTable * GetLookupTable(QWidget *iParent,
+                                         const QString & iTitle,
+                                         const int & iIdx = 0);
 
 public slots:
   /** \brief Change look up table*/
-  void ChangeLookupTable(const int&);
+  void ChangeLookupTable(const int &);
 
 protected:
-  vtkLookupTable*                    LUT;
-  vtkSmartPointer<vtkScalarBarActor> LUTActor;
-  vtkSmartPointer<vtkRenderer>       Renderer;
-  QDialogButtonBox*                  ButtonBox;
-  QVTKWidget*                        QvtkWidget;
-  QHBoxLayout*                       HorizontalLayout;
-  QHBoxLayout*                       HorizontalLayout_2;
-  QVBoxLayout*                       VerticalLayout;
-  QSpacerItem*                       HorizontalSpacer;
-  QLabel*                            Label;
-  QComboBox*                         LUTComboBox;
+  vtkLookupTable *                     LUT;
+  vtkSmartPointer< vtkScalarBarActor > LUTActor;
+  vtkSmartPointer< vtkRenderer >       Renderer;
+  QDialogButtonBox *                   ButtonBox;
+  QVTKWidget *                         QvtkWidget;
+  QHBoxLayout *                        HorizontalLayout;
+  QHBoxLayout *                        HorizontalLayout_2;
+  QVBoxLayout *                        VerticalLayout;
+  QSpacerItem *                        HorizontalSpacer;
+  QLabel *                             Label;
+  QComboBox *                          LUTComboBox;
 
   void setupUi(QDialog *LUTDialog);
 
 private:
   Q_DISABLE_COPY(QGoLUTDialog);
-  };
+};
 #endif

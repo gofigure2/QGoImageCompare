@@ -94,7 +94,6 @@
 #include <list>
 #include "vtkProp3D.h"
 
-
 class vtkViewImage3DCommand;
 class vtkVolumeTextureMapper3D;
 class vtkVolumeMapper;
@@ -116,24 +115,28 @@ class vtkColorTransferFunction;
 
 class ImageActorCallback;
 
+class vtkPlanes;
+
 /**
  * \class vtkViewImage3D
- * \ingroup MegaVTK 
- * \brief 3D view
+ * \ingroup MegaVTK
+ * \brief Basic class to handle items such as images and polydatas
+ * visualization in 3D
  */
-class VTK_RENDERINGADDON2_EXPORT vtkViewImage3D : public vtkViewImage
-  {
-
+class VTK_RENDERINGADDON2_EXPORT vtkViewImage3D:public vtkViewImage
+{
 public:
+  /**
+   * \brief Convenient method to access the constructor.
+   */
+  static vtkViewImage3D * New();
 
-  static vtkViewImage3D* New();
   vtkTypeRevisionMacro(vtkViewImage3D, vtkViewImage);
 
   // Description:
   // Render the resulting image.
   virtual void Render(void);
 
-  void UpdateInteractorStyle();
   /**
     Add a dataset to the view (has to be subclass of vtkPointSet).
     The dataset will be cut through the implicit slice plane
@@ -144,16 +147,17 @@ public:
     A vtkProperty of the dataset can be specified.
   */
 //   virtual vtkQuadricLODActor*
-  virtual vtkActor* AddDataSet(vtkDataSet* dataset,
-                               vtkProperty* property = NULL,
-                               const bool& intersection = true,
-                               const bool& iDataVisibility = true);
+  virtual vtkActor * AddDataSet(vtkDataSet *dataset,
+                                vtkProperty *property = NULL,
+                                const bool & intersection = true,
+                                const bool & iDataVisibility = true);
+
   /**
      Set/Get the current slice to display (depending on the orientation
      this can be in X, Y or Z).
   */
-  virtual void SetSlice(int s){ (void) s; }
-  virtual void SetSliceOrientation(int orientation){ (void) orientation; }
+  virtual void SetSlice(int s){ (void)s; }
+  virtual void SetSliceOrientation(int orientation){ (void)orientation; }
   // Description:
   // Update the display extent manually so that the proper slice for the
   // given orientation is displayed. It will also try to set a
@@ -168,46 +172,74 @@ public:
   virtual void UpdateDisplayExtent(){}
 
   virtual void Add2DPhantom(
-    const unsigned int& i,
-    vtkImageActor* input,
-    vtkPolyData* in_bounds = NULL);
+    const unsigned int & i,
+    vtkImageActor *input,
+    vtkPolyData *in_bounds = NULL);
 
-  virtual void SetOrientationMatrix(vtkMatrix4x4* matrix);
+  virtual void SetOrientationMatrix(vtkMatrix4x4 *matrix);
 
-  void SetVolumeRenderingOff();
+  /*
+   * \brief Set volume rendering on
+   */
   void SetVolumeRenderingOn();
 
+  /*
+   * \brief Set volume rendering off
+   */
+  void SetVolumeRenderingOff();
+
+  /*
+   * \brief Set TriPlanar rendering on
+   */
   void SetTriPlanarRenderingOn();
+
+  /*
+   * \brief Set TriPlanar rendering off
+   */
   void SetTriPlanarRenderingOff();
 
+  /*
+   * \brief Set the volume mapper to texture (for volume rendering purpose)
+   */
   void SetVolumeMapperToTexture(void)
   {
     this->VolumeActor->SetMapper (this->VolumeMapper3D);
     this->Callback->SetVolumeMapper (this->VolumeMapper3D);
   }
 
+  /*
+   * \brief Set the volume mapper to ray cast (for volume rendering purpose)
+   */
   void SetVolumeMapperToRayCast(void)
   {
     this->VolumeActor->SetMapper (this->VolumeRayCastMapper);
     this->Callback->SetVolumeMapper (this->VolumeRayCastMapper);
   }
 
+  /*
+   * \brief Set the volume ray cast function to composite
+   * (for volume rendering purpose)
+   */
   void SetVolumeRayCastFunctionToComposite(void)
   {
     this->VolumeRayCastMapper->SetVolumeRayCastFunction
-                  (this->VolumeRayCastCompositeFunction);
+      (this->VolumeRayCastCompositeFunction);
   }
 
+  /*
+   * \brief Set the volume ray cast function to MIP
+   * (for volume rendering purpose)
+   */
   void SetVolumeRayCastFunctionToMIP(void)
   {
     this->VolumeRayCastMapper->SetVolumeRayCastFunction
-                  (this->VolumeRayCastMIPFunction);
+      (this->VolumeRayCastMIPFunction);
   }
 
   void SetVolumeRayCastFunctionToIsosurface(void)
   {
     this->VolumeRayCastMapper->SetVolumeRayCastFunction
-                  (this->VolumeRayCastIsosurfaceFunction);
+      (this->VolumeRayCastIsosurfaceFunction);
   }
 
   /** Set the box widget visibility */
@@ -233,25 +265,44 @@ public:
   }
   vtkBooleanMacro (PlaneWidgetVisibility, int);*/
 
-  /** Set the cube widget on */
-  void SetCubeVisibility(const bool& a)
+  /**
+   * \brief Set the cube visibility
+   * \param[in] a true: visible, false: not visible
+   * */
+  void SetCubeVisibility(const bool & a)
   {
-    if (this->Interactor) this->Marker->SetEnabled (a);
+    if ( this->Interactor ) { this->Marker->SetEnabled (a); }
   }
+
+  /**
+   * \brief Get the cube visibility
+   * \return true: visible, false: not visible
+   * */
   bool GetCubeVisibility(void)
   {
-    return (this->Marker->GetEnabled() == 1);
+    return ( this->Marker->GetEnabled() == 1 );
   }
+
   vtkBooleanMacro (CubeVisibility, int);
 
-  void SetShade(const bool& a)
+  /**
+   * \brief Set the shade
+   * \param[in] a true: enable, false: disable
+   * */
+  void SetShade(const bool & a)
   {
     this->VolumeProperty->SetShade (a);
   }
+
+  /**
+   * \brief Get the shade
+   * \return a true: enable, false: disable
+   * */
   bool GetShade(void)
   {
-    return (this->VolumeProperty->GetShade() == 1);
+    return ( this->VolumeProperty->GetShade() == 1 );
   }
+
   vtkBooleanMacro (Shade, int);
 
   /** Get volume actor */
@@ -260,17 +311,34 @@ public:
   vtkGetObjectMacro (VolumeProperty, vtkVolumeProperty);
   //vtkGetObjectMacro (BoxWidget, vtkOrientedBoxWidget);
 
-  virtual void SetWorldCoordinates(double pos[3]) { (void) pos;}
+  virtual void SetWorldCoordinates(double pos[3]) { (void)pos; }
 
-  void SetBoundsActorsVisibility(bool);
+  /**
+   * \brief Set the bounds actors visibility
+   * \param iVisibility true: visible, false: not visible
+   * */
+  void SetBoundsActorsVisibility(bool iVisibility);
 
-  vtkInteractorStyleImage3D* GetInteractorStyle3D();
+  /**
+   * \brief Get the interactor style for the vtkViewImage3D
+   * \return pointer to the current vtkInteractorStyleImage3D
+   * */
+  vtkInteractorStyleImage3D * GetInteractorStyle3D();
 
   vtkGetObjectMacro (Command, vtkViewImage3DCommand);
 
-  void UpdateActorsStatus(double* iBoundingBox);
-  std::list<vtkProp3D*> GetListOfModifiedActors3D();
-  void UpdateCurrentActor();
+  /**
+   * \brief Compute the distance between 2 points
+   * \param[in] n double pointer to the first point (double[3])
+   * \param[in] origin double pointer to the second point (double[3])
+   * */
+  void ComputeDistances(double *n, double *origin);
+
+  /**
+   * \brief Compute the disctance from the actors to the surface
+   * \param[in] planes vtkPlanes pointer to the surface of interest
+   * */
+  void ComputeDistancesToSquare(vtkPlanes *planes);
 
 protected:
 
@@ -279,57 +347,55 @@ protected:
 
   // Description:
   virtual void InstallPipeline();
+
   virtual void UpdateOrientation(){}
 
   virtual void SetupVolumeRendering();
+
   virtual void SetupWidgets();
+
   virtual void SetupTextureMapper();
 
   // texture mapper in 3D
-  vtkVolumeMapper* VolumeMapper3D;
+  vtkVolumeMapper *VolumeMapper3D;
   // volume ray cast mapper
-  vtkVolumeRayCastMapper* VolumeRayCastMapper;
+  vtkVolumeRayCastMapper *VolumeRayCastMapper;
   // ray cast function
-  vtkVolumeRayCastMIPFunction* VolumeRayCastMIPFunction;
+  vtkVolumeRayCastMIPFunction *VolumeRayCastMIPFunction;
   // ray cast function
-  vtkVolumeRayCastCompositeFunction* VolumeRayCastCompositeFunction;
+  vtkVolumeRayCastCompositeFunction *VolumeRayCastCompositeFunction;
   // ray cast function
-  vtkVolumeRayCastIsosurfaceFunction* VolumeRayCastIsosurfaceFunction;
+  vtkVolumeRayCastIsosurfaceFunction *VolumeRayCastIsosurfaceFunction;
   // volume property
-  vtkVolumeProperty* VolumeProperty;
+  vtkVolumeProperty *VolumeProperty;
   // volume actor
-  vtkVolume* VolumeActor;
+  vtkVolume *VolumeActor;
   // opacity transfer function
-  vtkPiecewiseFunction* OpacityFunction;
+  vtkPiecewiseFunction *OpacityFunction;
   // blender
-  vtkImageBlend* Blender;
+  vtkImageBlend *Blender;
   // image 3D cropping box callback
-  vtkImage3DCroppingBoxCallback* Callback;
+  vtkImage3DCroppingBoxCallback *Callback;
 
-  std::vector<vtkImageActor*>      Phantom;
-  std::vector<ImageActorCallback*> PhantomCallback;
-  std::vector<vtkActor*>           BoundsActor;
+  std::vector< vtkImageActor * >      Phantom;
+  std::vector< ImageActorCallback * > PhantomCallback;
+  std::vector< vtkActor * >           BoundsActor;
 
   // box widget
   //vtkOrientedBoxWidget* BoxWidget;
   // vtkPlane widget
   // vtkPlaneWidget*                 PlaneWidget;
   // annotated cube actor
-  vtkAnnotatedCubeActor*      Cube;
-  vtkOrientationMarkerWidget* Marker;
+  vtkAnnotatedCubeActor *     Cube;
+  vtkOrientationMarkerWidget *Marker;
 
   /**
      Access to the command of the viewer.
      This instance is in charge of observing the interactorstyle (GetInteractorStyle())
      and update things accordingly in the view (i.e. the slice number when moving slice).
   */
-  vtkViewImage3DCommand*     Command;
-  vtkInteractorStyleImage3D* InteractorStyle3D;
-
-
-  std::list<vtkProp3D*> m_ListOfPickedActors;
-  std::list<vtkProp3D*> m_ListOfModifiedActors;
-
-  };
+  vtkViewImage3DCommand *    Command;
+  vtkInteractorStyleImage3D *InteractorStyle3D;
+};
 
 #endif /* _vtkViewImage3D_h_ */

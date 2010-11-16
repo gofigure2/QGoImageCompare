@@ -1,10 +1,4 @@
 /*=========================================================================
-  Author: $Author$  // Author of last commit
-  Version: $Rev$  // Revision of last commit
-  Date: $Date$  // Date of last commit
-=========================================================================*/
-
-/*=========================================================================
  Authors: The GoFigure Dev. Team.
  at Megason Lab, Systems biology, Harvard Medical school, 2009-10
 
@@ -51,25 +45,28 @@ class vtkViewImage2D;
 #include "GoFigureGlobalDefinition.h"
 
 //-------------------------------------------------------------------------
-bool BuildScreenshotFromImage(vtkImageData* image,
-                              vtkImageData* screenshot,
+bool BuildScreenshotFromImage(vtkImageData *image,
+                              vtkImageData *screenshot,
                               int tsize = 0);
+
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 bool BuildScreenshotFromRenderWindow(
   vtkRenderWindow *win,
-  vtkImageData* screenshot,
+  vtkImageData *screenshot,
   int tsize = 0);
+
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-QString SnapshotView(QVTKWidget* iWidget,
-                     const GoFigure::FileType& iType,
-                     const QString& iBaseName,
-                     const unsigned int& iSnapshotId);
+QString SnapshotView(QVTKWidget *iWidget,
+                     const GoFigure::FileType & iType,
+                     const QString & iBaseName,
+                     const unsigned int & iSnapshotId);
+
 //-------------------------------------------------------------------------
 
-void SetupViewGivenQVTKWidget(vtkViewImage2D* iView, QVTKWidget* iWidget);
+void SetupViewGivenQVTKWidget(vtkViewImage2D *iView, QVTKWidget *iWidget);
 
 #endif

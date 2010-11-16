@@ -1,10 +1,4 @@
 /*=========================================================================
-  Author: $Author$  // Author of last commit
-  Version: $Rev$  // Revision of last commit
-  Date: $Date$  // Date of last commit
-=========================================================================*/
-
-/*=========================================================================
  Authors: The GoFigure Dev. Team.
  at Megason Lab, Systems biology, Harvard Medical school, 2009-10
 
@@ -38,6 +32,7 @@
 
 =========================================================================*/
 #include "QGoImageView.h"
+#include "QDebug"
 
 #include "QVTKWidget.h"
 #include "vtkEventQtSlotConnect.h"
@@ -57,6 +52,7 @@
 #include "vtkProperty.h"
 #include "vtkWidgetEvent.h"
 #include "vtkWidgetEventTranslator.h"
+#include "vtkEvent.h"
 
 // For the distance widget...
 #include "vtkDistanceWidget.h"
@@ -74,21 +70,21 @@
  * \brief Default Constructor.
  * \param iParent
  */
-QGoImageView::
-QGoImageView(QWidget* iParent) : QWidget(iParent),
+QGoImageView::QGoImageView(QWidget *iParent):QWidget(iParent),
   m_Pool(0),
   m_Image(0),
   m_SnapshotId(0),
   m_ShowAnnotations(true),
   m_ShowSplinePlane(true)
-  {
+{
   m_Pool = vtkViewImage2DCollection::New();
-  }
+}
 
 //--------------------------------------------------------------------------
 QGoImageView::
 ~QGoImageView()
-  {
+{
+  /*
   std::vector<vtkSeedWidget*>::iterator seedWidgetIterator = m_SeedWidget.begin();
   while (seedWidgetIterator != m_SeedWidget.end())
     {
@@ -111,194 +107,189 @@ QGoImageView::
     (*seedIterator)->Delete();
     ++seedIterator;
     }
-
-  if (m_Pool)
+*/
+  if ( m_Pool )
     {
     m_Pool->Delete();
     m_Pool = 0;
     }
-  }
+}
 
 //--------------------------------------------------------------------------
 void
-QGoImageView::
-GetBackgroundColor(double& r,
-                                      double& g, double& b)
+QGoImageView::GetBackgroundColor(double & r,
+                                 double & g,
+                                 double & b)
 {
-  double* rgb = this->GetBackgroundColor();
+  double *rgb = this->GetBackgroundColor();
+
   r = rgb[0];
   g = rgb[1];
   b = rgb[2];
 }
 
 //-------------------------------------------------------------------------
-double*
-QGoImageView::
-GetBackgroundColor()
+double *
+QGoImageView::GetBackgroundColor()
 {
   return m_Pool->GetItem(0)->GetBackground();
 }
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-SetBackgroundColor(const double& r,
-                                      const double& g,
-                                      const double& b)
+QGoImageView::SetBackgroundColor(const double & r,
+                                 const double & g,
+                                 const double & b)
 {
-  double textcolor[3];
+  double *current_rgb = this->GetBackgroundColor();
 
-  if ((r != 0.5) && (g != 0.5) && (b != 0.5))
+  if ( ( current_rgb[0] != r )
+       && ( current_rgb[1] != g )
+       && ( current_rgb[2] != b ) )
     {
-    textcolor[0] = 1. - r;
-    textcolor[1] = 1. - g;
-    textcolor[2] = 1. - b;
+    double textcolor[3];
+
+    if ( ( r != 0.5 ) && ( g != 0.5 ) && ( b != 0.5 ) )
+      {
+      textcolor[0] = 1. - r;
+      textcolor[1] = 1. - g;
+      textcolor[2] = 1. - b;
+      }
+    else
+      {
+      textcolor[0] = 1.;
+      textcolor[1] = 1.;
+      textcolor[2] = 0.;
+      }
+
+    double rgb[3] = { r, g, b };
+
+    m_Pool->SyncSetBackground(rgb);
+    int n = m_Pool->GetNumberOfItems();
+
+    for ( int i = 0; i < n; i++ )
+      {
+      vtkTextProperty *tproperty =
+        m_Pool->GetItem(i)->GetTextProperty();
+      tproperty->SetFontFamilyToArial();
+      tproperty->SetFontSize(14);
+      tproperty->SetColor(textcolor);
+      }
+
+    m_Pool->SyncRender();
     }
-  else
-    {
-    textcolor[0] = 1.;
-    textcolor[1] = 1.;
-    textcolor[2] = 0.;
-    }
-
-  double rgb[3] = { r, g, b };
-
-  m_Pool->SyncSetBackground(rgb);
-  int n = m_Pool->GetNumberOfItems();
-
-  for (int i = 0; i < n; i++)
-    {
-    vtkTextProperty* tproperty =
-      m_Pool->GetItem(i)->GetTextProperty();
-    tproperty->SetFontFamilyToArial();
-    tproperty->SetFontSize(14);
-    tproperty->SetColor(textcolor);
-    }
-
-  m_Pool->SyncRender();
 }
 
 //--------------------------------------------------------------------------
 void
-QGoImageView::
-SetBackgroundColor(double rgb[3])
+QGoImageView::SetBackgroundColor(double rgb[3])
 {
   this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]);
 }
+
 //--------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------
 void
-QGoImageView::
-SetBackgroundColor(const QColor& iColor)
+QGoImageView::SetBackgroundColor(const QColor & iColor)
 {
   double r, g, b;
+
   iColor.getRgbF(&r, &g, &b);
 
   this->SetBackgroundColor(r, g, b);
 }
 
 //--------------------------------------------------------------------------
-int*
-QGoImageView::
-GetImageCoordinatesFromWorldCoordinates(double iPos[3])
+int *
+QGoImageView::GetImageCoordinatesFromWorldCoordinates(double iPos[3])
 {
-  vtkViewImage2D* View = m_Pool->GetItem(0);
+  vtkViewImage2D *View = m_Pool->GetItem(0);
+
   return View->GetImageCoordinatesFromWorldCoordinates(iPos);
 }
 
 //--------------------------------------------------------------------------
 
-vtkViewImage2D*
-QGoImageView::
-GetImageViewer(const int& iId)
+vtkViewImage2D *
+QGoImageView::GetImageViewer(const int & iId)
 {
   return m_Pool->GetItem(iId);
 }
 
 //--------------------------------------------------------------------------
 int
-QGoImageView::
-GetNumberOfImageViewers()
+QGoImageView::GetNumberOfImageViewers()
 {
   return m_Pool->GetNumberOfItems();
 }
 
 //--------------------------------------------------------------------------
-std::vector<vtkActor*>
-QGoImageView::
-AddContour(const int& iId, vtkPolyData* iDataset, vtkProperty* iProperty)
+std::vector< vtkActor * >
+QGoImageView::AddContour(vtkPolyData *iDataset, vtkProperty *iProperty)
 {
-  (void) iId;
-
   int n = m_Pool->GetNumberOfItems();
 
-  std::vector<vtkActor*> oActorVector(n);
+  std::vector< vtkActor * > oActorVector(n);
 
-  for (int i = 0; i < n; i++)
+  for ( int i = 0; i < n; i++ )
     {
-    vtkViewImage2D* viewer = m_Pool->GetItem(i);
-    vtkActor* temp = viewer->AddDataSet(iDataset, iProperty);
-    viewer->Render();
+    vtkViewImage2D *viewer = m_Pool->GetItem(i);
+    vtkActor *      temp = viewer->AddDataSet(iDataset, iProperty);
+    //viewer->Render();
     oActorVector[i] = temp;
     }
 
   return oActorVector;
 }
+
 //--------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------
-/**
- * \brief Highlight contour (or not).
- * \param[in] iProp contour
- * \param[in] iToDo to be highlighted
- */
 void
-QGoImageView::
-ChangeActorProperty(vtkProp3D* iActor,
-                    vtkProperty* iProperty)
+QGoImageView::ChangeActorProperty(vtkProp3D *iActor,
+                                  vtkProperty *iProperty)
 {
   int n = m_Pool->GetNumberOfItems();
 
-  for (int i = 0; i < n; i++)
+  for ( int i = 0; i < n; i++ )
     {
-    vtkViewImage2D* viewer = m_Pool->GetItem(i);
+    vtkViewImage2D *viewer = m_Pool->GetItem(i);
     viewer->ChangeActorProperty(iActor, iProperty);
     }
 }
+
 //--------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------
 void
-QGoImageView::
-RemoveActor(const int& iId, vtkActor* iActor)
+QGoImageView::RemoveActor(const int & iId, vtkActor *iActor)
 {
-  if ((iId >= 0) && (iId < m_Pool->GetNumberOfItems()))
+  if ( ( iId >= 0 ) && ( iId < m_Pool->GetNumberOfItems() ) )
     {
-    vtkViewImage2D* viewer = m_Pool->GetItem(iId);
+    vtkViewImage2D *viewer = m_Pool->GetItem(iId);
     viewer->GetRenderer()->RemoveActor(iActor);
     }
 }
+
 //--------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------
 void
-QGoImageView::
-AddActor(const int& iId, vtkActor* iActor)
+QGoImageView::AddActor(const int & iId, vtkActor *iActor)
 {
-  if ((iId >= 0) && (iId < m_Pool->GetNumberOfItems()))
+  if ( ( iId >= 0 ) && ( iId < m_Pool->GetNumberOfItems() ) )
     {
-    vtkViewImage2D* viewer = m_Pool->GetItem(iId);
+    vtkViewImage2D *viewer = m_Pool->GetItem(iId);
     viewer->GetRenderer()->AddActor(iActor);
     }
 }
 
 //--------------------------------------------------------------------------
 void
-QGoImageView::
-DefaultMode()
+QGoImageView::DefaultMode()
 {
-  std::cout << "Default Mode" <<std::endl;
+  //qDebug() << "Default Mode";
   //Change cursor
   ChangeCursorShape(Qt::ArrowCursor);
 
@@ -308,12 +299,11 @@ DefaultMode()
 
 //--------------------------------------------------------------------------
 void
-QGoImageView::
-ZoomMode()
+QGoImageView::ZoomMode()
 {
-  std::cout << "Zoom Mode" <<std::endl;
+  //qDebug() << "Zoom Mode";
   //Change cursors
-  QCursor zoomCursor(QPixmap(QString::fromUtf8(":/fig/zoom.png")), -1, -1);
+  QCursor zoomCursor(QPixmap( QString::fromUtf8(":/fig/zoom.png") ), -1, -1);
   ChangeCursorShape(zoomCursor);
 
   // Change mode in the collection
@@ -322,10 +312,9 @@ ZoomMode()
 
 //--------------------------------------------------------------------------
 void
-QGoImageView::
-PanMode()
+QGoImageView::PanMode()
 {
-  std::cout << "Pan Mode" <<std::endl;
+  //qDebug() << "Pan Mode";
   //Change cursor
   ChangeCursorShape(Qt::OpenHandCursor);
 
@@ -335,18 +324,16 @@ PanMode()
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-ResetWindowLevel()
+QGoImageView::ResetWindowLevel()
 {
   m_Pool->SyncResetWindowLevel();
 }
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-SetLookupTable(vtkLookupTable* iLut)
+QGoImageView::SetLookupTable(vtkLookupTable *iLut)
 {
-  if (this->m_Image->GetNumberOfScalarComponents() == 1)
+  if ( this->m_Image->GetNumberOfScalarComponents() == 1 )
     {
     m_Pool->SyncSetLookupTable(iLut);
     m_Pool->SyncResetWindowLevel();
@@ -356,10 +343,9 @@ SetLookupTable(vtkLookupTable* iLut)
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-ShowScalarBar(const bool& iShow)
+QGoImageView::ShowScalarBar(const bool & iShow)
 {
-  if (this->m_Image->GetNumberOfScalarComponents() == 1)
+  if ( this->m_Image->GetNumberOfScalarComponents() == 1 )
     {
     m_Pool->SyncSetShowScalarBar(iShow);
     m_Pool->SyncRender();
@@ -368,16 +354,14 @@ ShowScalarBar(const bool& iShow)
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-UpdateRenderWindows()
+QGoImageView::UpdateRenderWindows()
 {
   this->m_Pool->SyncRender();
 }
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-ShowAnnotations()
+QGoImageView::ShowAnnotations()
 {
   m_ShowAnnotations = !m_ShowAnnotations;
   this->m_Pool->SyncSetShowAnnotations(m_ShowAnnotations);
@@ -385,13 +369,12 @@ ShowAnnotations()
 }
 
 //-------------------------------------------------------------------------
-vtkImageActor*
-QGoImageView::
-GetImageActor(const int& iId)
+vtkImageActor *
+QGoImageView::GetImageActor(const int & iId)
 {
   int N = this->m_Pool->GetNumberOfItems();
 
-  if ((iId < 0) || (iId >= N))
+  if ( ( iId < 0 ) || ( iId >= N ) )
     {
     return NULL;
     }
@@ -403,16 +386,14 @@ GetImageActor(const int& iId)
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-ChangeActorProperty(int iDir, vtkProp3D* iActor, vtkProperty* iProperty)
+QGoImageView::ChangeActorProperty(int iDir, vtkProp3D *iActor, vtkProperty *iProperty)
 {
   m_Pool->GetItem(iDir)->ChangeActorProperty(iActor, iProperty);
 }
 
 //--------------------------------------------------------------------------
 void
-QGoImageView::
-ShowSplinePlane()
+QGoImageView::ShowSplinePlane()
 {
   // Invert state of m_ShowPlane
   m_ShowSplinePlane = !m_ShowSplinePlane;
@@ -421,18 +402,16 @@ ShowSplinePlane()
 
 //--------------------------------------------------------------------------
 void
-QGoImageView::
-SetInterpolate(const int& val)
+QGoImageView::SetInterpolate(const int & val)
 {
   m_Pool->SyncSetInterpolate(val);
 }
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-EnableContourPickingMode()
+QGoImageView::EnableContourPickingMode()
 {
-  std::cout << "Contour Picking Mode" <<std::endl;
+ // qDebug() << "Contour Picking Mode";
   //Change cursor
   ChangeCursorShape(Qt::ArrowCursor);
   // Change mode in the collection
@@ -440,34 +419,15 @@ EnableContourPickingMode()
 }
 
 //-------------------------------------------------------------------------
-std::list<vtkProp3D*>
-QGoImageView::
-GetListOfPickedContours()
-{
-  // Get picked contours from all views
-  return m_Pool->GetCommand()->GetListOfPickedActors();
-}
-
-//-------------------------------------------------------------------------
-std::list<vtkProp3D*>
-QGoImageView::
-GetListOfUnPickedContours()
-{
-  return m_Pool->GetCommand()->GetListOfUnPickedActors();
-}
-
-//-------------------------------------------------------------------------
-vtkImageData*
-QGoImageView::
-GetImage()
+vtkImageData *
+QGoImageView::GetImage()
 {
   return m_Image;
 }
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-InitializeSeedWidget()
+QGoImageView::InitializeSeedWidget()
 {
   int N = this->m_Pool->GetNumberOfItems();
 
@@ -476,75 +436,85 @@ InitializeSeedWidget()
   this->m_SeedRep.resize(N);
   this->m_SeedWidget.resize(N);
 
-  for (int i = 0; i < N; ++i)
+  for ( int i = 0; i < N; ++i )
     {
-    this->m_Handle[i] = vtkConstrainedPointHandleRepresentation::New();
+    this->m_Handle[i] = vtkSmartPointer< vtkConstrainedPointHandleRepresentation >::New();
     this->m_Handle[i]->GetProperty()->SetColor(1, 0, 0);
 
-    this->m_SeedRep[i] = vtkSeedRepresentation::New();
+    this->m_SeedRep[i] = vtkSmartPointer< vtkSeedRepresentation >::New();
     this->m_SeedRep[i]->SetHandleRepresentation(this->m_Handle[i]);
 
-    this->m_SeedWidget[i] = vtkSeedWidget::New();
+    this->m_SeedWidget[i] = vtkSmartPointer< vtkSeedWidget >::New();
     this->m_SeedWidget[i]->SetRepresentation(this->m_SeedRep[i]);
     this->m_SeedWidget[i]->SetRepresentation(this->m_SeedRep[i]);
 
     this->m_SeedWidget[i]->SetInteractor(
-      this->m_Pool->GetItem(i)->GetInteractor());
+      this->m_Pool->GetItem(i)->GetInteractor() );
 
     // to remove right click interaction in the one click widget
     this->m_SeedWidget[i]->GetEventTranslator()->RemoveTranslation(
       vtkCommand::RightButtonPressEvent);
+
+    this->m_SeedWidget[i]->GetEventTranslator()->SetTranslation(
+      vtkCommand::KeyPressEvent, vtkEvent::NoModifier, 100, 0, "d", vtkWidgetEvent::Delete);
     }
 }
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-EnableSeedWidget(bool iEnable)
+QGoImageView::EnableSeedWidget(bool iEnable)
 {
-  std::cout << "Seed ---Widget---" <<std::endl;
+  //qDebug() << "Seed ---Widget---" << iEnable;
 
-  if(iEnable)
+  if ( iEnable )
     {
     DefaultMode();
     }
 
-  std::vector<vtkSeedWidget*>::iterator
-  it = m_SeedWidget.begin();
-  while (it != m_SeedWidget.end())
+  std::vector< vtkSmartPointer< vtkSeedWidget > >::iterator
+    it = m_SeedWidget.begin();
+  while ( it != m_SeedWidget.end() )
     {
-    (*it)->SetEnabled(iEnable);
+    ( *it )->SetEnabled(iEnable);
     ++it;
     }
 }
 
+/// NOTE Returned value has to be deleted
 //-------------------------------------------------------------------------
-vtkPoints*
-QGoImageView::
-GetAllSeeds()
+vtkPoints *
+QGoImageView::GetAllSeeds()
 {
   double worldPosition[3];
 
-  /// TODO MEMORY LEAK HERE
-  vtkPoints* oPoints = vtkPoints::New();
+  vtkPoints *oPoints = vtkPoints::New();
 
-  for (unsigned int i = 0; i < this->m_SeedWidget.size(); i++)
+  for ( unsigned int i = 0; i < this->m_SeedWidget.size(); i++ )
     {
     int N = this->m_SeedRep[i]->GetNumberOfSeeds();
-    for (int j = 0; j < N; j++)
+    for ( int j = 0; j < N; j++ )
       {
-      // Get World position (may be not accurate if we are between 8 pixels (3D))
+      // Get World position (may be not accurate if we are between 8 pixels
+      // (3D))
       this->m_SeedRep[i]->GetSeedWorldPosition(j, worldPosition);
       // Get indexes of the closest point
-      int* index = this->m_Pool->GetItem(i)->GetImageCoordinatesFromWorldCoordinates(worldPosition);
+      int *index = this->m_Pool->GetItem(i)->GetImageCoordinatesFromWorldCoordinates(worldPosition);
+
       // Convert it back into world position
-      double spacing[3];
+     // qDebug() << "SLICE NUMBER: " << this->m_Pool->GetItem(i)->GetSlice();
+      double spacing[3] = { 0., 0., 0. };
       this->m_Pool->GetItem(i)->GetInput()->GetSpacing(spacing);
       double correctedPosition[3];
-      correctedPosition[0] = static_cast<double>(index[0]) * spacing[0];
-      correctedPosition[1] = static_cast<double>(index[1]) * spacing[1];
-      correctedPosition[2] = static_cast<double>(index[2]) * spacing[2];
+      correctedPosition[0] = static_cast< double >( index[0] ) * spacing[0];
+      correctedPosition[1] = static_cast< double >( index[1] ) * spacing[1];
+      correctedPosition[2] = static_cast< double >( index[2] ) * spacing[2];
+
+      //qDebug() << "CORRECTED: " << correctedPosition[0] << " - "
+     //           << correctedPosition[1] << " - "
+      //          << correctedPosition[2];
+
       oPoints->InsertNextPoint(correctedPosition);
+      delete[] index;
       }
     }
 
@@ -553,30 +523,31 @@ GetAllSeeds()
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-ClearAllSeeds()
+QGoImageView::ClearAllSeeds()
 {
-  for (unsigned int i = 0; i < this->m_SeedWidget.size(); i++)
+  for ( unsigned int i = 0; i < this->m_SeedWidget.size(); i++ )
     {
-    for (int k = this->m_SeedRep[i]->GetNumberOfSeeds() - 1; k >= 0; --k)
+    for ( int k = this->m_SeedRep[i]->GetNumberOfSeeds() - 1; k >= 0; --k )
       {
       this->m_SeedWidget[i]->DeleteSeed(k);
       this->m_SeedRep[i]->RemoveLastHandle();
       }
     }
+  // automatically remove seeds from the visualization
+  this->UpdateRenderWindows();
 }
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-InitializeDistanceWidget()
+QGoImageView::InitializeDistanceWidget()
 {
   int N = this->m_Pool->GetNumberOfItems();
+
   m_DistanceWidget.resize(N);
-  for (int i = 0; i < N; ++i)
+  for ( int i = 0; i < N; ++i )
     {
-    this->m_DistanceWidget[i] = vtkSmartPointer<vtkDistanceWidget>::New();
-    this->m_DistanceWidget[i]->SetInteractor(this->m_Pool->GetItem(i)->GetInteractor());
+    this->m_DistanceWidget[i] = vtkSmartPointer< vtkDistanceWidget >::New();
+    this->m_DistanceWidget[i]->SetInteractor( this->m_Pool->GetItem(i)->GetInteractor() );
     this->m_DistanceWidget[i]->CreateDefaultRepresentation();
 
     this->m_DistanceWidget[i]->Off();
@@ -585,33 +556,33 @@ InitializeDistanceWidget()
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-EnableDistanceWidget(bool iActive)
+QGoImageView::EnableDistanceWidget(bool iActive)
 {
-  std::cout << "Distance ---Widget---" <<std::endl;
-  if(iActive)
+  //qDebug() << "Distance ---Widget---" << iActive;
+
+  if ( iActive )
     {
     DefaultMode();
     }
 
   int N = this->m_Pool->GetNumberOfItems();
-  for (int i = 0; i < N; i++)
-  {
-  this->m_DistanceWidget[i]->SetEnabled(iActive);
-  }
+  for ( int i = 0; i < N; i++ )
+    {
+    this->m_DistanceWidget[i]->SetEnabled(iActive);
+    }
 }
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-InitializeAngleWidget()
+QGoImageView::InitializeAngleWidget()
 {
   int N = this->m_Pool->GetNumberOfItems();
+
   m_AngleWidget.resize(N);
-  for (int i = 0; i < N; ++i)
+  for ( int i = 0; i < N; ++i )
     {
-    this->m_AngleWidget[i] = vtkSmartPointer<vtkAngleWidget>::New();
-    this->m_AngleWidget[i]->SetInteractor(this->m_Pool->GetItem(i)->GetInteractor());
+    this->m_AngleWidget[i] = vtkSmartPointer< vtkAngleWidget >::New();
+    this->m_AngleWidget[i]->SetInteractor( this->m_Pool->GetItem(i)->GetInteractor() );
     this->m_AngleWidget[i]->CreateDefaultRepresentation();
 
     this->m_AngleWidget[i]->Off();
@@ -620,52 +591,51 @@ InitializeAngleWidget()
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-EnableAngleWidget(bool iActive)
+QGoImageView::EnableAngleWidget(bool iActive)
 {
-  std::cout << "Angle ---Widget---" <<std::endl;
+  //qDebug() << "Angle ---Widget---" << iActive;
 
-  if(iActive)
+  if ( iActive )
     {
     DefaultMode();
     }
 
   int N = this->m_Pool->GetNumberOfItems();
-  for (int i = 0; i < N; i++)
-  {
-  if (iActive)
+  for ( int i = 0; i < N; i++ )
     {
-    this->m_AngleWidget[i]->On();
+    if ( iActive )
+      {
+      this->m_AngleWidget[i]->On();
+      }
+    else
+      {
+      this->m_AngleWidget[i]->Off();
+      }
     }
-  else
-    {
-    this->m_AngleWidget[i]->Off();
-    }
-  }
 }
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-InitializeContourWidget()
+QGoImageView::InitializeContourWidget()
 {
   int N = this->m_Pool->GetNumberOfItems();
+
   m_ContourWidget.resize(N);
   m_ContourRepresentation.resize(N);
 
   // use while iterator
-  for (int i = 0; i < N; ++i)
+  for ( int i = 0; i < N; ++i )
     {
     // Contour widget
     m_ContourRepresentation[i] =
-      vtkSmartPointer<vtkOrientedGlyphContourRepresentation>::New();
+      vtkSmartPointer< vtkOrientedGlyphContourRepresentation >::New();
     m_ContourRepresentation[i]->GetProperty()->SetColor(0., 1., 1.);
     m_ContourRepresentation[i]->GetLinesProperty()->SetColor(1., 0., 1.);
     m_ContourRepresentation[i]->GetActiveProperty()->SetColor(1., 1., 0.);
 
-    m_ContourWidget[i] = vtkSmartPointer<vtkContourWidget>::New();
+    m_ContourWidget[i] = vtkSmartPointer< vtkContourWidget >::New();
     m_ContourWidget[i]->SetPriority(10.0);
-    m_ContourWidget[i]->SetInteractor(this->m_Pool->GetItem(i)->GetInteractor());
+    m_ContourWidget[i]->SetInteractor( this->m_Pool->GetItem(i)->GetInteractor() );
     m_ContourWidget[i]->Off();
 
     m_ContourWidget[i]->SetRepresentation(this->m_ContourRepresentation[i]);
@@ -674,31 +644,29 @@ InitializeContourWidget()
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-EnableContourWidget(bool iActivate)
+QGoImageView::EnableContourWidget(bool iActivate)
 {
-  std::cout << "Contour ---Widget---" <<std::endl;
+  //qDebug() << "Contour ---Widget---" << iActivate;
 
-  if(iActivate)
+  if ( iActivate )
     {
     DefaultMode();
     }
 
-  std::vector<vtkSmartPointer<vtkContourWidget> >::iterator
-  it = m_ContourWidget.begin();
-  while (it != m_ContourWidget.end())
+  std::vector< vtkSmartPointer< vtkContourWidget > >::iterator
+    it = m_ContourWidget.begin();
+  while ( it != m_ContourWidget.end() )
     {
-    (*it)->SetEnabled(iActivate);
+    ( *it )->SetEnabled(iActivate);
     ++it;
     }
 }
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-InitializeContourWidgetNodes( int iDir, vtkPolyData* iNodes )
+QGoImageView::InitializeContourWidgetNodes(int iDir, vtkPolyData *iNodes)
 {
-  if( (iDir >= 0) && (iDir < m_Pool->GetNumberOfItems()) )
+  if ( ( iDir >= 0 ) && ( iDir < m_Pool->GetNumberOfItems() ) )
     {
     m_ContourWidget[iDir]->SetEnabled(1);
     m_ContourWidget[iDir]->Initialize(iNodes);
@@ -707,20 +675,18 @@ InitializeContourWidgetNodes( int iDir, vtkPolyData* iNodes )
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-ReinitializeContourWidget()
+QGoImageView::ReinitializeContourWidget()
 {
-  for (unsigned int i = 0; i < m_ContourWidget.size(); i++)
+  for ( unsigned int i = 0; i < m_ContourWidget.size(); i++ )
     {
-    InitializeContourWidgetNodes( i, NULL );
+    InitializeContourWidgetNodes(i, NULL);
     }
 }
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-UpdateContourRepresentationProperties(float  linewidth, QColor linecolor,
-                                      QColor nodecolor, QColor activenodecolor)
+QGoImageView::UpdateContourRepresentationProperties(float linewidth, QColor linecolor,
+                                                    QColor nodecolor, QColor activenodecolor)
 {
   m_LinesWidth = linewidth;
   m_LinesColor = linecolor;
@@ -736,52 +702,51 @@ UpdateContourRepresentationProperties(float  linewidth, QColor linecolor,
   double ra, ga, ba;
   activenodecolor.getRgbF(&ra, &ga, &ba);
 
-  std::vector<vtkSmartPointer<vtkOrientedGlyphContourRepresentation> >::iterator
-  it = m_ContourRepresentation.begin();
-  while (it != m_ContourRepresentation.end())
+  std::vector< vtkSmartPointer< vtkOrientedGlyphContourRepresentation > >::iterator
+    it = m_ContourRepresentation.begin();
+  while ( it != m_ContourRepresentation.end() )
     {
-    (*it)->GetLinesProperty()->SetLineWidth(linewidth);
-    (*it)->GetLinesProperty()->SetColor(rl, gl, bl);
-    (*it)->GetProperty()->SetColor(rn, gn, bn);
-    (*it)->GetActiveProperty()->SetColor(ra, ga, ba);
+    ( *it )->GetLinesProperty()->SetLineWidth(linewidth);
+    ( *it )->GetLinesProperty()->SetColor(rl, gl, bl);
+    ( *it )->GetProperty()->SetColor(rn, gn, bn);
+    ( *it )->GetActiveProperty()->SetColor(ra, ga, ba);
     ++it;
     }
 }
 
 //-------------------------------------------------------------------------
-vtkPolyData*
-QGoImageView::
-GetContourRepresentationAsPolydata(int iDir)
+vtkPolyData *
+QGoImageView::GetContourRepresentationAsPolydata(int iDir)
 {
   return m_ContourRepresentation[iDir]->GetContourRepresentationAsPolyData();
 }
 
 //-------------------------------------------------------------------------
-vtkPolyData*
-QGoImageView::
-GetContourRepresentationNodePolydata(int iDir)
+vtkPolyData *
+QGoImageView::GetContourRepresentationNodePolydata(int iDir)
 {
-  vtkPolyData* contour_nodes = vtkPolyData::New();
+  vtkPolyData *contour_nodes = vtkPolyData::New();
+
   m_ContourRepresentation[iDir]->GetNodePolyData(contour_nodes);
+
   return contour_nodes;
 }
 
 //-------------------------------------------------------------------------
 void
-QGoImageView::
-Update()
+QGoImageView::Update()
 {
-  std::vector<vtkSmartPointer<vtkOrientedGlyphContourRepresentation> >::iterator
-  it = m_ContourRepresentation.begin();
-  int i=0;
+  std::vector< vtkSmartPointer< vtkOrientedGlyphContourRepresentation > >::iterator
+      it = m_ContourRepresentation.begin();
+  int i = 0;
 
-  while (it != m_ContourRepresentation.end())
+  while ( it != m_ContourRepresentation.end() )
     {
-    vtkSmartPointer<vtkImageActorPointPlacer> point_placer =
-      vtkSmartPointer<vtkImageActorPointPlacer>::New();
-    point_placer->SetImageActor(GetImageActor(i));
+    vtkSmartPointer< vtkImageActorPointPlacer > point_placer =
+      vtkSmartPointer< vtkImageActorPointPlacer >::New();
+    point_placer->SetImageActor( GetImageActor(i) );
 
-    (*it)->SetPointPlacer(point_placer);
+    ( *it )->SetPointPlacer(point_placer);
     ++it;
     ++i;
     }

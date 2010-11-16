@@ -39,81 +39,90 @@
 
 #include "vtkOrientedBoxWidget.h"
 
+#include "vtkImplicitPlaneWidget.h"
+
+#include "vtkPlanes.h"
+#include "vtkPlane.h"
+
 //----------------------------------------------------------------------------
-vtkViewImage3DCommand::
-vtkViewImage3DCommand()
-{
-}
+vtkViewImage3DCommand::vtkViewImage3DCommand()
+{}
+
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 vtkViewImage3DCommand::
 ~vtkViewImage3DCommand()
-{
-}
+{}
 
 //----------------------------------------------------------------------------
-vtkViewImage3DCommand*
+
+//----------------------------------------------------------------------------
+vtkViewImage3DCommand *
 vtkViewImage3DCommand::New()
 {
   return new vtkViewImage3DCommand;
 }
 
 //----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
 void
-vtkViewImage3DCommand::
-Execute(vtkObject *caller, unsigned long event, void *callData)
+vtkViewImage3DCommand::Execute(vtkObject *caller, unsigned long event, void *callData)
 {
   (void)callData;
 
-  if (event == vtkViewImage3DCommand::MeshPickingEvent)
+  if ( m_PlaneWidget == static_cast< vtkImplicitPlaneWidget * >( caller ) )
     {
-    m_vtkViewImage3D->UpdateCurrentActor();
+    if ( event == vtkCommand::InteractionEvent )
+      {
+      double *n = m_PlaneWidget->GetNormal();
+      double *origin = m_PlaneWidget->GetOrigin();
+      m_vtkViewImage3D->ComputeDistances(n, origin);
+      return;
+      }
+    }
+  else if ( m_BoxWidget == static_cast< vtkOrientedBoxWidget * >( caller ) )
+    {
+    vtkPlanes *planes = vtkPlanes::New();
+    m_BoxWidget->GetPlanes(planes);
+    m_vtkViewImage3D->ComputeDistancesToSquare(planes);
     return;
     }
-  if (event == vtkCommand::InteractionEvent)
+  else
     {
-    vtkOrientedBoxWidget* test = static_cast<vtkOrientedBoxWidget*>(caller);
-    vtkPolyData* pd = vtkPolyData::New();
-    test->GetPolyData(pd);
-
-    double pt[3];
-    pd->GetPoint(0, pt);
-
-    double bextent[6];
-    bextent[0] = pt[0];
-    bextent[1] = pt[0];
-    bextent[2] = pt[1];
-    bextent[3] = pt[1];
-    bextent[4] = pt[2];
-    bextent[5] = pt[2];
-
-    // Get Extent of the box
-    for (int i = 1; i < 8; i += 2)
-      {
-      pd->GetPoint(i, pt);
-
-      if (pt[0] < bextent[0]) bextent[0] = pt[0];
-      if (pt[0] > bextent[1]) bextent[1] = pt[0];
-      if (pt[1] < bextent[2]) bextent[2] = pt[1];
-      if (pt[1] > bextent[3]) bextent[3] = pt[1];
-      if (pt[2] < bextent[4]) bextent[4] = pt[2];
-      if (pt[2] > bextent[5]) bextent[5] = pt[2];
-      }
-    pd->Delete();
-
-    //Get Actors which are in the box (picked/unpicked)
-    m_vtkViewImage3D->UpdateActorsStatus(bextent);
     return;
     }
 }
 
 //----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
 void
-vtkViewImage3DCommand::
-SetVtkImageView3D(vtkViewImage3D* iViewImage3D)
+vtkViewImage3DCommand::SetVtkImageView3D(vtkViewImage3D *iViewImage3D)
 {
-  if (iViewImage3D)
+  if ( iViewImage3D )
     {
     m_vtkViewImage3D = iViewImage3D;
     }
 }
+
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+void
+vtkViewImage3DCommand::SetPlaneWidget(vtkImplicitPlaneWidget *iPlaneWidget)
+{
+  m_PlaneWidget = iPlaneWidget;
+}
+
+//----------------------------------------------------------------------------
+
+//----------------------------------------------------------------------------
+void
+vtkViewImage3DCommand::SetBoxWidget(vtkOrientedBoxWidget *iBoxWidget)
+{
+  m_BoxWidget = iBoxWidget;
+}
+
+//----------------------------------------------------------------------------

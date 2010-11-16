@@ -1,10 +1,4 @@
 /*=========================================================================
-  Author: $Author$  // Author of last commit
-  Version: $Rev$  // Revision of last commit
-  Date: $Date$  // Date of last commit
-=========================================================================*/
-
-/*=========================================================================
  Authors: The GoFigure Dev. Team.
  at Megason Lab, Systems biology, Harvard Medical school, 2009-10
 
@@ -62,11 +56,11 @@
 #include "vtkViewImage2D.h"
 
 //-------------------------------------------------------------------------
-bool BuildScreenshotFromImage(vtkImageData* image,
-                              vtkImageData* screenshot,
+bool BuildScreenshotFromImage(vtkImageData *image,
+                              vtkImageData *screenshot,
                               int tsize)
 {
-  if (!image || !screenshot)
+  if ( !image || !screenshot )
     {
     return false;
     }
@@ -75,9 +69,9 @@ bool BuildScreenshotFromImage(vtkImageData* image,
 
   int image_dims[3];
   image->GetDimensions(image_dims);
-  if (image_dims[0] == 0 ||
-      image_dims[1] == 0 ||
-      image_dims[2] == 0)
+  if ( image_dims[0] == 0
+       || image_dims[1] == 0
+       || image_dims[2] == 0 )
     {
     return false;
     }
@@ -89,10 +83,10 @@ bool BuildScreenshotFromImage(vtkImageData* image,
   // is by clipping its UpdateExtent. By doing so, we prevent our resample
   // and permute filter the process the image's *whole* extent.
 
-  vtkSmartPointer<vtkImageClip> clip
-    = vtkSmartPointer<vtkImageClip>::New();
+  vtkSmartPointer< vtkImageClip > clip =
+    vtkSmartPointer< vtkImageClip >::New();
   clip->SetInput(image);
-  clip->SetOutputWholeExtent(image->GetUpdateExtent());
+  clip->SetOutputWholeExtent( image->GetUpdateExtent() );
   clip->Update();
 
   // Permute, as a convenience
@@ -100,12 +94,12 @@ bool BuildScreenshotFromImage(vtkImageData* image,
   int clip_dims[3];
   clip->GetOutput()->GetDimensions(clip_dims);
 
-  vtkSmartPointer<vtkImagePermute> permute
-    = vtkSmartPointer<vtkImagePermute>::New();
-  if (clip_dims[2] != 1)
+  vtkSmartPointer< vtkImagePermute > permute =
+    vtkSmartPointer< vtkImagePermute >::New();
+  if ( clip_dims[2] != 1 )
     {
-    permute->SetInput(clip->GetOutput());
-    if (clip_dims[0] == 1)
+    permute->SetInput( clip->GetOutput() );
+    if ( clip_dims[0] == 1 )
       {
       permute->SetFilteredAxes(1, 2, 0);
       }
@@ -127,29 +121,29 @@ bool BuildScreenshotFromImage(vtkImageData* image,
   double *resample_input_spacing = resample_input->GetSpacing();
 
   int large_dim = 0, small_dim = 1;
-  if (resample_input_dims[0] < resample_input_dims[1])
+  if ( resample_input_dims[0] < resample_input_dims[1] )
     {
     large_dim = 1;
     small_dim = 0;
     }
 
-  if (tsize != 0)
+  if ( tsize != 0 )
     {
-    vtkSmartPointer<vtkImageResample> resample =
-      vtkSmartPointer<vtkImageResample>::New();
+    vtkSmartPointer< vtkImageResample > resample =
+      vtkSmartPointer< vtkImageResample >::New();
     resample->SetInput(resample_input);
     resample->SetInterpolationModeToCubic();
     resample->SetDimensionality(2);
 
     // Create the screenshot
 
-    factor = static_cast<double>(tsize) /
-             static_cast<double>(resample_input_dims[large_dim]);
+    factor = static_cast< double >( tsize )
+             / static_cast< double >( resample_input_dims[large_dim] );
 
     resample->SetAxisMagnificationFactor(large_dim, factor);
     resample->SetAxisMagnificationFactor(
-      small_dim, factor * (resample_input_spacing[small_dim] /
-                           resample_input_spacing[large_dim]));
+      small_dim, factor * ( resample_input_spacing[small_dim]
+                            / resample_input_spacing[large_dim] ) );
     resample->Update();
     resample_output = resample->GetOutput();
     //   resample_output->GetDimensions(resample_output_dims);
@@ -163,18 +157,19 @@ bool BuildScreenshotFromImage(vtkImageData* image,
 
   return true;
 }
+
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
 bool BuildScreenshotFromRenderWindow(
   vtkRenderWindow *win,
-  vtkImageData* screenshot,
+  vtkImageData *screenshot,
   int tsize)
 {
-  if (win && screenshot)
+  if ( win && screenshot )
     {
-    vtkSmartPointer<vtkWindowToImageFilter> filter =
-      vtkSmartPointer<vtkWindowToImageFilter>::New();
+    vtkSmartPointer< vtkWindowToImageFilter > filter =
+      vtkSmartPointer< vtkWindowToImageFilter >::New();
     filter->ShouldRerenderOff();
     filter->SetInput(win);
     filter->Update();
@@ -184,51 +179,52 @@ bool BuildScreenshotFromRenderWindow(
     }
   return false;
 }
+
 //-------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------
-QString SnapshotView(QVTKWidget* iWidget,
-                     const GoFigure::FileType& iType,
-                     const QString& iBaseName,
-                     const unsigned int& iSnapshotId)
+QString SnapshotView(QVTKWidget *iWidget,
+                     const GoFigure::FileType & iType,
+                     const QString & iBaseName,
+                     const unsigned int & iSnapshotId)
 {
-  vtkSmartPointer<vtkImageData> image =
-    vtkSmartPointer<vtkImageData>::New();
+  vtkSmartPointer< vtkImageData > image =
+    vtkSmartPointer< vtkImageData >::New();
   BuildScreenshotFromRenderWindow(iWidget->GetRenderWindow(),
                                   image);
   QString filename = iBaseName;
-  filename.append(QString("%1").arg(iSnapshotId));
+  filename.append( QString("%1").arg(iSnapshotId) );
 
-  switch (iType)
+  switch ( iType )
     {
     case GoFigure::BMP:
       {
       filename.append(".bmp");
-      vtkWriteImage<vtkBMPWriter>(image, filename);
+      vtkWriteImage< vtkBMPWriter >(image, filename);
       break;
       }
     case GoFigure::EPS:
       {
       filename.append(".eps");
-      vtkWriteImage<vtkPostScriptWriter>(image, filename);
+      vtkWriteImage< vtkPostScriptWriter >(image, filename);
       break;
       }
     case GoFigure::JPEG:
       {
       filename.append(".jpeg");
-      vtkWriteImage<vtkJPEGWriter>(image, filename);
+      vtkWriteImage< vtkJPEGWriter >(image, filename);
       break;
       }
     case GoFigure::PNG:
       {
       filename.append(".png");
-      vtkWriteImage<vtkPNGWriter>(image, filename);
+      vtkWriteImage< vtkPNGWriter >(image, filename);
       break;
       }
     case GoFigure::TIFF:
       {
       filename.append(".tiff");
-      vtkWriteImage<vtkTIFFWriter>(image, filename);
+      vtkWriteImage< vtkTIFFWriter >(image, filename);
       break;
       }
     default:
@@ -239,12 +235,14 @@ QString SnapshotView(QVTKWidget* iWidget,
     }
   return filename;
 }
+
 //-------------------------------------------------------------------------
 
-void SetupViewGivenQVTKWidget(vtkViewImage2D* iView, QVTKWidget* iWidget)
+void SetupViewGivenQVTKWidget(vtkViewImage2D *iView, QVTKWidget *iWidget)
 {
-  vtkRenderWindow* renwin = iWidget->GetRenderWindow();
+  vtkRenderWindow *renwin = iWidget->GetRenderWindow();
+
   iView->SetRenderWindow(renwin);
-  iView->SetRenderer(renwin->GetRenderers()->GetFirstRenderer());
-  iView->SetupInteractor(iWidget->GetInteractor());
+  iView->SetRenderer( renwin->GetRenderers()->GetFirstRenderer() );
+  iView->SetupInteractor( iWidget->GetInteractor() );
 }

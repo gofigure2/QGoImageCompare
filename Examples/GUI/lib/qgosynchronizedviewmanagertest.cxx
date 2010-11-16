@@ -1,10 +1,4 @@
 /*=========================================================================
-  Author: $Author$  // Author of last commit
-  Version: $Rev$  // Revision of last commit
-  Date: $Date$  // Date of last commit
-=========================================================================*/
-
-/*=========================================================================
  Authors: The GoFigure Dev. Team.
  at Megason Lab, Systems biology, Harvard Medical school, 2009
 
@@ -58,10 +52,9 @@
 #include <QStringList>
 #include <QString>
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-
-  if (argc != 4)
+  if ( argc != 4 )
     {
     std::cout << "Usage : QGoSynchronizedViewManagerTest(.exe) " << std::endl;
     std::cout << "1-file.png" << std::endl;
@@ -78,45 +71,45 @@ int main(int argc, char** argv)
   // ITK Reader Typedef
   typedef double InputPixelType;
   const unsigned int Dimension = 3;
-  typedef itk::Image<InputPixelType, Dimension> InputImage3DType;
-  typedef InputImage3DType::Pointer             InputImage3DPointer;
+  typedef itk::Image< InputPixelType, Dimension > InputImage3DType;
+  typedef InputImage3DType::Pointer               InputImage3DPointer;
 
   //itk reader
-  typedef itk::ImageFileReader<InputImage3DType> itkReaderType;
+  typedef itk::ImageFileReader< InputImage3DType > itkReaderType;
   itkReaderType::Pointer itkReader = itkReaderType::New();
   itkReader->SetFileName(argv[2]);
   itkReader->Update();
 
   // create 3 2D images from 1
 
-  vtkSmartPointer<vtkPNGReader> reader = vtkSmartPointer<vtkPNGReader>::New();
+  vtkSmartPointer< vtkPNGReader > reader = vtkSmartPointer< vtkPNGReader >::New();
   reader->SetFileName(argv[1]);
   reader->Update();
 
-  vtkSmartPointer<vtkImageGaussianSmooth> filter1 =
-    vtkSmartPointer<vtkImageGaussianSmooth>::New();
-  filter1->SetInputConnection(reader->GetOutputPort());
+  vtkSmartPointer< vtkImageGaussianSmooth > filter1 =
+    vtkSmartPointer< vtkImageGaussianSmooth >::New();
+  filter1->SetInputConnection( reader->GetOutputPort() );
   filter1->Update();
 
-  vtkSmartPointer<vtkImageGradient> filter2 =
-    vtkSmartPointer<vtkImageGradient>::New();
-  filter2->SetInputConnection(reader->GetOutputPort());
+  vtkSmartPointer< vtkImageGradient > filter2 =
+    vtkSmartPointer< vtkImageGradient >::New();
+  filter2->SetInputConnection( reader->GetOutputPort() );
   filter2->Update();
 
   // create 3 3D images from 1
 
-  vtkSmartPointer<vtkMetaImageReader> reader3D = vtkSmartPointer<vtkMetaImageReader>::New();
+  vtkSmartPointer< vtkMetaImageReader > reader3D = vtkSmartPointer< vtkMetaImageReader >::New();
   reader3D->SetFileName(argv[2]);
   reader3D->Update();
 
-  vtkSmartPointer<vtkImageGaussianSmooth> filter13D =
-    vtkSmartPointer<vtkImageGaussianSmooth>::New();
-  filter13D->SetInputConnection(reader3D->GetOutputPort());
+  vtkSmartPointer< vtkImageGaussianSmooth > filter13D =
+    vtkSmartPointer< vtkImageGaussianSmooth >::New();
+  filter13D->SetInputConnection( reader3D->GetOutputPort() );
   filter13D->Update();
 
-  vtkSmartPointer<vtkImageGradient> filter23D =
-    vtkSmartPointer<vtkImageGradient>::New();
-  filter23D->SetInputConnection(reader3D->GetOutputPort());
+  vtkSmartPointer< vtkImageGradient > filter23D =
+    vtkSmartPointer< vtkImageGradient >::New();
+  filter23D->SetInputConnection( reader3D->GetOutputPort() );
   filter23D->Update();
 
   QString cp0 = "comp0";
@@ -128,25 +121,25 @@ int main(int argc, char** argv)
   QString cp23D = "comp33D";
   QString cp33D = "compITK_3D";
 
-  QGoSynchronizedViewManager* syncViewManage = new QGoSynchronizedViewManager();
+  QGoSynchronizedViewManager *syncViewManage = new QGoSynchronizedViewManager();
 
-  syncViewManage->newSynchronizedView(cp0, reader->GetOutput());
-  syncViewManage->newSynchronizedView(cp1, filter1->GetOutput());
-  syncViewManage->newSynchronizedView(cp03D, reader3D->GetOutput());
-  syncViewManage->newSynchronizedView(cp13D, filter13D->GetOutput());
+  syncViewManage->newSynchronizedView( cp0, reader->GetOutput() );
+  syncViewManage->newSynchronizedView( cp1, filter1->GetOutput() );
+  syncViewManage->newSynchronizedView( cp03D, reader3D->GetOutput() );
+  syncViewManage->newSynchronizedView( cp13D, filter13D->GetOutput() );
 
-  syncViewManage->newSynchronizedView<InputPixelType>(cp33D, itkReader->GetOutput());
+  syncViewManage->newSynchronizedView< InputPixelType >( cp33D, itkReader->GetOutput() );
 
   syncViewManage->Update();
   syncViewManage->show();
   syncViewManage->synchronizeOpenSynchronizedViews();
 
-  QTimer* timer = new QTimer;
+  QTimer *timer = new QTimer;
   timer->setSingleShot(true);
 
-  QObject::connect(timer, SIGNAL(timeout()), qApp, SLOT(closeAllWindows()));
+  QObject::connect( timer, SIGNAL( timeout() ), qApp, SLOT( closeAllWindows() ) );
 
-  if (atoi(argv[3]) == 1)
+  if ( atoi(argv[3]) == 1 )
     {
     timer->start(1000);
     }
