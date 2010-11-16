@@ -73,16 +73,26 @@
 
 #define VTKIS_SLICE_MOVE  5051
 
-class VTK_RENDERINGADDON2_EXPORT vtkInteractorStyleImage2D :
+/**
+ * \class vtkInteractorStyleImage2D
+ * \ingroup MegaVTK
+ * \brief Define the interactor behavior withing a vtkImage2D.
+ * 4 modes (Default, Zoom, Pan and Pick)
+ */
+
+class VTK_RENDERINGADDON2_EXPORT vtkInteractorStyleImage2D:
   public vtkInteractorStyleImage
-  {
+{
 public:
-  static vtkInteractorStyleImage2D *New();
+    /**
+     * \brief Convenient method to access the constructor
+     */
+  static vtkInteractorStyleImage2D * New();
+
   vtkTypeRevisionMacro (vtkInteractorStyleImage2D, vtkInteractorStyleImage);
 
   //BTX
-  enum InteractionTypeIds
-    {
+  enum InteractionTypeIds {
     InteractionTypeWindowLevel = 0,
     InteractionTypeZoom,
     InteractionTypePan,
@@ -91,56 +101,91 @@ public:
     };
 
   virtual void OnMouseMove();
+
   virtual void OnLeftButtonDown();
+
   virtual void OnLeftButtonUp();
+
   virtual void OnMiddleButtonDown();
+
   virtual void OnMiddleButtonUp();
+
   virtual void OnRightButtonDown();
+
   virtual void OnRightButtonUp();
+
   virtual void OnMouseWheelForward();
+
   virtual void OnMouseWheelBackward();
 
   virtual void OnChar();
+
   virtual void OnKeyDown();
+
   virtual void OnKeyUp();
+
   virtual void OnKeyPress();
+
   virtual void OnKeyRelease();
 
   virtual void StartSliceMove();
+
   virtual void SliceMove();
+
   virtual void EndSliceMove();
 
   virtual void DefaultMoveAction();
 
+  // Different modes
+  /**
+    * \brief Start the Default Mode
+    */
   void SetDefaultMode();
+
+  /**
+    * \brief Start the Zoom Mode
+    */
   void SetZoomMode();
+
+  /**
+    * \brief Start the Pan Mode
+    */
   void SetPanMode();
+
+  /**
+    * \brief Start the Pick Mode
+    */
   void SetPickMode();
 
   /**
-   * \brief Highlights the actor which is pointed by the mouse
+   * \brief Draw a bounding box around the actor which is pointed by the cursor
    */
   void HighlightCurrentActor();
 
   vtkGetMacro(SliceStep, int);
-  int* GetRequestedPosition(void)
+  int * GetRequestedPosition(void)
   { return this->RequestedPosition; }
 
-  vtkProp* GetCurrentProp();
+  /**
+   * \brief Return the actor which is pointed by the cursor
+   */
+  vtkProp * GetCurrentProp();
 
 protected:
   vtkInteractorStyleImage2D();
   ~vtkInteractorStyleImage2D();
 
-  int  SliceStep;
-  int* RequestedPosition;
-
+  int SliceStep;
+  int *RequestedPosition;
 private:
 
-  vtkInteractorStyleImage2D(const vtkInteractorStyleImage2D &);  // Not implemented.
-  void operator =(const vtkInteractorStyleImage2D&);  // Not implemented.
+  vtkInteractorStyleImage2D(const vtkInteractorStyleImage2D &); // Not
+                                                                // implemented.
+  void operator=(const vtkInteractorStyleImage2D &);            // Not
+                                                                // implemented.
 
   unsigned int m_Mode;
-  };
+  bool         m_LeftButtonDown;
+};
 
 #endif

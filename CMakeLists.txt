@@ -1,7 +1,7 @@
 PROJECT( GOFIGURE2 )
 
-# CMake >= 2.6 MUST be installed
-CMAKE_MINIMUM_REQUIRED( VERSION 2.6 )
+# CMake >= 2.8.2 MUST be installed (which is requiered by ITK)
+CMAKE_MINIMUM_REQUIRED( VERSION 2.8.2 )
 
 IF( COMMAND CMAKE_POLICY )
   CMAKE_POLICY( VERSION 2.6 )
@@ -46,6 +46,35 @@ IF( WIN32 )
   ENDIF( NOT BORLAND )
 ENDIF( WIN32 )
 
+#-----------------------------------------------------------------------
+# Export and Install configuration
+#
+# GOFIGURE2_INSTALL_BUNDLE_DIR       - bundle dir
+# GOFIGURE2_INSTALL_BIN_DIR          - binary dir (executables)
+# GOFIGURE2_INSTALL_LIB_DIR          - library dir (libs)
+# GOFIGURE2_INSTALL_DOC_DIR          - documentation dir
+# GOFIGURE2_INSTALL_LICENSE_DIR      - licenses dir
+#-----------------------------------------------------------------------
+IF( NOT GOFIGURE2_INSTALL_BUNDLE_DIR )
+  SET( GOFIGURE2_INSTALL_BUNDLE_DIR "." )
+ENDIF( NOT GOFIGURE2_INSTALL_BUNDLE_DIR )
+
+IF( NOT GOFIGURE2_INSTALL_BIN_DIR )
+  SET( GOFIGURE2_INSTALL_BIN_DIR "bin" )
+ENDIF( NOT GOFIGURE2_INSTALL_BIN_DIR )
+   
+IF( NOT GOFIGURE2_INSTALL_LIB_DIR )
+  SET( GOFIGURE2_INSTALL_LIB_DIR "lib/gofigure2" )
+ENDIF( NOT GOFIGURE2_INSTALL_LIB_DIR )
+
+IF( NOT GOFIGURE2_INSTALL_DOC_DIR )
+  SET( GOFIGURE2_INSTALL_DOC_DIR "share/doc/gofigure2" )
+ENDIF( NOT GOFIGURE2_INSTALL_DOC_DIR )
+
+IF( NOT GOFIGURE2_INSTALL_LICENSE_DIR )
+  SET( GOFIGURE2_INSTALL_LICENSE_DIR "share/doc/gofigure2/Licenses" )
+ENDIF( NOT GOFIGURE2_INSTALL_LICENSE_DIR )
+
 #---------------------------------------------------------------------------
 # Define CMAKE_whatever_OUTPUT_DIRECTORY
 #---------------------------------------------------------------------------
@@ -74,8 +103,6 @@ SET( TESTING_DATA_PATH
   ${GOFIGURE2_SOURCE_DIR}/Testing/Data
   CACHE PATH "Directory which contains data for testing."
 )
-
-
 
 #---------------------------------------------------------------------------
 # Handle Documentation
@@ -107,7 +134,6 @@ IF( BUILD_DOCUMENTATION )
   ENDIF( DOXYGEN_FOUND )
 ENDIF( BUILD_DOCUMENTATION )
 
-
 #---------------------------------------------------------------------------
 # Main GoFigure Settings
 #---------------------------------------------------------------------------
@@ -132,6 +158,13 @@ IF( VTK_FOUND )
     MESSAGE( SEND_ERROR
       "GoFigure2 requires VTK 5.6 (your version of VTK is ${VTK_VERSION})" )
   ENDIF( ( ${VTK_MAJOR_VERSION} LESS 5 ) OR ( ${VTK_MINOR_VERSION} LESS 6 ) )
+  
+  # Check if version of VTK is > 5.6
+  # Requiered to now if we can use setBitRate() and setBitRateTolerance
+  # in the vtkFFMPEGWriter
+  IF( ( ${VTK_MAJOR_VERSION} EQUAL 5 ) AND ( ${VTK_MINOR_VERSION} GREATER 6 ))
+    ADD_DEFINITIONS( -DVTKTRUNK )
+  ENDIF( ( ${VTK_MAJOR_VERSION} EQUAL 5 ) AND ( ${VTK_MINOR_VERSION} GREATER 6 ))
 
   INCLUDE( ${VTK_USE_FILE} )
 
@@ -158,12 +191,28 @@ IF( VTK_FOUND )
 
     IF( ( ${ITK_VERSION_MAJOR} LESS 3 ) OR
         ( ( ${ITK_VERSION_MAJOR} EQUAL 3 ) AND
-          ( ${ITK_VERSION_MINOR} LESS 18 ) ) )
+          ( ${ITK_VERSION_MINOR} LESS 18 ) ) ) 
       MESSAGE( SEND_ERROR
         "GoFigure2 requires ITK 3.18 or newer version (your version of ITK is ${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}.${ITK_VERSION_PATCH})" )
     ENDIF( ( ${ITK_VERSION_MAJOR} LESS 3 ) OR
         ( ( ${ITK_VERSION_MAJOR} EQUAL 3 ) AND
-          ( ${ITK_VERSION_MINOR} LESS 18 ) ) )
+          ( ${ITK_VERSION_MINOR} LESS 18 ) ) ) 
+
+  
+  IF( ${ITK_VERSION_MAJOR} EQUAL 3 ) 
+    IF( ( ${ITK_USE_REVIEW} MATCHES "OFF" ) OR 
+        ( ${ITK_USE_REVIEW_STATISTICS} MATCHES "OFF" ) )
+      MESSAGE( SEND_ERROR
+        "GoFigure2 requires ITK to be compiled with USE_REVIEW and USE_REVIEW_STATISTICS turned ON" )
+     ENDIF( ( ${ITK_USE_REVIEW} MATCHES "OFF" ) OR 
+        ( ${ITK_USE_REVIEW_STATISTICS} MATCHES "OFF" ) )
+  ELSE( ${ITK_VERSION_MAJOR} EQUAL 3 )
+    IF( ${ITK_USE_REVIEW} MATCHES "OFF" )
+      MESSAGE( SEND_ERROR
+        "GoFigure2 requires ITK to be compiled with USE_REVIEW turned ON" )
+    ENDIF( ${ITK_USE_REVIEW} MATCHES "OFF" )
+
+  ENDIF( ${ITK_VERSION_MAJOR} EQUAL 3 ) 
 
   ENDIF( ITK_FOUND )
   #----------------------------------------------------------

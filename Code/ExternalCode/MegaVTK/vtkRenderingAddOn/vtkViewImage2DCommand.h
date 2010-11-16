@@ -80,17 +80,18 @@ class vtkViewImage2D;
  * \ingroup MegaVTK
  * \brief Manage events occuring in 2D view
  */
-class VTK_RENDERINGADDON2_EXPORT vtkViewImage2DCommand : public vtkCommand
-  {
+class VTK_RENDERINGADDON2_EXPORT vtkViewImage2DCommand:public vtkCommand
+{
 public:
-
-  static vtkViewImage2DCommand* New()
+  /**
+   * \brief Convenient method to access the constructor.
+   */
+  static vtkViewImage2DCommand * New()
   { return new vtkViewImage2DCommand; }
 
   //BTX
-  enum EventIds
-    {
-    SliceMoveEvent = (vtkCommand::UserEvent + 1),
+  enum EventIds {
+    SliceMoveEvent = ( vtkCommand::UserEvent + 1 ),
     StartSliceMoveEvent,
     EndSliceMoveEvent,
     ZoomEvent,
@@ -111,8 +112,8 @@ public:
   // the instance invoking the event; eid is the event id (see
   // vtkCommand.h); and calldata is information sent when the callback
   // was invoked (e.g., progress value in the vtkCommand::ProgressEvent).
-  virtual void Execute(vtkObject * caller, unsigned long event,
-                       void *vtkNotUsed(callData));
+  virtual void Execute( vtkObject * caller, unsigned long event,
+                        void *vtkNotUsed(callData) );
 
   /**
    * \brief Set the 2d image related to this 2d event manager
@@ -120,24 +121,26 @@ public:
    */
   void SetViewer(vtkViewImage2D *viewer)
   { this->Viewer = viewer; }
-
 protected:
   vtkViewImage2DCommand();
-  ~vtkViewImage2DCommand(){};
+  ~vtkViewImage2DCommand(){}
 
   /**
    * \brief Method to be called if an event is caught in "Windowing Mode"
    * \param[in] isi Related interactor
    */
-  void Windowing(vtkInteractorStyleImage2D* isi);
+  void Windowing(vtkInteractorStyleImage2D *isi);
+
   /**
    * \brief Method to be called if an event is caught in "Zooming Mode"
    */
   void Zooming();
+
   /**
    * \brief Method to be called if an event is caught in "Panning Mode"
    */
   void Panning();
+
   /**
    * \brief Method to be called when an event is caught to update information in 2D view
    * such as position, pixel intensity, etc.
@@ -145,11 +148,10 @@ protected:
   void PrintInformation();
 
 private:
-  vtkViewImage2D* Viewer;
+  vtkViewImage2D *Viewer;
   double          InitialWindow;
   double          InitialLevel;
   int             InitialSlice;
-
-  };
+};
 
 #endif

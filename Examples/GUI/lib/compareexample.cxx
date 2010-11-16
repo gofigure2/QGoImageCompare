@@ -1,10 +1,4 @@
 /*=========================================================================
-  Author: $Author$  // Author of last commit
-  Version: $Rev$  // Revision of last commit
-  Date: $Date$  // Date of last commit
-=========================================================================*/
-
-/*=========================================================================
  Authors: The GoFigure Dev. Team.
  at Megason Lab, Systems biology, Harvard Medical school, 2009
 
@@ -46,7 +40,6 @@
 
 #include "QGoSynchronizedViewManager.h"
 
-
 /* This simple examples shows how to use the high level interface
  * of the QGoSynchronize classes.
  * It takes a list of images as an input and displays the readable ones
@@ -54,9 +47,10 @@
  * It synchronize the visualizations.
  */
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   QApplication app(argc, argv);
+
   QCoreApplication::setOrganizationName("MegasonLab");
   QCoreApplication::setOrganizationDomain("http://gofigure2.sourceforge.net");
 
@@ -66,7 +60,7 @@ int main(int argc, char** argv)
   /* we simply create a new manager that will take care of
    ∗ creation/deletion of visualization and callbacks for us.
    */
-  QGoSynchronizedViewManager* ViewManager	=	new	QGoSynchronizedViewManager ();
+  QGoSynchronizedViewManager *ViewManager = new QGoSynchronizedViewManager ();
 
   QString ViewName;
 
@@ -74,14 +68,13 @@ int main(int argc, char** argv)
     {
     std::cout << argv[i] << std::endl;
 
-    vtkImageReader2 * imageReader =
-       imageFactory->CreateImageReader2( argv[i] );
+    vtkImageReader2 *imageReader =
+      imageFactory->CreateImageReader2(argv[i]);
 
-    if (imageReader != NULL)
+    if ( imageReader != NULL )
       {
-      imageReader->SetFileName( argv[i] );
+      imageReader->SetFileName(argv[i]);
       imageReader->Update();
-
 
       ViewName.clear();
       ViewName.append(argv[i]);
@@ -90,7 +83,7 @@ int main(int argc, char** argv)
        * a valid pointer to a VTK image and
        * a string encoding the name of the visualization.
        */
-      ViewManager->newSynchronizedView(ViewName, imageReader->GetOutput() );
+      ViewManager->newSynchronizedView( ViewName, imageReader->GetOutput() );
       ViewManager->Update();
       ViewManager->show();
       }
@@ -104,12 +97,12 @@ int main(int argc, char** argv)
 
 /* the synchronization manager can synchronize the opened images
 ∗ with a simple function call */
-ViewManager->synchronizeOpenSynchronizedViews();
+  ViewManager->synchronizeOpenSynchronizedViews();
 
-app.processEvents();
-int output = app.exec();
+  app.processEvents();
+  int output = app.exec();
 
-delete ViewManager;
+  delete ViewManager;
 
-return output;
+  return output;
 }

@@ -1,10 +1,4 @@
 /*=========================================================================
-  Author: $Author$  // Author of last commit
-  Version: $Rev$  // Revision of last commit
-  Date: $Date$  // Date of last commit
-=========================================================================*/
-
-/*=========================================================================
  Authors: The GoFigure Dev. Team.
  at Megason Lab, Systems biology, Harvard Medical school, 2009
 
@@ -48,17 +42,18 @@
 #include "vtksys/SystemTools.hxx"
 #include "QGoImageView2D.h"
 
-bool CheckSnapshot(QGoImageView2D* iViewer, GoFigure::FileType iType)
+bool CheckSnapshot(QGoImageView2D *iViewer, GoFigure::FileType iType)
 {
   QString     filename = iViewer->SnapshotViewXY(iType);
   std::string path =
     vtksys::SystemTools::GetCurrentWorkingDirectory();
+
   path += "/";
   path += filename.toStdString();
 
-  if (vtksys::SystemTools::FileExists(path.c_str()))
+  if ( vtksys::SystemTools::FileExists( path.c_str() ) )
     {
-    vtksys::SystemTools::RemoveFile(path.c_str());
+    vtksys::SystemTools::RemoveFile( path.c_str() );
     return true;
     }
   else
@@ -69,9 +64,9 @@ bool CheckSnapshot(QGoImageView2D* iViewer, GoFigure::FileType iType)
     }
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
-  if (argc != 3)
+  if ( argc != 3 )
     {
     std::cout << "Usage : qgoimageview2d(.exe) " << std::endl;
     std::cout << "1-file.png" << std::endl;
@@ -82,39 +77,39 @@ int main(int argc, char** argv)
   QCoreApplication::setOrganizationName("MegasonLab");
   QCoreApplication::setOrganizationDomain("http://gofigure2.sourceforge.net");
 
-  QGoImageView2D* viewer = new QGoImageView2D;
+  QGoImageView2D *viewer = new QGoImageView2D;
 
-  vtkSmartPointer<vtkPNGReader> reader = vtkSmartPointer<vtkPNGReader>::New();
+  vtkSmartPointer< vtkPNGReader > reader = vtkSmartPointer< vtkPNGReader >::New();
   reader->SetFileName(argv[1]);
   reader->Update();
 
-  QTimer* timer = new QTimer;
+  QTimer *timer = new QTimer;
   timer->setSingleShot(true);
-  QObject::connect(timer, SIGNAL(timeout()), viewer, SLOT(close()));
+  QObject::connect( timer, SIGNAL( timeout() ), viewer, SLOT( close() ) );
 
-  viewer->SetImage(reader->GetOutput());
+  viewer->SetImage( reader->GetOutput() );
   viewer->Update();
   viewer->show();
 
-  if (atoi(argv[2]) == 1)
+  if ( atoi(argv[2]) == 1 )
     {
-    if (!CheckSnapshot(viewer, GoFigure::BMP))
+    if ( !CheckSnapshot(viewer, GoFigure::BMP) )
       {
       return EXIT_FAILURE;
       }
-    if (!CheckSnapshot(viewer, GoFigure::PNG))
+    if ( !CheckSnapshot(viewer, GoFigure::PNG) )
       {
       return EXIT_FAILURE;
       }
-    if (!CheckSnapshot(viewer, GoFigure::JPEG))
+    if ( !CheckSnapshot(viewer, GoFigure::JPEG) )
       {
       return EXIT_FAILURE;
       }
-    if (!CheckSnapshot(viewer, GoFigure::EPS))
+    if ( !CheckSnapshot(viewer, GoFigure::EPS) )
       {
       return EXIT_FAILURE;
       }
-    if (!CheckSnapshot(viewer, GoFigure::TIFF))
+    if ( !CheckSnapshot(viewer, GoFigure::TIFF) )
       {
       return EXIT_FAILURE;
       }
@@ -132,7 +127,7 @@ int main(int argc, char** argv)
 
   std::cout << viewer->GetImage() << std::endl;
 
-  vtkLookupTable * LUT = vtkLookupTableManager::GetHotMetalLookupTable();
+  vtkLookupTable *LUT = vtkLookupTableManager::GetHotMetalLookupTable();
 
   viewer->SetLookupTable(LUT);
 
@@ -142,7 +137,7 @@ int main(int argc, char** argv)
   rgb[2] = 0.;
   viewer->SetBackgroundColor(rgb);
 
-  if(viewer->GetNumberOfImageViewers() != 1)
+  if ( viewer->GetNumberOfImageViewers() != 1 )
     {
     return EXIT_FAILURE;
     }
@@ -164,7 +159,6 @@ int main(int argc, char** argv)
   viewer->EnableContourWidget(false);
   viewer->EnableSeedWidget(true);
   viewer->EnableSeedWidget(false);
-
 
   app.processEvents();
 

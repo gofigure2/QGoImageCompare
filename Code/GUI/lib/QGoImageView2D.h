@@ -1,10 +1,4 @@
 /*=========================================================================
-  Author: $Author$  // Author of last commit
-  Version: $Rev$  // Revision of last commit
-  Date: $Date$  // Date of last commit
-=========================================================================*/
-
-/*=========================================================================
  Authors: The GoFigure Dev. Team.
  at Megason Lab, Systems biology, Harvard Medical school, 2009-10
 
@@ -58,31 +52,32 @@ class vtkEventQtSlotConnect;
 \brief Widget to visualize a 2D image (represented as vtkImageData).
 \example GUI/lib/qgoimageview2d.cxx
 */
-class QGOGUILIB_EXPORT QGoImageView2D : public QGoImageView
-  {
+class QGOGUILIB_EXPORT QGoImageView2D:public QGoImageView
+{
   Q_OBJECT
 public:
-  explicit QGoImageView2D(QWidget* parent = 0);
+  explicit QGoImageView2D(QWidget *parent = 0);
   ~QGoImageView2D();
 
-  void SetImage(vtkImageData* iImage);
+  void SetImage(vtkImageData *iImage);
 
-  QVTKInteractor* GetInteractor(const int& i = 0);
+  QVTKInteractor * GetInteractor(const int & i = 0);
 
   void Update();
 
-  void setupUi(QWidget* parent);
+  void setupUi(QWidget *parent);
+
   void retranslateUi(QWidget *parent);
 
+  virtual void ChangeCursorShape(QCursor iCursorShape);
+
 public slots:
-  QString SnapshotViewXY(const GoFigure::FileType& iType,
-                         const QString& iBaseName = tr("Snapshot"));
+  QString SnapshotViewXY( const GoFigure::FileType & iType,
+                          const QString & iBaseName = tr("Snapshot") );
 
 protected:
-  QHBoxLayout*           m_LayOut;
-  QVTKWidget*            m_QVTKWidgetXY;
-  vtkEventQtSlotConnect* m_VTKEventQtConnector;
-
-  virtual void ChangeCursorShape(QCursor iCursorShape);
-  };
+  QHBoxLayout *          m_LayOut;
+  QVTKWidget *           m_QVTKWidgetXY;
+  vtkEventQtSlotConnect *m_VTKEventQtConnector;
+};
 #endif

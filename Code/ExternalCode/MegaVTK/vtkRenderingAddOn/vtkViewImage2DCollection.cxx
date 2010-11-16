@@ -117,28 +117,27 @@ vtkCxxRevisionMacro(vtkViewImage2DCollection, "$Revision: 490 $");
 vtkStandardNewMacro(vtkViewImage2DCollection);
 
 //----------------------------------------------------------------------------
-vtkViewImage2DCollection::vtkViewImage2DCollection() : ExtraRenderWindow(0)
-  {
+vtkViewImage2DCollection::vtkViewImage2DCollection():ExtraRenderWindow(0)
+{
   this->Command = vtkViewImage2DCollectionCommand::New();
   this->Command->SetCollection(this);
-  }
+}
 
 //----------------------------------------------------------------------------
 vtkViewImage2DCollection::~vtkViewImage2DCollection()
-  {
+{
   this->Command->Delete();
-  }
+}
 
 //----------------------------------------------------------------------------
 void
-vtkViewImage2DCollection::
-InitializeAllObservers()
+vtkViewImage2DCollection::InitializeAllObservers()
 {
   this->InitTraversal();
-  vtkViewImage2D* a = this->GetNextItem();
-  while (a)
+  vtkViewImage2D *a = this->GetNextItem();
+  while ( a )
     {
-    vtkInteractorStyle* style = a->GetInteractorStyle();
+    vtkInteractorStyle *style = a->GetInteractorStyle();
 
     style->RemoveObservers(vtkViewImage2DCommand::SyncViewsEvent);
     style->RemoveObservers(vtkViewImage2DCommand::ResetViewerEvent);
@@ -152,30 +151,10 @@ InitializeAllObservers()
     style->AddObserver(vtkViewImage2DCommand::ContourPickingEvent, this->Command);
     style->AddObserver(vtkViewImage2DCommand::MeshPickingEvent, this->Command);
 
-    a = this->GetNextItem();
-    }
-}
+    style->AddObserver(vtkCommand::StartWindowLevelEvent, this->Command);
+    style->AddObserver(vtkCommand::ResetWindowLevelEvent, this->Command);
+    style->AddObserver(vtkCommand::WindowLevelEvent, this->Command);
 
-//----------------------------------------------------------------------------
-void vtkViewImage2DCollection::UpdateWindowLevelObservers()
-{
-  this->InitTraversal();
-  vtkViewImage2D* a = this->GetNextItem();
-  while (a)
-    {
-    vtkInteractorStyle* style = a->GetInteractorStyle();
-    if (a->GetIsColor())
-      {
-      style->RemoveObservers(vtkCommand::StartWindowLevelEvent);
-      style->RemoveObservers(vtkCommand::ResetWindowLevelEvent);
-      style->RemoveObservers(vtkCommand::WindowLevelEvent);
-      }
-    if (!a->GetIsColor())
-      {
-      style->AddObserver(vtkCommand::StartWindowLevelEvent, this->Command);
-      style->AddObserver(vtkCommand::ResetWindowLevelEvent, this->Command);
-      style->AddObserver(vtkCommand::WindowLevelEvent, this->Command);
-      }
     a = this->GetNextItem();
     }
 }
@@ -224,41 +203,41 @@ void vtkViewImage2DCollection::RemoveItem(int i)
 //----------------------------------------------------------------------------
 void vtkViewImage2DCollection::Initialize()
 {
-  vtkSmartPointer<vtkProperty> plane_property =
-    vtkSmartPointer<vtkProperty>::New();
+  vtkSmartPointer< vtkProperty > plane_property =
+    vtkSmartPointer< vtkProperty >::New();
   plane_property->SetRepresentationToWireframe();
 
   int n = this->GetNumberOfItems();
 
-  for (int i = 0; i < n; i++)
+  for ( int i = 0; i < n; i++ )
     {
-    for (int j = 0; j < n; j++)
+    for ( int j = 0; j < n; j++ )
       {
 //       vtkQuadricLODActor* temp =
-      vtkActor* temp =  this->GetItem(j)->AddDataSet(
-        static_cast<vtkDataSet*>(this->GetItem(i)->GetSlicePlane()),
-        plane_property, (i != j));
+      vtkActor *temp =  this->GetItem(j)->AddDataSet(
+        static_cast< vtkDataSet * >( this->GetItem(i)->GetSlicePlane() ),
+        plane_property, ( i != j ) );
       //store all slice actors
       this->SlicePlaneActors.push_back(temp);
+      /// \todo Check if delete makes sense here
       temp->Delete();
       }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkViewImage2DCollection::
-SyncSetBackground(double* rgb)
+void vtkViewImage2DCollection::SyncSetBackground(double *rgb)
 {
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
     item->SetBackground(rgb);
     item = this->GetNextItem();
     }
-  if (this->ExtraRenderWindow)
+  if ( this->ExtraRenderWindow )
     {
-    vtkRenderer* ren =
+    vtkRenderer *ren =
       this->ExtraRenderWindow->GetRenderers()->GetFirstRenderer();
     ren->SetBackground(rgb);
     }
@@ -268,14 +247,34 @@ SyncSetBackground(double* rgb)
 void vtkViewImage2DCollection::SyncRender(void)
 {
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
+  vtkViewImage2D *item = this->GetNextItem();
 
-  while (item)
+  while ( item )
     {
     item->Render();
     item = this->GetNextItem();
     }
-  if (this->ExtraRenderWindow)
+  if ( this->ExtraRenderWindow )
+    {
+    this->ExtraRenderWindow->Render();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkViewImage2DCollection::SyncRender(vtkViewImage2D *iV)
+{
+  this->InitTraversal();
+  vtkViewImage2D *item = this->GetNextItem();
+
+  while ( item )
+    {
+    if ( item != iV )
+      {
+      item->Render();
+      }
+    item = this->GetNextItem();
+    }
+  if ( this->ExtraRenderWindow )
     {
     this->ExtraRenderWindow->Render();
     }
@@ -285,19 +284,20 @@ void vtkViewImage2DCollection::SyncRender(void)
 void vtkViewImage2DCollection::SyncReset(void)
 {
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
     item->Reset();
     item = this->GetNextItem();
     }
 }
+
 //----------------------------------------------------------------------------
 void vtkViewImage2DCollection::SyncResetWindowLevel(void)
 {
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
     item->ResetWindowLevel();
     item = this->GetNextItem();
@@ -305,29 +305,28 @@ void vtkViewImage2DCollection::SyncResetWindowLevel(void)
 }
 
 //----------------------------------------------------------------------------
-void vtkViewImage2DCollection::
-SyncPan()
+void vtkViewImage2DCollection::SyncPan()
 {
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
     item = this->GetNextItem();
     }
 }
+
 //----------------------------------------------------------------------------
-void vtkViewImage2DCollection::
-SyncSetZoomAndParallelScale(double Zoom, double ParallelScale)
+void vtkViewImage2DCollection::SyncSetZoomAndParallelScale(double Zoom, double ParallelScale)
 {
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
+  vtkViewImage2D *item = this->GetNextItem();
   double          t = ParallelScale / Zoom;
-  while (item)
+  while ( item )
     {
     item->SetZoom(Zoom);
     item->GetRenderer()->GetActiveCamera()->SetParallelScale(t);
 
-    if (item->GetInteractorStyle()->GetInteractor()->GetLightFollowCamera())
+    if ( item->GetInteractorStyle()->GetInteractor()->GetLightFollowCamera() )
       {
       item->GetRenderer()->UpdateLightsGeometryToFollowCamera();
       }
@@ -342,71 +341,61 @@ SyncSetZoomAndParallelScale(double Zoom, double ParallelScale)
  * \param[in] iVisibility true to see the actors, false to hide the actors
  */
 void
-vtkViewImage2DCollection::
-SetSplinePlaneActorsVisibility(bool iVisibility)
+vtkViewImage2DCollection::SetSplinePlaneActorsVisibility(bool iVisibility)
 {
   // vtkstd::vector<vtkQuadricLODActor*>::iterator
-  vtkstd::vector<vtkActor*>::iterator SlicePlaneActorsIterator
-    = SlicePlaneActors.begin();
+  vtkstd::vector< vtkActor * >::iterator SlicePlaneActorsIterator =
+    SlicePlaneActors.begin();
 
-  while (SlicePlaneActorsIterator != SlicePlaneActors.end())
+  while ( SlicePlaneActorsIterator != SlicePlaneActors.end() )
     {
-    (*SlicePlaneActorsIterator)->SetVisibility(iVisibility);
+    ( *SlicePlaneActorsIterator )->SetVisibility(iVisibility);
     ++SlicePlaneActorsIterator;
     }
 }
+
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
-void vtkViewImage2DCollection::SyncAddDataSet(vtkDataSet* dataset, vtkProperty* property)
+void vtkViewImage2DCollection::SyncAddDataSet(vtkDataSet *dataset, vtkProperty *property)
 {
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
     item->AddDataSet (dataset, property);
     item = this->GetNextItem();
     }
 }
-//----------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------
-void vtkViewImage2DCollection::SyncRemoveDataSet(vtkDataSet* dataset)
-{
-  this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
-    {
-    item->RemoveDataSet(dataset);
-    item = this->GetNextItem();
-    }
-}
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void vtkViewImage2DCollection::SyncResetCamera(void)
 {
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
     item->ResetCamera ();
     item = this->GetNextItem();
     }
 }
+
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 void vtkViewImage2DCollection::SyncStart(void)
 {
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
     item->GetInteractor()->Start();
     item = this->GetNextItem();
     }
 }
+
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -414,13 +403,13 @@ void vtkViewImage2DCollection::SetLinkSliceMove(unsigned int v)
 {
   this->LinkSliceMove = v;
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
-    vtkInteractorStyle* style = item->GetInteractorStyle();
-    if (v)
+    vtkInteractorStyle *style = item->GetInteractorStyle();
+    if ( v )
       {
-      if (!style->HasObserver (vtkViewImage2DCommand::SyncViewsEvent, this->Command))
+      if ( !style->HasObserver (vtkViewImage2DCommand::SyncViewsEvent, this->Command) )
         {
         style->AddObserver (vtkViewImage2DCommand::SyncViewsEvent, this->Command);
         }
@@ -433,6 +422,7 @@ void vtkViewImage2DCollection::SetLinkSliceMove(unsigned int v)
     item = this->GetNextItem();
     }
 }
+
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -440,13 +430,13 @@ void vtkViewImage2DCollection::SetLinkColorWindowLevel(unsigned int v)
 {
   this->LinkColorWindowLevel = v;
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
-    vtkInteractorStyle* style = item->GetInteractorStyle();
-    if (v)
+    vtkInteractorStyle *style = item->GetInteractorStyle();
+    if ( v )
       {
-      if (!style->HasObserver (vtkCommand::WindowLevelEvent, this->Command))
+      if ( !style->HasObserver (vtkCommand::WindowLevelEvent, this->Command) )
         {
         style->AddObserver (vtkCommand::WindowLevelEvent, this->Command);
         }
@@ -459,6 +449,7 @@ void vtkViewImage2DCollection::SetLinkColorWindowLevel(unsigned int v)
     item = this->GetNextItem();
     }
 }
+
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -466,13 +457,13 @@ void vtkViewImage2DCollection::SetLinkResetWindowLevel(unsigned int v)
 {
   this->LinkResetWindowLevel = v;
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
-    vtkInteractorStyle* style = item->GetInteractorStyle();
-    if (v)
+    vtkInteractorStyle *style = item->GetInteractorStyle();
+    if ( v )
       {
-      if (!style->HasObserver(vtkCommand::ResetWindowLevelEvent, this->Command))
+      if ( !style->HasObserver(vtkCommand::ResetWindowLevelEvent, this->Command) )
         {
         style->AddObserver (vtkCommand::ResetWindowLevelEvent, this->Command);
         }
@@ -485,6 +476,7 @@ void vtkViewImage2DCollection::SetLinkResetWindowLevel(unsigned int v)
     item = this->GetNextItem();
     }
 }
+
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -492,13 +484,13 @@ void vtkViewImage2DCollection::SetLinkResetViewer(unsigned int v)
 {
   this->LinkResetViewer = v;
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
-    vtkInteractorStyle* style = item->GetInteractorStyle();
-    if (v)
+    vtkInteractorStyle *style = item->GetInteractorStyle();
+    if ( v )
       {
-      if (!style->HasObserver (vtkViewImage2DCommand::ResetViewerEvent, this->Command))
+      if ( !style->HasObserver (vtkViewImage2DCommand::ResetViewerEvent, this->Command) )
         {
         style->AddObserver (vtkViewImage2DCommand::ResetViewerEvent, this->Command);
         }
@@ -511,6 +503,7 @@ void vtkViewImage2DCollection::SetLinkResetViewer(unsigned int v)
 
   item = this->GetNextItem();
 }
+
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -518,13 +511,13 @@ void vtkViewImage2DCollection::SetLinkRequestedPosition(unsigned int v)
 {
   this->LinkRequestedPosition = v;
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
-    vtkInteractorStyle* style = item->GetInteractorStyle();
-    if (v)
+    vtkInteractorStyle *style = item->GetInteractorStyle();
+    if ( v )
       {
-      if (!style->HasObserver (vtkViewImage2DCommand::RequestedPositionEvent, this->Command))
+      if ( !style->HasObserver (vtkViewImage2DCommand::RequestedPositionEvent, this->Command) )
         {
         style->AddObserver (vtkViewImage2DCommand::RequestedPositionEvent, this->Command);
         }
@@ -537,6 +530,7 @@ void vtkViewImage2DCollection::SetLinkRequestedPosition(unsigned int v)
     item = this->GetNextItem();
     }
 }
+
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -544,14 +538,14 @@ void vtkViewImage2DCollection::SetLinkCamera(unsigned int v)
 {
   this->LinkCamera = v;
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
-    vtkInteractorStyle* style = item->GetInteractorStyle();
+    vtkInteractorStyle *style = item->GetInteractorStyle();
 
-    if (v)
+    if ( v )
       {
-      if (!style->HasObserver(vtkViewImage2DCommand::CameraMoveEvent, this->Command))
+      if ( !style->HasObserver(vtkViewImage2DCommand::CameraMoveEvent, this->Command) )
         {
         item->GetInteractorStyle()->AddObserver(vtkViewImage2DCommand::CameraMoveEvent, this->Command);
         }
@@ -564,6 +558,7 @@ void vtkViewImage2DCollection::SetLinkCamera(unsigned int v)
     item = this->GetNextItem();
     }
 }
+
 //----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
@@ -571,15 +566,15 @@ void vtkViewImage2DCollection::SetLinkPosition(unsigned int v)
 {
   this->LinkPosition = v;
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
+  vtkViewImage2D *item = this->GetNextItem();
 
-  while (item)
+  while ( item )
     {
-    vtkInteractorStyle* style = item->GetInteractorStyle();
+    vtkInteractorStyle *style = item->GetInteractorStyle();
 
-    if (v)
+    if ( v )
       {
-      if (!style->HasObserver(vtkViewImage2DCommand::DefaultMoveEvent, this->Command))
+      if ( !style->HasObserver(vtkViewImage2DCommand::DefaultMoveEvent, this->Command) )
         {
         style->AddObserver(vtkViewImage2DCommand::DefaultMoveEvent, this->Command);
         }
@@ -599,7 +594,7 @@ void vtkViewImage2DCollection::SetShowAxes(unsigned int v)
   std::cout << "in show axe-nothing here" << std::endl;
 
   // unused argument v
-  (void) v;
+  (void)v;
 
   /*this->ShowAxes = v;
 
@@ -623,8 +618,8 @@ void vtkViewImage2DCollection::SetShowAxes(unsigned int v)
 void vtkViewImage2DCollection::EnableDefaultInteractionMode()
 {
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
     item->SetDefaultInteractionStyle();
     item = this->GetNextItem();
@@ -633,15 +628,14 @@ void vtkViewImage2DCollection::EnableDefaultInteractionMode()
     {
     this->ExtraRenderWindow->GetInteractor()->GetInteractorStyle()->EnableDefaultMode();
     }*/
-
 }
 
 //----------------------------------------------------------------------------
 void vtkViewImage2DCollection::EnableZoomInteractionMode()
 {
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
     item->SetZoomInteractionStyle();
     item = this->GetNextItem();
@@ -652,8 +646,8 @@ void vtkViewImage2DCollection::EnableZoomInteractionMode()
 void vtkViewImage2DCollection::EnablePanInteractionMode()
 {
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
     item->SetPanInteractionStyle();
     item = this->GetNextItem();
@@ -664,8 +658,8 @@ void vtkViewImage2DCollection::EnablePanInteractionMode()
 void vtkViewImage2DCollection::EnableContourPickingMode()
 {
   this->InitTraversal();
-  vtkViewImage2D* item = this->GetNextItem();
-  while (item)
+  vtkViewImage2D *item = this->GetNextItem();
+  while ( item )
     {
     item->SetPickInteractionStyle();
     item = this->GetNextItem();

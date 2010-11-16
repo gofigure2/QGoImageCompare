@@ -1,14 +1,8 @@
 /*=========================================================================
-  Author: $Author: nicolasrannou $  // Author of last commit
-  Version: $Rev: 1803 $  // Revision of last commit
-  Date: $Date: 2010-07-15 13:48:08 -0400 (Thu, 15 Jul 2010) $  // Date of last commit
-=========================================================================*/
-
-/*=========================================================================
  Authors: The GoFigure Dev. Team.
- at Megason Lab, Systems biology, Harvard Medical school, 2009
+ at Megason Lab, Systems biology, Harvard Medical school, 2009-10
 
- Copyright (c) 2009, President and Fellows of Harvard College.
+ Copyright (c) 2009-10, President and Fellows of Harvard College.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -40,16 +34,15 @@
 #include <QApplication>
 #include "QGoSynchronizedViewMainWindow.h"
 
-
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   QApplication app(argc, argv);
+
   QCoreApplication::setOrganizationName("MegasonLab");
   QCoreApplication::setOrganizationDomain("http://gofigure2.sourceforge.net");
 
-
-  QGoSynchronizedViewMainWindow* SynchronizedViewMainWindow
-    = new QGoSynchronizedViewMainWindow();
+  QGoSynchronizedViewMainWindow *SynchronizedViewMainWindow =
+    new QGoSynchronizedViewMainWindow();
 
   SynchronizedViewMainWindow->Update();
   SynchronizedViewMainWindow->show();
@@ -57,5 +50,4 @@ int main(int argc, char** argv)
   app.processEvents();
   int output = app.exec();
   return output;
-
 }

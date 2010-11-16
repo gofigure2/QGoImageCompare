@@ -75,67 +75,72 @@
 
 class vtkViewImage2D;
 
-class VTK_RENDERINGADDON2_EXPORT vtkImage3DImagePlaneCallback : public vtkCommand
-  {
-
+/**
+ * \class vtkImage3DImagePlaneCallback
+ * \brief TO BE FILLED
+ * \ingroup MegaVTK
+ */
+class VTK_RENDERINGADDON2_EXPORT vtkImage3DImagePlaneCallback:public vtkCommand
+{
 public:
 
-  static vtkImage3DImagePlaneCallback* New()
+  /*
+   * \brief Convenient method to access the constructor
+   */
+  static vtkImage3DImagePlaneCallback * New()
   { return new vtkImage3DImagePlaneCallback; }
 
-  virtual void Execute(vtkObject *caller, unsigned long, void*);
+  virtual void Execute(vtkObject *caller, unsigned long, void *);
 
   /*
-  void SetViewImage2D (vtkViewImage2D* view)
-  {
-    this->ViewImage2D = view;
-    this->FirstRender = true;
-    }*/
-
-  vtkImageData* GetOutput(void) const
+   * \brief TO BE FILLED
+   * \return A pointer to the resliced vtkImageData
+   */
+  vtkImageData * GetOutput(void) const
   {
     return this->Reslice->GetOutput();
   }
 
+  // Reset the input of the reslice filter
   virtual void Reset(void)
   {
     this->Reslice->SetInput (NULL);
-    //this->FirstRender = true;
   }
 
-  vtkImageReslice* GetReslice()
+  /*
+   * \brief TO BE FILLED
+   * \return A pointer to the reslice filter
+   */
+  vtkImageReslice * GetReslice()
   {
     return this->Reslice;
   }
-  vtkMatrix4x4* GetMatrix()
+
+  /*
+   * \brief Get the orientation matrix to extract the data
+   * \return A pointer to a vtkMatrix4x4
+   */
+  vtkMatrix4x4 * GetMatrix()
   {
     return this->ResliceAxes;
   }
 
 protected:
   vtkImage3DImagePlaneCallback()
-    {
-    /*
-    this->ViewImage2D = 0;
-    this->FirstRender = true;
-    */
+  {
     this->Reslice     = vtkImageReslice::New();
     this->ResliceAxes = vtkMatrix4x4::New();
-    }
+  }
+
   ~vtkImage3DImagePlaneCallback()
-    {
+  {
     this->Reslice->Delete();
     this->ResliceAxes->Delete();
-    }
+  }
 
 private:
-  /*
-  vtkViewImage2D*   ViewImage2D;
-  bool              FirstRender;*/
-
-  vtkImageReslice* Reslice;
-  vtkMatrix4x4*    ResliceAxes;
-
-  };
+  vtkImageReslice *Reslice;
+  vtkMatrix4x4 *   ResliceAxes;
+};
 
 #endif

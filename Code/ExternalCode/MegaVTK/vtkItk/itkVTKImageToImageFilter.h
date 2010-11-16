@@ -67,7 +67,6 @@
 
 namespace itk
 {
-
 /** \class VTKImageToImageFilter
  * \brief Converts a VTK image into an ITK image and plugs a
  *  vtk data pipeline to an ITK datapipeline.
@@ -80,15 +79,15 @@ namespace itk
  *
  * \ingroup   ImageFilters
  */
-template <class TOutputImage>
-class ITK_EXPORT VTKImageToImageFilter : public ProcessObject
-  {
+template< class TOutputImage >
+class ITK_EXPORT VTKImageToImageFilter:public ProcessObject
+{
 public:
   /** Standard class typedefs. */
-  typedef VTKImageToImageFilter    Self;
-  typedef ProcessObject            Superclass;
-  typedef SmartPointer<Self>       Pointer;
-  typedef SmartPointer<const Self> ConstPointer;
+  typedef VTKImageToImageFilter      Self;
+  typedef ProcessObject              Superclass;
+  typedef SmartPointer< Self >       Pointer;
+  typedef SmartPointer< const Self > ConstPointer;
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
@@ -99,7 +98,7 @@ public:
   /** Some typedefs. */
   typedef TOutputImage                              OutputImageType;
   typedef typename    OutputImageType::ConstPointer OutputImagePointer;
-  typedef VTKImageImport<OutputImageType>           ImporterFilterType;
+  typedef VTKImageImport< OutputImageType >         ImporterFilterType;
   typedef typename ImporterFilterType::Pointer      ImporterFilterPointer;
 
   /** Get the output in the form of a vtkImage.
@@ -125,16 +124,13 @@ public:
 protected:
   VTKImageToImageFilter();
   virtual ~VTKImageToImageFilter();
-
 private:
   VTKImageToImageFilter(const Self &); //purposely not implemented
-  void operator =(const Self&); //purposely not implemented
+  void operator=(const Self &);        //purposely not implemented
 
   ImporterFilterPointer m_Importer;
   vtkImageExport *      m_Exporter;
-
-  };
-
+};
 } // end namespace itk
 
 #ifndef ITK_MANUAL_INSTANTIATION

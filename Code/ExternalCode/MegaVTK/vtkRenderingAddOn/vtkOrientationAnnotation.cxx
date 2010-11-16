@@ -76,13 +76,11 @@ vtkCxxRevisionMacro(vtkOrientationAnnotation, "$Revision: 490 $");
 
 //----------------------------------------------------------------------------
 vtkOrientationAnnotation::vtkOrientationAnnotation()
-  {
-  }
+{}
 
 //----------------------------------------------------------------------------
 vtkOrientationAnnotation::~vtkOrientationAnnotation()
-  {
-  }
+{}
 
 //----------------------------------------------------------------------------
 void vtkOrientationAnnotation::SetTextActorsPosition(int vsize[2])
@@ -97,6 +95,7 @@ void vtkOrientationAnnotation::SetTextActorsPosition(int vsize[2])
 void vtkOrientationAnnotation::SetTextActorsJustification()
 {
   vtkTextProperty *tprop = this->TextMapper[2]->GetTextProperty();
+
   tprop->SetJustificationToLeft();
   tprop->SetVerticalJustificationToCentered();
 

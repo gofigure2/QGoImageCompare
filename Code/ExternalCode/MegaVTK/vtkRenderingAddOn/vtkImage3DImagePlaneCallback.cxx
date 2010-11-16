@@ -93,7 +93,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 void vtkImage3DImagePlaneCallback::Execute(vtkObject *caller,
                                            unsigned long,
-                                           void*)
+                                           void *)
 {
   /*
   if( !this->ViewImage2D )
@@ -105,14 +105,15 @@ void vtkImage3DImagePlaneCallback::Execute(vtkObject *caller,
   // get the box widget
 //   vtkPlaneWidget *widget = reinterpret_cast<vtkPlaneWidget*>(caller);
   vtkPlaneWidget *widget = vtkPlaneWidget::SafeDownCast(caller);
-  if (!widget)
+
+  if ( !widget )
     {
     return;
     }
 
-  vtkImageData* imageData = vtkImageData::SafeDownCast(widget->GetInput());
+  vtkImageData *imageData = vtkImageData::SafeDownCast( widget->GetInput() );
 
-  if (!imageData)
+  if ( !imageData )
     {
     this->Reslice->SetInput (NULL);
     return;
@@ -129,18 +130,18 @@ void vtkImage3DImagePlaneCallback::Execute(vtkObject *caller,
   imageData->GetOrigin(imOrigin);
   int extent[6];
   imageData->GetWholeExtent(extent);
-  double bounds[] = { imOrigin[0] + spacing[0] * extent[0], //xmin
-                      imOrigin[0] + spacing[0] * extent[1], //xmax
-                      imOrigin[1] + spacing[1] * extent[2], //ymin
-                      imOrigin[1] + spacing[1] * extent[3], //ymax
-                      imOrigin[2] + spacing[2] * extent[4], //zmin
-                      imOrigin[2] + spacing[2] * extent[5]}; //zmax
+  double bounds[] = { imOrigin[0] + spacing[0] * extent[0],   //xmin
+                      imOrigin[0] + spacing[0] * extent[1],   //xmax
+                      imOrigin[1] + spacing[1] * extent[2],   //ymin
+                      imOrigin[1] + spacing[1] * extent[3],   //ymax
+                      imOrigin[2] + spacing[2] * extent[4],   //zmin
+                      imOrigin[2] + spacing[2] * extent[5] }; //zmax
 
   int i = 0;
 
-  for (i = 0; i <= 4; i += 2)  // reverse bounds if necessary
+  for ( i = 0; i <= 4; i += 2 )  // reverse bounds if necessary
     {
-    if (bounds[i] > bounds[i + 1])
+    if ( bounds[i] > bounds[i + 1] )
       {
       double t = bounds[i + 1];
       bounds[i + 1] = bounds[i];
@@ -154,10 +155,10 @@ void vtkImage3DImagePlaneCallback::Execute(vtkObject *caller,
   widget->GetCenter(planeCenter);
   double nmax = 0.0;
   int    k = 0;
-  for (i = 0; i < 3; i++)
+  for ( i = 0; i < 3; i++ )
     {
     abs_normal[i] = fabs(abs_normal[i]);
-    if (abs_normal[i] > nmax)
+    if ( abs_normal[i] > nmax )
       {
       nmax = abs_normal[i];
       k = i;
@@ -167,11 +168,11 @@ void vtkImage3DImagePlaneCallback::Execute(vtkObject *caller,
   // Force the plane to lie within the true image bounds along its normal
   //
 
-  if (planeCenter[k] > bounds[2 * k + 1])
+  if ( planeCenter[k] > bounds[2 * k + 1] )
     {
     planeCenter[k] = bounds[2 * k + 1];
     }
-  else if (planeCenter[k] < bounds[2 * k])
+  else if ( planeCenter[k] < bounds[2 * k] )
     {
     planeCenter[k] = bounds[2 * k];
     }
@@ -186,7 +187,7 @@ void vtkImage3DImagePlaneCallback::Execute(vtkObject *caller,
   widget->GetNormal (normal);
 
   double axis1[3], axis2[3];
-  for (i = 0; i < 3; i++)
+  for ( i = 0; i < 3; i++ )
     {
     axis1[i] = point1[i] - origin[i];
     axis2[i] = point2[i] - origin[i];
@@ -196,7 +197,7 @@ void vtkImage3DImagePlaneCallback::Execute(vtkObject *caller,
   double planeSizeY = vtkMath::Normalize(axis2);
 
   this->ResliceAxes->Identity();
-  for (i = 0; i < 3; i++)
+  for ( i = 0; i < 3; i++ )
     {
     this->ResliceAxes->SetElement(0, i, axis1[i]);
     this->ResliceAxes->SetElement(1, i, axis2[i]);
@@ -209,7 +210,7 @@ void vtkImage3DImagePlaneCallback::Execute(vtkObject *caller,
 
   this->ResliceAxes->Transpose();
   double neworiginXYZW[4];
-  double point[] =  { originXYZW[0], originXYZW[1], originXYZW[2], originXYZW[3]};
+  double point[] =  { originXYZW[0], originXYZW[1], originXYZW[2], originXYZW[3] };
   this->ResliceAxes->MultiplyPoint(point, neworiginXYZW);
 
   this->ResliceAxes->SetElement(0, 3, neworiginXYZW[0]);
@@ -220,8 +221,8 @@ void vtkImage3DImagePlaneCallback::Execute(vtkObject *caller,
   this->Reslice->SetInterpolationModeToLinear();
   this->Reslice->SetOutputSpacing (1.0, 1.0, 1.0);
   this->Reslice->SetOutputOrigin (0, 0, 0);
-  this->Reslice->SetOutputExtent (0, static_cast<int>(planeSizeX) - 1,
-                                  0, static_cast<int>(planeSizeY) - 1,
+  this->Reslice->SetOutputExtent (0, static_cast< int >( planeSizeX ) - 1,
+                                  0, static_cast< int >( planeSizeY ) - 1,
                                   0, 0);
 
   this->Reslice->Update();
