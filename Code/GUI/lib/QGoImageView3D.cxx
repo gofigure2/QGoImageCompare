@@ -33,6 +33,7 @@
 =========================================================================*/
 
 #include "QGoImageView3D.h"
+#include "QDebug"
 
 #include "vtkImageData.h"
 #include "vtkViewImage2D.h"
@@ -1146,7 +1147,7 @@ QGoImageView3D::EnableSeedWidget(bool iActivate)
 void
 QGoImageView3D::EnableBoxWidget(bool iValue)
 {
-  std::cout << "Box ---Widget---" << std::endl;
+  //qDebug() << "Box ---Widget---";
   DefaultMode();
   m_BoxWidget->SetEnabled(iValue);
 
@@ -1163,7 +1164,7 @@ QGoImageView3D::EnableBoxWidget(bool iValue)
 void
 QGoImageView3D::EnablePlaneWidget(bool iValue)
 {
-  std::cout << "Plane ---Widget---" << std::endl;
+  //qDebug() << "Plane ---Widget---";
   DefaultMode();
   m_PlaneWidget->SetEnabled(iValue);
 
@@ -1305,27 +1306,27 @@ QGoImageView3D::UpdateCurrentActorSelection(vtkObject *caller)
 
   if ( t == m_Pool->GetItem(0)->GetInteractorStyle() )
     {
-    std::cout << "in XY" << std::endl;
+    //qDebug() << "in XY";
     emit SelectionXYChanged();
     }
   else if ( t == m_Pool->GetItem(1)->GetInteractorStyle() )
     {
-    std::cout << "in XZ" << std::endl;
+   // qDebug() << "in XZ";
     emit SelectionXZChanged();
     }
   else if ( t == m_Pool->GetItem(2)->GetInteractorStyle() )
     {
-    std::cout << "in YZ" << std::endl;
+    //qDebug() << "in YZ";
     emit SelectionYZChanged();
     }
   else if ( t == (vtkInteractorStyleImage2D *)this->m_View3D->GetInteractorStyle3D() )
     {
-    std::cout << "in 3D" << std::endl;
+   // qDebug() << "in 3D";
     emit SelectionXYZChanged();
     }
   else
     {
-    std::cout << "no match" << std::endl;
+    qWarning() << "no match";
     }
 }
 
