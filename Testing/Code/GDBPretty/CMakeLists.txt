@@ -1,5 +1,14 @@
 ADD_EXECUTABLE( pretty-executable
   pretty-executable.cpp )
+IF( CMAKE_COMPILER_IS_GNUCXX )
+  SET_TARGET_PROPERTIES( pretty-executable
+    PROPERTIES COMPILE_FLAGS "-g -O0"
+    )
+ELSE()
+  MESSAGE( WARNING "In order to test the GDB module properly, compiler flags
+  must include a flag to include debugging symbols and an optimization level of
+  zero." )
+ENDIF()
 TARGET_LINK_LIBRARIES( pretty-executable
   ITKCommon
   ITKIO
