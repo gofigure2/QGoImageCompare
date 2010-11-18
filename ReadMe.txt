@@ -3,15 +3,19 @@ GoFigure2- Image Compare subproject
 
 1-Introduction
 
-  The prime goal of GoFigure is the automatic segmentation of nuclei and
+  The primary goal of GoFigure is the automatic segmentation of nuclei and
 cell membranes and in temporally tracking them amidst cell division to
 create lineages.
 
-  Using ITK, VTK and Qt libraries, we developed an application for images
-visualization and comparison. A set of classes is provided for simple
-integration in a program, an executable is also provided for a command line use.
-In case of a 3D dataset, the visualization is rendered with a variant of the vtkINRIA engine.
+  Using ITK, VTK and Qt libraries, we developed an application for 2D and 3D
+image visualization and comparison. We provide a set of classes for simple
+integration in a program, an executable for a command line use, and a
+pretty-printer for visual debugging in GDB.  In case of a 3D dataset, the
+visualization is rendered with a variant of the vtkINRIA engine.
 
+  The GDB pretty-printer requires the setup described at
+
+  http://itk.org/Wiki/ITK/GDBPretty
 
 
 2-Documentation
