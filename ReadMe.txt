@@ -3,13 +3,13 @@ GoFigure2- Image Compare subproject
 
 1-Introduction
 
-  The prime goal of GoFigure is the automatic segmentation of nuclei and 
-cell membranes and in temporally tracking them amidst cell division to 
+  The prime goal of GoFigure is the automatic segmentation of nuclei and
+cell membranes and in temporally tracking them amidst cell division to
 create lineages.
 
-  Using ITK, VTK and Qt libraries, we developed an application for images 
-visualization and comparison. A set of classes is provided for simple 
-integration in a program, an executable is also provided for a command line use. 
+  Using ITK, VTK and Qt libraries, we developed an application for images
+visualization and comparison. A set of classes is provided for simple
+integration in a program, an executable is also provided for a command line use.
 In case of a 3D dataset, the visualization is rendered with a variant of the vtkINRIA engine.
 
 
@@ -17,9 +17,9 @@ In case of a 3D dataset, the visualization is rendered with a variant of the vtk
 2-Documentation
   2.1 Article
   An article introducing the features of this project is provided via its LateX sources.
-  
+
     2.1.1 Prerequites
-  
+
   To be able to compile this article, reader should first have the following software:
       * LateX distribution (TexLive 2009 was used with picins.sty)
 
@@ -38,11 +38,11 @@ $ make
 the following software:
       * Doxygen (>=1.7.1)
 
-   
+
     2.2.2 Compiling the documentation:
 
   Turn on BUILD_DOCUMENTATION during cmake configuration (See 3-Installation).
-  ITK, VTK, Qt documentations can be linked 
+  ITK, VTK, Qt documentations can be linked
 by turning ON the option LINK_EXTERNAL_DOC.
 
 
@@ -56,7 +56,7 @@ by turning ON the option LINK_EXTERNAL_DOC.
 softwares:
       * CMake (>=2.6) visit http://www.cmake.org
       * Qt  (>=4.5)   visit http://www.qtsoftware.com
-      * VTK with Qt   visit http://www.vtk.org 
+      * VTK with Qt   visit http://www.vtk.org
       * ITK (>=3.18)  visit http://www.itk.org
 
 
@@ -71,7 +71,7 @@ $ cd itkCompareProject
 Create a build directory where GoFigure will be compiled
 $ mkdir BUILD
 
-Launch cmake 
+Launch cmake
 $ cd BUILD
 $ ccmake path/to/source/directory
 
