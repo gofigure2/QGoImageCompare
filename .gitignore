@@ -2,5 +2,6 @@
 *~
 *.user
 BUILD
+build
 Documentation/Article/Code/Article.*
 !Documentation/Article/Code/Article.tex
