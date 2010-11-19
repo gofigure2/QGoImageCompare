@@ -24,7 +24,7 @@ SET_TARGET_PROPERTIES( icpGui
 GET_TARGET_PROPERTY( ICPGUI_BUILD_LOCATION icpGui RUNTIME_OUTPUT_DIRECTORY )
 # @TODO figure out where we want to install it
 SET( ICPGUI_INSTALL_LOCATION
-  "${CMAKE_INSTALL_PREFIX}/share/gdb/python/gdb/pretty"
+  "${CMAKE_INSTALL_PREFIX}/share/gdb/python/"
   CACHE PATH "Where to install the gdb icp pretty-printer.  Should be
   somewhere in Python's sys.path." )
 
