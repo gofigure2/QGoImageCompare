@@ -159,7 +159,7 @@ QGoSynchronizedViewMainWindow::openfile()
   QString filename = QFileDialog::getOpenFileName(
     this,
     tr("Select Image"), "",
-    tr("Images (*.png *.bmp *.jpg *.jpeg *.tiff *.mha *.mhd *.img *.lsm)") );
+    tr("Images (*.png *.bmp *.jpg *.jpeg *.tiff *.mha *.mhd *.img)") );// *.lsm)") );
 
   if ( !filename.isEmpty() )
     {
