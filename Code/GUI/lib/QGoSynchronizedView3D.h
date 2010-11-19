@@ -111,6 +111,11 @@ public:
    */
   void Render(const int & iId);
 
+  /**
+   * \brief Set the lookup table in the collection
+   */
+  void SetLookupTable(vtkLookupTable *iLut);
+
   /** \brief get the camera of the current fullscreen view
   */
   vtkCamera * GetCamera(void);

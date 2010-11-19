@@ -158,6 +158,8 @@ private slots:
 
   void Quadscreen();
 
+  void ChangeLookupTable();
+
 private:
 
   void SaveSnapshotInFile(QString & iFile, QGoSynchronizedView *SynchronizedView);
@@ -207,6 +209,7 @@ private:
   QAction *YZviewAct;
   QAction *XYZviewAct;
   QAction *QuadviewAct;
+  QAction *LUTAct;
 
   QGoSynchronizedViewManager *m_SynchronizedViewManager;
 

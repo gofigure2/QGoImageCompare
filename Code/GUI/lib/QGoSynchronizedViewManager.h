@@ -202,6 +202,11 @@ public slots:
    */
   void show();
 
+  /**
+   * \brief Set the lookup table in the collection
+   */
+  void SetLookupTable(vtkLookupTable *iLut);
+
 protected:
 
   // vector to store the open QGoSynchronizedView s

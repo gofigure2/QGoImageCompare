@@ -43,9 +43,11 @@
 #include "QGoSynchronizedViewManager.h"
 
 #include "itkImageFileReader.h"
+#include "QGoLUTDialog.h"
 
 #include "vtkImageReader2Factory.h"
 #include "vtkImageReader2.h"
+#include "vtkLookupTable.h"
 #include "vtkImageData.h"
 
 QGoSynchronizedViewMainWindow::QGoSynchronizedViewMainWindow()
@@ -384,6 +386,22 @@ QGoSynchronizedViewMainWindow::Quadscreen()
 }
 
 void
+QGoSynchronizedViewMainWindow::ChangeLookupTable()
+{
+  vtkLookupTable *lut =
+      QGoLUTDialog::GetLookupTable( this, tr("Choose one look-up table") );
+
+  if( lut )
+    {
+    m_SynchronizedViewManager->SetLookupTable(lut);
+
+    // free memory since it is not freed in the QGoLUTDialog
+    lut->Delete();
+    }
+}
+
+
+void
 QGoSynchronizedViewMainWindow::about()
 {
   QMessageBox::about( this,
@@ -416,6 +434,7 @@ QGoSynchronizedViewMainWindow::updateMenus()
   closeAllAct->setEnabled(hasSynchronizedView);
   tileAct->setEnabled(hasSynchronizedView);
   cascadeAct->setEnabled(hasSynchronizedView);
+  LUTAct->setEnabled(hasSynchronizedView);
 
   // if it is a 3D view, we activate the change view actions
   bool has3DSynchronizedView = ( ( hasSynchronizedView )
@@ -572,6 +591,13 @@ QGoSynchronizedViewMainWindow::createActions()
            SIGNAL( triggered() ),
            this,
            SLOT( Quadscreen() ) );
+
+  LUTAct = new QAction(tr("Lookup Table"), this );
+  LUTAct->setStatusTip( tr("change look up table") );
+  connect( LUTAct,
+           SIGNAL( triggered() ),
+           this,
+           SLOT( ChangeLookupTable() ) );
 }
 
 void QGoSynchronizedViewMainWindow::createMenus()
@@ -608,6 +634,7 @@ void QGoSynchronizedViewMainWindow::createToolBars()
   View3DToolBar->addAction(YZviewAct);
   View3DToolBar->addAction(XYZviewAct);
   View3DToolBar->addAction(QuadviewAct);
+  View3DToolBar->addAction(LUTAct);
 }
 
 void QGoSynchronizedViewMainWindow::createStatusBar()

@@ -131,6 +131,14 @@ QGoSynchronizedView2D::GetCamera()
     return NULL;
     }
 }
+//--------------------------------------------------------------------------
+void QGoSynchronizedView2D::SetLookupTable(vtkLookupTable *iLut)
+{
+  if( HasViewer() )
+    {
+    m_View->SetLookupTable( iLut );
+    }
+}
 
 //--------------------------------------------------------------------------
 /*  true if the widget has a viewer */

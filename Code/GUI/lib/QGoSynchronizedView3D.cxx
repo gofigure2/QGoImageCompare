@@ -37,6 +37,7 @@
 #include "vtkImageData.h"
 #include "vtkViewImage3D.h"
 #include "vtkViewImage2D.h"
+#include "vtkLookupTable.h"
 #include "vtkEventQtSlotConnect.h"
 #include "QGoImageView3D.h"
 #include "QGoSynchronizedViewManager.h"
@@ -155,6 +156,16 @@ QGoSynchronizedView3D::Render(const int & iId)
       }
     }
 }
+
+//--------------------------------------------------------------------------
+void QGoSynchronizedView3D::SetLookupTable(vtkLookupTable *iLut)
+{
+  if( HasViewer() )
+    {
+    m_View->SetLookupTable( iLut );
+    }
+}
+
 
 //--------------------------------------------------------------------------
 /* get the camera of the current viewer */

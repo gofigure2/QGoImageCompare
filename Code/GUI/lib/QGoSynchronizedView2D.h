@@ -44,6 +44,7 @@
 
 class vtkCamera;
 class vtkImageData;
+class vtkLookuptable;
 class vtkEventQtSlotConnect;
 class QGoImageView2D;
 
@@ -83,6 +84,11 @@ public:
   /** \brief get the camera of the current viewer
    */
   vtkCamera * GetCamera(void);
+
+  /**
+   * \brief Set the lookup table in the collection
+   */
+  void SetLookupTable(vtkLookupTable *iLut);
 
   /** \brief true if the widget has a viewer
    */

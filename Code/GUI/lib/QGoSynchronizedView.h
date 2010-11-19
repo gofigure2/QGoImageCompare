@@ -44,6 +44,7 @@
 class vtkCamera;
 class vtkImageData;
 class vtkEventQtSlotConnect;
+class vtkLookupTable;
 class QGoImageView;
 class QGoSynchronizedViewManager;
 
@@ -74,6 +75,11 @@ public:
   /** \brief Update the viewer contained in the widget
    */
   virtual void Update(void) = 0;
+
+  /**
+   * \brief Set the lookup table in the collection
+   */
+  virtual void SetLookupTable(vtkLookupTable *iLut) = 0;
 
   /** \brief Set the address of the QGoSynchronizedViewManager
    */

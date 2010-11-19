@@ -417,7 +417,7 @@ QGoSynchronizedViewManager::Update()
   // we update all SynchronizedViews
   for ( SynchronizedViewIt = m_openSynchronizedViews.begin();
         SynchronizedViewIt != m_openSynchronizedViews.end();
-        SynchronizedViewIt++ )
+        ++SynchronizedViewIt )
     {
     ( *SynchronizedViewIt )->Update();
     }
@@ -427,13 +427,37 @@ QGoSynchronizedViewManager::Update()
   // we update all SynchronizedViews
   for ( SynchronizedView3DIt = m_openSynchronizedViews3D.begin();
         SynchronizedView3DIt != m_openSynchronizedViews3D.end();
-        SynchronizedView3DIt++ )
+        ++SynchronizedView3DIt )
     {
     ( *SynchronizedView3DIt )->Update();
     }
 }
 
 //--------------------------------------------------------------------------
+
+void
+QGoSynchronizedViewManager::SetLookupTable( vtkLookupTable* iLut )
+{
+  std::vector< QGoSynchronizedView2D * >::iterator SynchronizedViewIt;
+
+  // we update all SynchronizedViews
+  for ( SynchronizedViewIt = m_openSynchronizedViews.begin();
+        SynchronizedViewIt != m_openSynchronizedViews.end();
+        ++SynchronizedViewIt )
+    {
+    ( *SynchronizedViewIt )->SetLookupTable( iLut );
+    }
+
+  std::vector< QGoSynchronizedView3D * >::iterator SynchronizedView3DIt;
+
+  // we update all SynchronizedViews
+  for ( SynchronizedView3DIt = m_openSynchronizedViews3D.begin();
+        SynchronizedView3DIt != m_openSynchronizedViews3D.end();
+        ++SynchronizedView3DIt )
+    {
+    ( *SynchronizedView3DIt )->SetLookupTable( iLut );
+    }
+}
 
 //--------------------------------------------------------------------------
 //show all the SynchronizedViews
