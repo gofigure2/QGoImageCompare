@@ -98,8 +98,7 @@ public:
       iSynchronizedViewName, iImage);
 
     mdiArea->addSubWindow(synchronizedView, Qt::SubWindow);
-    synchronizedView->parentWidget()
-    ->resize(300, 300);
+    synchronizedView->parentWidget()->resize(300, 300);
     synchronizedView->show();
     tileAct->trigger();
     return synchronizedView;
@@ -116,8 +115,7 @@ public:
       iSynchronizedViewName, iImage);
 
     mdiArea->addSubWindow(synchronizedView, Qt::SubWindow);
-    synchronizedView->parentWidget()
-    ->resize(300, 300);
+    synchronizedView->parentWidget()->resize(300, 300);
     synchronizedView->show();
     tileAct->trigger();
     return synchronizedView;
@@ -211,6 +209,10 @@ private:
   QAction *QuadviewAct;
 
   QGoSynchronizedViewManager *m_SynchronizedViewManager;
+
+  typedef void ( QGoSynchronizedView3D::*SynchronizedViewMethod ) ();
+
+  void ApplyToActiveView( SynchronizedViewMethod );
 };
 
 #endif // QGOSYNCHRONIZEDVIEWMAINWINDOW_H

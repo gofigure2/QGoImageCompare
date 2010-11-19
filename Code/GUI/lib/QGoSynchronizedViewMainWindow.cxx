@@ -356,61 +356,31 @@ QGoSynchronizedViewMainWindow::synchronize()
 void
 QGoSynchronizedViewMainWindow::FullscreenXY()
 {
-  if ( activeSynchronizedView() != 0 )
-    {
-    if ( activeSynchronizedView()->GetSynchronizedViewType() == 3 )
-      {
-      static_cast< QGoSynchronizedView3D * >( activeSynchronizedView() )->SetFullXYScreenView();
-      }
-    }
+  ApplyToActiveView( &QGoSynchronizedView3D::SetFullXYScreenView );
 }
 
 void
 QGoSynchronizedViewMainWindow::FullscreenXZ()
 {
-  if ( activeSynchronizedView() != 0 )
-    {
-    if ( activeSynchronizedView()->GetSynchronizedViewType() == 3 )
-      {
-      static_cast< QGoSynchronizedView3D * >( activeSynchronizedView() )->SetFullXZScreenView();
-      }
-    }
+  ApplyToActiveView( &QGoSynchronizedView3D::SetFullXZScreenView );
 }
 
 void
 QGoSynchronizedViewMainWindow::FullscreenYZ()
 {
-  if ( activeSynchronizedView() != 0 )
-    {
-    if ( activeSynchronizedView()->GetSynchronizedViewType() == 3 )
-      {
-      static_cast< QGoSynchronizedView3D * >( activeSynchronizedView() )->SetFullYZScreenView();
-      }
-    }
+  ApplyToActiveView( &QGoSynchronizedView3D::SetFullYZScreenView );
 }
 
 void
 QGoSynchronizedViewMainWindow::FullscreenXYZ()
 {
-  if ( activeSynchronizedView() != 0 )
-    {
-    if ( activeSynchronizedView()->GetSynchronizedViewType() == 3 )
-      {
-      static_cast< QGoSynchronizedView3D * >( activeSynchronizedView() )->SetFullXYZScreenView();
-      }
-    }
+  ApplyToActiveView( &QGoSynchronizedView3D::SetFullXYZScreenView );
 }
 
 void
 QGoSynchronizedViewMainWindow::Quadscreen()
 {
-  if ( activeSynchronizedView() != 0 )
-    {
-    if ( activeSynchronizedView()->GetSynchronizedViewType() == 3 )
-      {
-      static_cast< QGoSynchronizedView3D * >( activeSynchronizedView() )->SetQuadView();
-      }
-    }
+  ApplyToActiveView( &QGoSynchronizedView3D::SetQuadView );
 }
 
 void
@@ -509,9 +479,9 @@ QGoSynchronizedViewMainWindow::createActions()
 
   //! [0]
   exitAct = new QAction(tr("E&xit"), this);
-  #if ( ( QT_MAJOR_VERSION == 4 ) && ( QT_MINOR_VERSION >= 6 ) )
+#if ( ( QT_MAJOR_VERSION == 4 ) && ( QT_MINOR_VERSION >= 6 ) )
   exitAct->setShortcuts(QKeySequence::Quit);
-  #endif
+#endif
   exitAct->setStatusTip( tr("Exit the application") );
   connect( exitAct,
            SIGNAL( triggered() ),
@@ -681,5 +651,17 @@ void QGoSynchronizedViewMainWindow::setActiveSubWindow(QWidget *twindow)
   else
     {
     mdiArea->setActiveSubWindow( qobject_cast< QMdiSubWindow * >(twindow) );
+    }
+}
+
+void QGoSynchronizedViewMainWindow::ApplyToActiveView( SynchronizedViewMethod f )
+{
+  QGoSynchronizedView* view = activeSynchronizedView();
+  if ( view != 0 )
+    {
+    if ( view->GetSynchronizedViewType() == 3 )
+      {
+      ( ( static_cast< QGoSynchronizedView3D * >( view ) )->*f )();
+      }
     }
 }
