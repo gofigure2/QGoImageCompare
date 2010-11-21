@@ -486,7 +486,7 @@ static PyTypeObject ICPPrinterType = {
  */
 static PyObject * lookup_function( PyObject * icpPrinter )
 {
-  PyObject * npArrayModule = PyImport_ImportModule( "itk.v3.numpy.array" );
+  PyObject * npArrayModule = PyImport_ImportModule( "itk.v@ITK_VERSION_MAJOR@.numpy.array" );
   if( npArrayModule == NULL )
     return NULL;
   PyObject * lookupFunctionClass = PyObject_GetAttrString( npArrayModule, "RELookupFunctionTagNumpyType" );
