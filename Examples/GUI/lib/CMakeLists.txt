@@ -5,7 +5,6 @@ SET( QGOGUILIB_EXAMPLE_SRC
   qgosynchronizedview2dtest
   qgosynchronizedview3dtest
   qgosynchronizedviewmanagertest
-  compareexample
   comparepipelineexample
 )
 
