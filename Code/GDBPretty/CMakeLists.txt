@@ -9,12 +9,19 @@ SET( ICPGUI_SRCS_CXX
   icpGuiMain.cxx
   QImageReceiver.cxx
   )
-SET( ICPGUI_SRCS_MOC_SRCS
+SET( ICPGUI_MOC_HDRS
   QImageReceiver.h
   )
-QT4_WRAP_CPP( ICPGUI_SRCS_CXX ${ICPGUI_SRCS_MOC_SRCS} )
+
+QT4_WRAP_CPP( ICPGUI_MOC_CXX ${ICPGUI_MOC_HDRS} )
+
+SET_SOURCE_FILES_PROPERTIES( ${ICPGUI_MOC_CXX} PROPERTIES
+  OBJECT_DEPENDS "${ICPGUI_MOC_HDRS}"
+)
+
 ADD_EXECUTABLE( icpGui
   ${ICPGUI_SRCS_CXX}
+  ${ICPGUI_MOC_CXX}
   )
 TARGET_LINK_LIBRARIES( icpGui QGoGui )
 SET_TARGET_PROPERTIES( icpGui
@@ -29,6 +36,11 @@ SET( ICPGUI_INSTALL_LOCATION
   somewhere in Python's sys.path." )
 
 CONFIGURE_FILE( icpmodule.cxx.in icpmodule.cxx @ONLY )
+
+SET_SOURCE_FILES_PROPERTIES( icpmodule.cxx PROPERTIES
+  OBJECT_DEPENDS "${ICPGUI_MOC_HDRS}"
+)
+
 PYTHON_ADD_MODULE( icp
   ${CMAKE_CURRENT_BINARY_DIR}/icpmodule.cxx )
 # TODO: The following should be done in the upstream cmake module.
