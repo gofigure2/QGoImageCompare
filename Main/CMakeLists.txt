@@ -1,7 +1,6 @@
 SET( APP_LIST
   comparegui
   comparesimple
-  pipeExample
 )
 
 FOREACH( var ${APP_LIST} )
