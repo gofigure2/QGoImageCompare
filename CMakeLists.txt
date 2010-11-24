@@ -62,7 +62,7 @@ ENDIF( NOT GOFIGURE2_INSTALL_BUNDLE_DIR )
 IF( NOT GOFIGURE2_INSTALL_BIN_DIR )
   SET( GOFIGURE2_INSTALL_BIN_DIR "bin" )
 ENDIF( NOT GOFIGURE2_INSTALL_BIN_DIR )
-   
+
 IF( NOT GOFIGURE2_INSTALL_LIB_DIR )
   SET( GOFIGURE2_INSTALL_LIB_DIR "lib/gofigure2" )
 ENDIF( NOT GOFIGURE2_INSTALL_LIB_DIR )
@@ -116,19 +116,19 @@ IF( BUILD_DOCUMENTATION )
     IF( DOXYGEN_DOT_FOUND )
 
       OPTION( LINK_EXTERNAL_DOC
-        "Should the doc be linked with external sources (VTK, ITK, Qt)?" 
-        OFF 
+        "Should the doc be linked with external sources (VTK, ITK, Qt)?"
+        OFF
       )
 
       ADD_SUBDIRECTORY( Documentation )
 
     ELSE( DOXYGEN_DOT_FOUND )
-      MESSAGE( STATUS 
-        "Warning: Dot (from GraphViz) not found - Documentation will not ce generated" 
+      MESSAGE( STATUS
+        "Warning: Dot (from GraphViz) not found - Documentation will not ce generated"
       )
     ENDIF( DOXYGEN_DOT_FOUND )
   ELSE( DOXYGEN_FOUND )
-    MESSAGE( STATUS 
+    MESSAGE( STATUS
       "Warning: Doxygen not found - Documentation will not be created"
     )
   ENDIF( DOXYGEN_FOUND )
@@ -166,7 +166,7 @@ IF( VTK_FOUND )
     MESSAGE( SEND_ERROR
       "GoFigure2 requires VTK 5.6 (your version of VTK is ${VTK_VERSION})" )
   ENDIF( ( ${VTK_MAJOR_VERSION} LESS 5 ) OR ( ${VTK_MINOR_VERSION} LESS 6 ) )
-  
+
   # Check if version of VTK is > 5.6
   # Requiered to now if we can use setBitRate() and setBitRateTolerance
   # in the vtkFFMPEGWriter
@@ -199,20 +199,20 @@ IF( VTK_FOUND )
 
     IF( ( ${ITK_VERSION_MAJOR} LESS 3 ) OR
         ( ( ${ITK_VERSION_MAJOR} EQUAL 3 ) AND
-          ( ${ITK_VERSION_MINOR} LESS 18 ) ) ) 
+          ( ${ITK_VERSION_MINOR} LESS 18 ) ) )
       MESSAGE( SEND_ERROR
         "GoFigure2 requires ITK 3.18 or newer version (your version of ITK is ${ITK_VERSION_MAJOR}.${ITK_VERSION_MINOR}.${ITK_VERSION_PATCH})" )
     ENDIF( ( ${ITK_VERSION_MAJOR} LESS 3 ) OR
         ( ( ${ITK_VERSION_MAJOR} EQUAL 3 ) AND
-          ( ${ITK_VERSION_MINOR} LESS 18 ) ) ) 
+          ( ${ITK_VERSION_MINOR} LESS 18 ) ) )
 
-  
-  IF( ${ITK_VERSION_MAJOR} EQUAL 3 ) 
-    IF( ( ${ITK_USE_REVIEW} MATCHES "OFF" ) OR 
+
+  IF( ${ITK_VERSION_MAJOR} EQUAL 3 )
+    IF( ( ${ITK_USE_REVIEW} MATCHES "OFF" ) OR
         ( ${ITK_USE_REVIEW_STATISTICS} MATCHES "OFF" ) )
       MESSAGE( SEND_ERROR
         "GoFigure2 requires ITK to be compiled with USE_REVIEW and USE_REVIEW_STATISTICS turned ON" )
-     ENDIF( ( ${ITK_USE_REVIEW} MATCHES "OFF" ) OR 
+     ENDIF( ( ${ITK_USE_REVIEW} MATCHES "OFF" ) OR
         ( ${ITK_USE_REVIEW_STATISTICS} MATCHES "OFF" ) )
   ELSE( ${ITK_VERSION_MAJOR} EQUAL 3 )
     IF( ${ITK_USE_REVIEW} MATCHES "OFF" )
@@ -220,7 +220,7 @@ IF( VTK_FOUND )
         "GoFigure2 requires ITK to be compiled with USE_REVIEW turned ON" )
     ENDIF( ${ITK_USE_REVIEW} MATCHES "OFF" )
 
-  ENDIF( ${ITK_VERSION_MAJOR} EQUAL 3 ) 
+  ENDIF( ${ITK_VERSION_MAJOR} EQUAL 3 )
 
   ENDIF( ITK_FOUND )
   #----------------------------------------------------------

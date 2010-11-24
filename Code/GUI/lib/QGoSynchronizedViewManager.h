@@ -207,6 +207,16 @@ public slots:
    */
   void SetLookupTable(vtkLookupTable *iLut);
 
+  /**
+   * \brief Set full screen view for the collection : iId = [0-4]
+   *  0 : Quadview (all 4 views)
+   *  1 : XY
+   *  2 : XZ
+   *  3 : YZ
+   *  4 : 3D view
+   */
+  void SetFullScreenView(const int & iId);
+
 protected:
 
   // vector to store the open QGoSynchronizedView s

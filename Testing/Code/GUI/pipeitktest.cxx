@@ -32,6 +32,8 @@
 
 =========================================================================*/
 
+#include <QTimer>
+
 #include "itkImage.h"
 #include "itkImageFileReader.h"
 
@@ -72,6 +74,11 @@ int main( int argc, char * argv[] )
   QString ViewName;
 
 
+  QTimer *timer = new QTimer;
+  timer->setSingleShot(true);
+  QObject::connect( timer, SIGNAL( timeout() ),
+                    ViewManager,  SLOT( close() ) );
+app.closeAllWindows();
 
   typedef    float    InputPixelType;
   typedef    float    OutputPixelType;
@@ -160,13 +167,16 @@ int main( int argc, char * argv[] )
 
 
   // display the visualisation
-  ViewManager->SetFullScreenView(1);// set fullscreen xy view
   ViewManager->show();
   ViewManager->synchronizeOpenSynchronizedViews();
+
+  timer->start(500);
 
   // run the Qt event loop
   app.processEvents();
   int output = app.exec();
+
+  app.closeAllWindows();
 
   // clean up
   delete ViewManager;

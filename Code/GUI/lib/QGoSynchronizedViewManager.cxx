@@ -460,6 +460,23 @@ QGoSynchronizedViewManager::SetLookupTable( vtkLookupTable* iLut )
 }
 
 //--------------------------------------------------------------------------
+
+void
+QGoSynchronizedViewManager::SetFullScreenView(const int & iId)
+{
+
+  std::vector< QGoSynchronizedView3D * >::iterator SynchronizedView3DIt;
+
+  // we update all SynchronizedViews
+  for ( SynchronizedView3DIt = m_openSynchronizedViews3D.begin();
+        SynchronizedView3DIt != m_openSynchronizedViews3D.end();
+        ++SynchronizedView3DIt )
+    {
+    ( *SynchronizedView3DIt )->SetFullScreenView( iId );
+    }
+}
+
+//--------------------------------------------------------------------------
 //show all the SynchronizedViews
 void
 QGoSynchronizedViewManager::show()
