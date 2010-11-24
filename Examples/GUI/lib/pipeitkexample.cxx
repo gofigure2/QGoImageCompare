@@ -43,12 +43,21 @@
 #include <QApplication>
 #include "QGoSynchronizedViewManager.h"
 
+
+/* This simple examples shows how to use the high level interface
+ * of the QGoSynchronize classes.
+ * It takes a 3D image as an input, smooth it, and threshold it,
+ * displaying each intermediate image, in a synchronized manner.
+ * This example makes use of itk readers/filters
+ */
+
+
 int main( int argc, char * argv[] )
 {
-  if( argc < 2 )
+  if ( argc != 2 )
     {
-    std::cerr << "Usage: " << std::endl;
-    std::cerr << argv[0] << "  inputImageFile" << std::endl;
+    std::cout << "Usage : pipeitkexmaple(.exe) " << std::endl;
+    std::cout << "1-imagefile" << std::endl;
     return EXIT_FAILURE;
     }
 
@@ -56,7 +65,9 @@ int main( int argc, char * argv[] )
   QCoreApplication::setOrganizationName("MegasonLab");
   QCoreApplication::setOrganizationDomain("http://gofigure2.sourceforge.net");
 
-
+  /* we simply create a new manager that will take care of
+   ∗ creation/deletion of visualization and callbacks for us.
+   */
   QGoSynchronizedViewManager *ViewManager = new QGoSynchronizedViewManager ();
   QString ViewName;
 
@@ -119,7 +130,7 @@ int main( int argc, char * argv[] )
 
   // Visualisation :
   // define a name for this viewer
-  ViewName = "filtered image";
+  ViewName.append(" - filtered");
   // create it and let the ViewManager deal with it
   ViewManager->newSynchronizedView<InputPixelType>( ViewName,
                  filter->GetOutput() );
@@ -141,7 +152,7 @@ int main( int argc, char * argv[] )
 
   // Visualisation :
   // define a name for this viewer
-  ViewName = "threshold";
+  ViewName.append(" - thresholded");
   // create it and let the ViewManager deal with it
   ViewManager->newSynchronizedView<InputPixelType>( ViewName,
                  threshold->GetOutput() );

@@ -43,16 +43,16 @@
 
 /* This simple examples shows how to use the high level interface
  * of the QGoSynchronize classes.
- * It takes a list of images as an input and displays the readable ones
- * with the standard VTK reader.
- * It synchronize the visualizations.
+ * It takes an image as an input and blurs it,
+ * displaying the input and output image, in a synchronized manner.
+ * This example makes use of vtk readers/filters
  */
 
 int main(int argc, char **argv)
 {
   if ( argc != 2 )
     {
-    std::cout << "Usage : QGoSynchronizedViewManagerTest(.exe) " << std::endl;
+    std::cout << "Usage : pipevtkexmaple(.exe) " << std::endl;
     std::cout << "1-imagefile" << std::endl;
     return EXIT_FAILURE;
     }
@@ -71,7 +71,6 @@ int main(int argc, char **argv)
    ∗ creation/deletion of visualization and callbacks for us.
    */
   QGoSynchronizedViewManager *ViewManager = new QGoSynchronizedViewManager ();
-
   QString ViewName;
 
   vtkImageReader2 *imageReader =
