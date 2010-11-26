@@ -31,14 +31,14 @@ PROJECT_NAME           = @PROJECT_NAME@
 # This could be handy for archiving the generated documentation or 
 # if some version control system is used.
 
-PROJECT_NUMBER         = @GOFIGURE2_VERSION@
+PROJECT_NUMBER         = @QGOIMAGECOMPARE_VERSION@
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
 # base path where the generated documentation will be put. 
 # If a relative path is entered, it will be relative to the location 
 # where doxygen was started. If left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = @GOFIGURE2_BINARY_DIR@/Documentation
+OUTPUT_DIRECTORY       = @QGOIMAGECOMPARE_BINARY_DIR@/Documentation
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 
 # 4096 sub-directories (in 2 levels) under the output directory of each output 
@@ -124,7 +124,7 @@ FULL_PATH_NAMES        = YES
 # If left blank the directory from which doxygen is run is used as the 
 # path to strip.
 
-STRIP_FROM_PATH        = @GOFIGURE2_SOURCE_DIR@
+STRIP_FROM_PATH        = @QGOIMAGECOMPARE_SOURCE_DIR@
 
 # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of 
 # the path mentioned in the documentation of a class, which tells 
@@ -133,7 +133,7 @@ STRIP_FROM_PATH        = @GOFIGURE2_SOURCE_DIR@
 # definition is used. Otherwise one should specify the include paths that 
 # are normally passed to the compiler using the -I flag.
 
-STRIP_FROM_INC_PATH    = @GOFIGURE2_SOURCE_DIR@/
+STRIP_FROM_INC_PATH    = @QGOIMAGECOMPARE_SOURCE_DIR@/
 
 # If the SHORT_NAMES tag is set to YES, doxygen will generate much shorter 
 # (but less readable) file names. This can be useful is your file systems 
@@ -590,7 +590,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = @GOFIGURE2_SOURCE_DIR@
+INPUT                  = @QGOIMAGECOMPARE_SOURCE_DIR@
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
@@ -675,11 +675,11 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a 
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE                = @GOFIGURE2_BINARY_DIR@ \
-                         @GOFIGURE2_SOURCE_DIR@/Examples \
-                         @GOFIGURE2_SOURCE_DIR@/BUILD \
-                         @GOFIGURE2_SOURCE_DIR@/Code/Attic \
-                         @GOFIGURE2_SOURCE_DIR@/Code/ExternalCode/PoissonReconstruction
+EXCLUDE                = @QGOIMAGECOMPARE_BINARY_DIR@ \
+                         @QGOIMAGECOMPARE_SOURCE_DIR@/Examples \
+                         @QGOIMAGECOMPARE_SOURCE_DIR@/BUILD \
+                         @QGOIMAGECOMPARE_SOURCE_DIR@/Code/Attic \
+                         @QGOIMAGECOMPARE_SOURCE_DIR@/Code/ExternalCode/PoissonReconstruction
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or 
 # directories that are symbolic links (a Unix filesystem feature) are excluded 
@@ -708,7 +708,7 @@ EXCLUDE_SYMBOLS        =
 # directories that contain example code fragments that are included (see 
 # the \include command).
 
-EXAMPLE_PATH           = @GOFIGURE2_SOURCE_DIR@/Examples
+EXAMPLE_PATH           = @QGOIMAGECOMPARE_SOURCE_DIR@/Examples
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the 
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -728,7 +728,7 @@ EXAMPLE_RECURSIVE      = YES
 # directories that contain image that are included in the documentation (see 
 # the \image command).
 
-IMAGE_PATH             = @GOFIGURE2_SOURCE_DIR@/Documentation/Doxygen/Images/
+IMAGE_PATH             = @QGOIMAGECOMPARE_SOURCE_DIR@/Documentation/Doxygen/Images/
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should 
 # invoke to filter for each input file. Doxygen will invoke the filter program 
@@ -878,7 +878,7 @@ HTML_TIMESTAMP         = YES
 # the style sheet file to the HTML output directory, so don't put your own 
 # stylesheet in the HTML output directory as well, or it will be erased!
 
-HTML_STYLESHEET        = @GOFIGURE2_SOURCE_DIR@/Documentation/Doxygen/DoxygenStyle.css
+HTML_STYLESHEET        = @QGOIMAGECOMPARE_SOURCE_DIR@/Documentation/Doxygen/DoxygenStyle.css
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. 
 # Doxygen will adjust the colors in the stylesheet and background images 
@@ -1470,14 +1470,14 @@ SKIP_FUNCTION_MACROS   = YES
 # If a tag file is not located in the directory in which doxygen 
 # is run, you must also specify the path to the tagfile here.
 
-TAGFILES               = @GOFIGURE2_BINARY_DIR@/Documentation/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html \
-                         @GOFIGURE2_BINARY_DIR@/Documentation/qt.tag=http://doc.trolltech.com/4.6 \
-                         @GOFIGURE2_BINARY_DIR@/Documentation/InsightDoxygen.tag=http://www.itk.org/Doxygen/html
+TAGFILES               = @QGOIMAGECOMPARE_BINARY_DIR@/Documentation/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html \
+                         @QGOIMAGECOMPARE_BINARY_DIR@/Documentation/qt.tag=http://doc.trolltech.com/4.6 \
+                         @QGOIMAGECOMPARE_BINARY_DIR@/Documentation/InsightDoxygen.tag=http://www.itk.org/Doxygen/html
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create 
 # a tag file that is based on the input files it reads.
 
-GENERATE_TAGFILE       = GOFIGURE2.tag
+GENERATE_TAGFILE       = QGOIMAGECOMPARE.tag
 
 # If the ALLEXTERNALS tag is set to YES all external classes will be listed 
 # in the class index. If set to NO only the inherited external classes 
