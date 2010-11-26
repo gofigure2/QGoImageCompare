@@ -1,4 +1,4 @@
-GoFigure2- Image Compare subproject
+GoFigure2- QGoImageCompare : Image Compare subproject
 ============================================================================
 
 1-Introduction
@@ -71,16 +71,16 @@ softwares:
 
       * On Linux/Mac Os X:
 
-$ git clone git://github.com/antonin07130/itkCompareProject.git
+$ git clone git://github.com/gofigure2/QGoImageCompare.git
 
-$ cd itkCompareProject
+$ cd QGoImageCompare
 
 Create a build directory where GoFigure will be compiled
 $ mkdir BUILD
 
 Launch cmake
 $ cd BUILD
-$ ccmake path/to/source/directory
+$ ccmake ../
 
 Build
 $ make -j2
