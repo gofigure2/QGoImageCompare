@@ -28,7 +28,7 @@ LateX sources.
   
   You can also find the Kitware Source Article (.doc and .odt). 
 
-    2.1.1 Prerequites
+    2.1.1 Prerequisites
 
   To be able to compile this article, reader should first have the 
 following software:
@@ -42,10 +42,10 @@ $ make
 
   2.2 Doxygen
 
-    2.2.1 Prerequites
+    2.2.1 Prerequisites
 
-  To be able to compile the documentation, User or Developper should first 
-intall the following software:
+  To be able to compile the documentation, User or Developer should first 
+install the following software:
       * Doxygen (>=1.7.1)
 
     2.2.2 Compiling the documentation:
