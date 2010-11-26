@@ -1471,7 +1471,7 @@ SKIP_FUNCTION_MACROS   = YES
 # is run, you must also specify the path to the tagfile here.
 
 TAGFILES               = @QGOIMAGECOMPARE_BINARY_DIR@/Documentation/vtkNightlyDoc.tag=http://www.vtk.org/doc/nightly/html \
-                         @QGOIMAGECOMPARE_BINARY_DIR@/Documentation/qt.tag=http://doc.trolltech.com/4.6 \
+                         @QGOIMAGECOMPARE_BINARY_DIR@/Documentation/qt.tags=http://doc.trolltech.com/4.@QT_VERSION_MINOR@.@QT_VERSION_PATCH@ \
                          @QGOIMAGECOMPARE_BINARY_DIR@/Documentation/InsightDoxygen.tag=http://www.itk.org/Doxygen/html
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create 
