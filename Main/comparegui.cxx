@@ -44,6 +44,12 @@ int main(int argc, char **argv)
   QGoSynchronizedViewMainWindow *SynchronizedViewMainWindow =
     new QGoSynchronizedViewMainWindow();
 
+  for (int i = 1; i < argc; ++i)
+    {
+    QByteArray fileBa( argv[i] );
+    QString file( fileBa );
+    SynchronizedViewMainWindow->OpenSynchronizedViewForFile( file );
+    }
   SynchronizedViewMainWindow->Update();
   SynchronizedViewMainWindow->show();
 
