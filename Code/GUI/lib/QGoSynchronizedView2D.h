@@ -38,6 +38,7 @@
 #include "itkCastImageFilter.h"
 #include "itkSmartPointer.h"
 #include "itkImage.h"
+#include "QGoGUILibConfigure.h"
 #include "QGoSynchronizedView.h"
 #include "SnapshotHelper.h"
 #include "vtkSmartPointer.h"
@@ -55,7 +56,7 @@ class QGoImageView2D;
  * QGoSynchronizedView2D provide the interface to synchronize cameras among
  * several GoSynchronizedView2D.
  */
-class QGoSynchronizedView2D:public QGoSynchronizedView
+class QGOGUILIB_EXPORT QGoSynchronizedView2D:public QGoSynchronizedView
 {
   // QT macro
   Q_OBJECT

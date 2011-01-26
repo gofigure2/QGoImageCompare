@@ -41,6 +41,7 @@
 #include "itkSmartPointer.h"
 
 #include "QGoSynchronizedViewManager.h"
+#include "QGoGUILibConfigure.h"
 
 class QGoSynchronizedView;
 class QGoSynchronizedView3D;
@@ -70,7 +71,7 @@ QT_END_NAMESPACE
 
 // \example GUI/lib/qgosynchronizedviewguitest.cxx
 
-class QGoSynchronizedViewMainWindow:public QMainWindow
+class QGOGUILIB_EXPORT QGoSynchronizedViewMainWindow:public QMainWindow
 {
 // QT macro
   Q_OBJECT

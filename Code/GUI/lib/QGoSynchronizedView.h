@@ -36,10 +36,10 @@
 
 #include "SnapshotHelper.h"
 #include "vtkSmartPointer.h"
+#include "QGoGUILibConfigure.h"
 #include "ui_QGoSynchronizedView.h"
 
 #include "itkImage.h"
-#include "QGoGUILibConfigure.h"
 
 class vtkCamera;
 class vtkImageData;

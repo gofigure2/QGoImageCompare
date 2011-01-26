@@ -35,6 +35,7 @@
 #define __QGoSynchronizedView2DCallbacks_h
 
 #include "vtkCommand.h"
+#include "QGoGUILibConfigure.h"
 #include "QGoSynchronizedView2D.h"
 
 class vtkObject;
@@ -48,7 +49,7 @@ class vtkCallbackCommand;
  * QGoSynchronizedViewManager deal
  * with SynchronizedView synchronization.
  */
-class QGoSynchronizedView2DCallbacks:public QObject
+class QGOGUILIB_EXPORT QGoSynchronizedView2DCallbacks:public QObject
 {
   Q_OBJECT
 public:

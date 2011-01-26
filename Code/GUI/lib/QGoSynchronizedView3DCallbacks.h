@@ -35,6 +35,7 @@
 #define __GoSynchronizedView3DCallbacks_h
 
 #include "vtkCommand.h"
+#include "QGoGUILibConfigure.h"
 #include "QGoSynchronizedView3D.h"
 
 class vtkCallbackCommand;
@@ -49,7 +50,7 @@ class vtkObject;
  * with SynchronizedView synchronization.
  */
 
-class QGoSynchronizedView3DCallbacks:public QObject
+class QGOGUILIB_EXPORT QGoSynchronizedView3DCallbacks:public QObject
 {
   /** QT macro for signals and slots.
    *  we use signales and slots to synchronize the sliders
