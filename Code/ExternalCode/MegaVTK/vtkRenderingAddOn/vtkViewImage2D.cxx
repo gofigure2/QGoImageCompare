@@ -482,10 +482,8 @@ vtkViewImage2D::SetAnnotationToConvention(void)
 
   unsigned int id1 = 0;
   unsigned int id2 = 0;
-  unsigned int id3 = 0;
   double       dot1 = 0;
   double       dot2 = 0;
-  double       dot3 = 0;
 
   for ( unsigned int i = 0; i < 3; i++ )
     {
@@ -498,11 +496,6 @@ vtkViewImage2D::SetAnnotationToConvention(void)
       {
       dot2 = fabs(rightvector[i]);
       id2 = i;
-      }
-    if ( dot3 <= fabs(normal[i]) )
-      {
-      dot3 = fabs(normal[i]);
-      id3 = i;
       }
     }
 
@@ -893,13 +886,7 @@ vtkViewImage2D::AddDataSet(vtkPolyData *dataset,
                            const bool & intersection,
                            const bool & iDataVisibility)
 {
-  vtkCamera *cam = NULL;
-
-  if ( this->Renderer )
-    {
-    cam = this->Renderer->GetActiveCamera();
-    }
-  else
+  if ( !this->Renderer )
     {
     return NULL;
     }
@@ -971,15 +958,7 @@ vtkViewImage2D::AddDataSet(vtkDataSet *dataset,
                            const bool & intersection,
                            const bool & iDataVisibility)
 {
-  /* return this->AddDataSet( vtkPolyData::SafeDownCast( dataset ),
-     property, intersection, iDataVisibility );*/
-  vtkCamera *cam = NULL;
-
-  if ( this->Renderer )
-    {
-    cam = this->Renderer->GetActiveCamera();
-    }
-  else
+  if ( !this->Renderer )
     {
     return NULL;
     }
@@ -995,14 +974,12 @@ vtkViewImage2D::AddDataSet(vtkDataSet *dataset,
 
   if ( intersection )
     {
-    //std::cout << "inter dataset" << std::endl;
     cutter->SetInput(dataset);
     cutter->SetCutFunction(this->SliceImplicitPlane);
     mapper->SetInput( cutter->GetOutput() );
     }
   else
     {
-    //std::cout << "else dataset" << std::endl;
     mapper->SetInput( vtkPolyData::SafeDownCast(dataset) );
     }
   mapper->Update();
@@ -1028,16 +1005,12 @@ vtkViewImage2D::UpdateCenter(void)
     {
     return;
     }
-  vtkCamera *cam = NULL;
 
-  if ( this->Renderer )
-    {
-    cam = this->Renderer->GetActiveCamera();
-    }
-  else
+  if ( !this->Renderer )
     {
     return;
     }
+
   int *dimensions = this->GetInput()->GetDimensions();
 
   int indices[3] = { 0, 0, 0 };
@@ -1244,10 +1217,8 @@ vtkViewImage2D::SetAnnotationsFromOrientation(void)
 
   unsigned int id1 = 0;
   unsigned int id2 = 0;
-  unsigned int id3 = 0;
   double       dot1 = 0;
   double       dot2 = 0;
-  double       dot3 = 0;
 
   for ( unsigned int i = 0; i < 3; i++ )
     {
@@ -1260,11 +1231,6 @@ vtkViewImage2D::SetAnnotationsFromOrientation(void)
       {
       dot2 = std::abs (rightvector[i]);
       id2 = i;
-      }
-    if ( dot3 <= std::abs (normal[i]) )
-      {
-      dot3 = std::abs (normal[i]);
-      id3 = i;
       }
     }
 
