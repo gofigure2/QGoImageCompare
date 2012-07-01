@@ -89,10 +89,7 @@ SET( QGoGUI_LIBS
 
 TARGET_LINK_LIBRARIES( QGoGui
   ${QGoGUI_LIBS}
-  ITKIO
-  ITKCommon
-  ITKBasicFilters
-  ITKStatistics
+  ${ITK_LIBRARIES}
   )
 
   

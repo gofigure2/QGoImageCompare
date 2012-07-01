@@ -10,8 +10,7 @@ ELSE()
   zero." )
 ENDIF()
 TARGET_LINK_LIBRARIES( pretty-executable
-  ITKCommon
-  ITKIO
+  ${ITK_LIBRARIES}
   )
 ADD_CUSTOM_COMMAND( TARGET pretty-executable
   POST_BUILD
