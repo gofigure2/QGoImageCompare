@@ -215,10 +215,10 @@ IF( VTK_FOUND )
      ENDIF( ( ${ITK_USE_REVIEW} MATCHES "OFF" ) OR
         ( ${ITK_USE_REVIEW_STATISTICS} MATCHES "OFF" ) )
   ELSE( ${ITK_VERSION_MAJOR} EQUAL 3 )
-    IF( ${ITK_USE_REVIEW} MATCHES "OFF" )
+    IF( ${Module_ITKReview} MATCHES "OFF" )
       MESSAGE( SEND_ERROR
         "QGoImageCompare requires ITK to be compiled with USE_REVIEW turned ON" )
-    ENDIF( ${ITK_USE_REVIEW} MATCHES "OFF" )
+    ENDIF( ${Module_ITKReview} MATCHES "OFF" )
 
   ENDIF( ${ITK_VERSION_MAJOR} EQUAL 3 )
 
