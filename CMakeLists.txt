@@ -162,17 +162,17 @@ IF( VTK_FOUND )
 
   # Check the version of VTK
   # QGoImageCompare requires vtk >= 5.6
-  IF( ( ${VTK_MAJOR_VERSION} LESS 5 ) OR ( ${VTK_MINOR_VERSION} LESS 6 ) )
+  IF( ${VTK_MAJOR_VERSION} LESS 5 ) 
     MESSAGE( SEND_ERROR
       "QGoImageCompare requires VTK 5.6 (your version of VTK is ${VTK_VERSION})" )
-  ENDIF( ( ${VTK_MAJOR_VERSION} LESS 5 ) OR ( ${VTK_MINOR_VERSION} LESS 6 ) )
+  ENDIF()
 
   # Check if version of VTK is > 5.6
   # Requiered to now if we can use setBitRate() and setBitRateTolerance
   # in the vtkFFMPEGWriter
-  IF( ( ${VTK_MAJOR_VERSION} EQUAL 5 ) AND ( ${VTK_MINOR_VERSION} GREATER 6 ))
+  # IF( ( ${VTK_MAJOR_VERSION} EQUAL 5 ) AND ( ${VTK_MINOR_VERSION} GREATER 6 ))
     ADD_DEFINITIONS( -DVTKTRUNK )
-  ENDIF( ( ${VTK_MAJOR_VERSION} EQUAL 5 ) AND ( ${VTK_MINOR_VERSION} GREATER 6 ))
+  # ENDIF( ( ${VTK_MAJOR_VERSION} EQUAL 5 ) AND ( ${VTK_MINOR_VERSION} GREATER 6 ))
 
   INCLUDE( ${VTK_USE_FILE} )
 
